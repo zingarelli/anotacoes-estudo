@@ -2771,13 +2771,13 @@ No caso de projeto em **TypeScript**, também é necessário instalar o pacote p
 
 Você pode utilizar o styled-components no mesmo arquivo em que o componente é definido, ou então criar um arquivo (a convenção é geralmente nomeá-lo de `styled.js` ou `styled.ts`) e nele fazer o export de seus componentes estilizados. 
 
-Para criar um componente estilizado, você importa a biblioteca. A convenção é nomear o objeto como `styled`. A partir deste objeto, é possível chamar a função que cria um componente (elementos do HTML, por exemplo), seguida de uma template string em que você inclui o CSS.
+Para criar um componente estilizado, você importa a função `styled` da biblioteca. A partir dela, é possível criar um componente (elementos do HTML, por exemplo), seguida de uma template string em que você inclui o CSS.
 
-É possível incluir no CSS conceitos parecidos do SASS, como o parent selector (`&`) e aninhamento. Também é possível passar variáveis e expressões JS com a sintaxe `${}`.
+É possível incluir no CSS conceitos parecidos do SASS, como o parent selector (`&`) e aninhamento. Também é possível passar variáveis e expressões JS com a sintaxe `${}`. Além disso, todas as outras funcionalidade CSS estão acessíveis, como uso de seletores para adicionar estilos a um elemento/classe/id, e media queries.
 
 Exemplo de uso em um arquivo único:
 
-```jsx
+```js
 import styled from "styled-components";
 
 // definindo um componente estilizado
@@ -2796,9 +2796,84 @@ export const AbButton = () => {
 }
 ```
 
-## TODO: texto em construção...
+## Função `createGlobalStyle`
 
-Falar sobre passar props aos componentes estilizados: 
+Quando você quer aplicar estilos globais ao projeto ou até mesmo um css reset, você pode utilizar a função `createGlobalStyle` e com ela adicionar os estilos a serem aplicados no projeto inteiro.
+
+Utilizamos o `createGlobalStyle` para exportar um componente com os estilos globais, e então importá-lo para o componente mais ao topo da aplicação (o `App.js`, por exemplo).
+
+```js
+// arquivo GlobalStyle.js
+import { createGlobalStyle } from 'styled-components';
+
+export const Reset = createGlobalStyle`
+    * {
+        font-family: "Montserrat", sans-serif;
+        margin: 0;
+        padding: 0;
+        text-decoration: none;
+    }
+`;
+
+// arquivo App.js
+import { Reset } from "./components/GlobalStyle";
+
+export default function App() {
+  return (
+    <>
+      <Reset />
+      <SeusOutrosComponentesVemDepoisDoGlobalStyle />
+    </>
+  );
+}
+```
+
+## Variáveis
+
+Para criar variáveis que guardam algum valor e podem ser reutilizadas em seus estilos, você pode criar um arquivo nele exportar variáveis JS e o valor que devem assumir. Elas podem ser então importadas em seus styled components e usadas dentro de `${}`.
+
+```js
+// arquivo variaveis.js
+export const corPrimaria = "#41d3be";
+
+// arquivo Titulo.js
+import styled from 'styled-components';
+import { corPrimaria } from '../variaveis';
+
+const Titulo = styled.h1`
+  color: ${corPrimaria};
+`;
+```
+
+- lembrando que o CSS também possui sua própria solução para variáveis, em que as definimos com o prefixo `--` e as utilizamos com a função `var()`.
+
+## Props
+
+Os styled components também podem receber props. Para acessá-las, você utiliza uma arrow function.
+
+```js
+const BtnCabecalho = styled.a`
+  background-color: ${(props) => props.primary ? 'blue' : 'white'};
+`;
+
+// quando a prop não é informada, o valor será undefined
+const Cabecalho = () => {
+  return (
+    <BtnCabecalho primary href="https://google.com">
+        Ajuda
+    </BtnCabecalho>
+    <BtnCabecalho href="https://google.com">
+        Sair
+    </BtnCabecalho>
+  );
+};
+```
+
+- o nome `props` dentro da arrow function é somente uma convenção. Você pode utilizar o nome que quiser;
+
+- você também pode passar valores às props.
+
+Exemplo mais avançado, utilizando TypeScript e interface:
 
 ```js
 import styled from "styled-components";
@@ -2827,11 +2902,75 @@ export const Titulo = styled.h2<TituloProps>`
 </Titulo>
 ```
 
-Falar sobre estender e sobrepor estilos: https://styled-components.com/docs/basics#extending-styles
+## Herança
 
-Falar sobre injetar estilos a outros componentes, inclusive de outras bibliotecas: https://styled-components.com/docs/basics#styling-any-component
+Podemos herdar estilos de outro styled component, utilizando a mesma função `styled`, passando como parâmetro o styled component a ser herdado:
 
---- 
+```js
+export const Icone = styled.img`
+    height: 25px;
+    width: 25px;
+`;
+
+// herdando estilos de Icone e adicionando mais estilos
+export const IconeMargin = styled(Icone)`
+    margin-top: 2px;
+`;
+
+// posso também sobrescrever estilos herdados 
+export const IconeMaior = styled(Icone)`
+    width: 80px;
+`;
+```
+
+Veja mais sobre herança na [documentação da biblioteca](https://styled-components.com/docs/basics#extending-styles).
+
+É possível até adicionar estilos a componentes de outras bibliotecas. A [documentação](https://styled-components.com/docs/basics#styling-any-component) também dá detalhes sobre como isso pode ser feito.
+
+## Componente `ThemeProvider`
+
+O styled-components oferece o componente `ThemeProvider`, que permite a aplicação de temas de maneira fácil. Por detrás dos panos, esse componente usa a Context API.
+
+O `ThemeProvider` possui uma prop `theme`, em que você passa um objeto com suas definições para o tema. Subcomponentes de `ThemeProvider` podem acessar esse `theme` e utilizá-lo para estilizar seus elementos. 
+
+```js
+// arquivo variaveis.js
+export const fundoClaro = "#f1f1f1";
+export const textoFundoClaro = "grey";
+
+// arquivo temas.js
+export const TemaClaro = {
+    body: fundoClaro,
+    text: textoFundoClaro
+};
+
+// arquivo App.js
+import { ThemeProvider } from "styled-components";
+import { TemaClaro } from "./Components/UI/temas";
+import Container from "./Components/Container";
+
+function App() {
+  return (
+    <ThemeProvider theme={TemaClaro}>      
+      <Container />
+    </ThemeProvider>
+  );
+}
+
+// arquivo Container.jsx
+import styled from 'styled-components';
+
+// acessando a prop theme e seus valores
+const StyledContainer = styled.div`
+  background-color: ${({ theme }) => theme.body};
+  color: ${({ theme }) => theme.text};
+  padding: 0px 15vw;
+`;
+```
+
+A [documentação](https://styled-components.com/docs/advanced#theming) possui mais conteúdo a respeito de temas.
+
+---
 
 # Criação de uma biblioteca de componentes com o TSDX
 
