@@ -212,10 +212,16 @@ Envia as mudanças commitadas para o repositório remoto.
 ### `git pull`
 
 ```bash
-git pull nome_do_repositorio_remoto nome_da_branch
+git pull [nome_do_repositorio_remoto]
 ```
 
-Comando oposto ao `push`, baixa os arquivos do repositório remoto para a branch mencionada. 
+Comando oposto ao `push`, baixa os arquivos do repositório remoto e tenta adicioná-los ao seu repositório local (caso encontre conflito entre o código do repositório remoto e o local, será necessário verificar e resolver). Ele pode ser visto como um combo de `git fetch` + `git merge`.
+
+**Atenção**: minhas anotações estavam anteriormente **ERRADAS**. Eu havia considerado que era obrigatório enviar no comando do git pull dois argumentos: `[nome_do_repositorio_remoto]` e `[nome_da_branch]`. Eles são opcionais. Mais detalhes sobre eles:
+
+- O argumento `[nome_do_repositorio_remoto]` é  usado caso você tenha mais de um repositório remoto e queira indicar de onde as mudanças devem ser baixadas. Quando não passado, o pull será feito no repositório remoto padrão (geralmente é o `origin` do GitHub);
+
+- Há um segundo argumento `[nome_da_branch]` que você pode passar para indicar que você quer atualizar sua branch local com o conteúdo da branch remota indicada. **Tome cuidado para não atualizar a branch local errada** ao usar esse argumento. Quando não passado, o pull será feito da branch local em que você está. 
 
 O que acontece com os arquivos que você alterou e ainda não commitou após um `pull`? Perde os dados? Os arquivos alterados não são baixados?
 
