@@ -269,7 +269,8 @@ git clone caminho_do_repositorio_remoto nome_para_a_pasta_local
 
 Clona um projeto, ou seja, baixa os arquivos de um repositório remoto para a máquina e salva em uma pasta com o `nome_para_a_pasta_local`. 
 
-- se quiser salvar o repositório na pasta corrente, basta usar o ponto (`.`) no lugar.
+- se quiser salvar o repositório na pasta corrente (e ela estiver **vazia**), basta usar o ponto (`.`) no lugar.
+- se você não passar o `nome_para_a_pasta_local`, será criada uma pasta com o nome do repositório clonado. Por exemplo, caso o `caminho_do_repositorio_remoto` seja `https://github.com/zingarelli/anotacoes-estudo.git`, será criada a pasta `anotacoes-estudo` e o conteúdo do repositório será salvo dentro dela.
 
 Com o projeto clonado, é possível alterar os arquivos, commitar e fazer push para o repositório remoto. 
 
