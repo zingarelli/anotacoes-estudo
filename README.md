@@ -26,7 +26,9 @@ A foto de capa deste repositório é de  <a href="https://unsplash.com/@tjerwin?
 
 ## Detalhes do projeto
 
-Separei minhas anotações em arquivos `.md`, cada um abordando um tópico diferente. A maioria se concentra no Front End, mas também há tópicos diversos como anotações sobre Git, desenvolvimento de carreira e protocolo HTTP. Criei uma [seção em que faço uma lista dos tópicos](#lista-de-anotações), com um link para ir direto ao arquivo das anotações. 
+Separei minhas anotações em arquivos `.md`, cada um abordando um tópico diferente. A maioria se concentra no **Front End**, mas também há tópicos diversos como anotações sobre **Git**, desenvolvimento de **carreira** e protocolo **HTTP**. Há também um link para outro repositório em que tenho anotações de estudo sobre **Machine Learning**, especificamente voltado para problemas de Classificação; como são vários notebooks, deixei um repositório separado para esses estudos. 
+
+Você pode ver a lista dos tópicos de estudo [nesta seção do README](#lista-de-anotações), com um link para ir direto ao arquivo das anotações. 
 
 Este é um projeto em contínuo andamento. Conforme eu vou avançando nos estudos, adiciono novas notas a algum tópico ou crio novos. Com certa frequência, leio minhas anotações como forma de estudo e acabo fazendo uma revisão do texto. **Caso encontre algum erro ou tenha alguma sugestão, fique à vontade para abrir uma issue no GitHub ou me mande uma mensagem.**
 
@@ -38,15 +40,16 @@ A partir de abril/23 eu comecei a utilizar a [ChatGPT](https://chat.openai.com) 
 
 ## Lista de anotações
 
-- [Acessibilidade Web](https://github.com/zingarelli/anotacoes-estudo/blob/main/Acessibilidade.md)
-- [Cloud Computing](https://github.com/zingarelli/anotacoes-estudo/blob/main/Cloud.md)
-- [Desenvolvimento de Carreira](https://github.com/zingarelli/anotacoes-estudo/blob/main/Desenvolvimento-Carreira.md)
-- [Git e o GitHub](https://github.com/zingarelli/anotacoes-estudo/blob/main/Git-Github.md)
-- [HTML & CSS](https://github.com/zingarelli/anotacoes-estudo/blob/main/HTML_CSS.md)
-- [JavaScript](https://github.com/zingarelli/anotacoes-estudo/blob/main/JavaScript.md)
-- [Protocolo HTTP](https://github.com/zingarelli/anotacoes-estudo/blob/main/Protocolo-HTTP.md)
-- [React](https://github.com/zingarelli/anotacoes-estudo/blob/main/React.md)
-- [TypeScript](https://github.com/zingarelli/anotacoes-estudo/blob/main/TypeScript.md)
+- [Acessibilidade Web](./Acessibilidade.md)
+- [Cloud Computing](./Cloud.md)
+- [Desenvolvimento de Carreira](./Desenvolvimento-Carreira.md)
+- [Git e o GitHub](./Git-Github.md)
+- [HTML & CSS](./HTML_CSS.md)
+- [JavaScript](./JavaScript.md)
+- [Machine Learning - Classificação](https://github.com/zingarelli/Python_ML_Alura)
+- [Protocolo HTTP](./Protocolo-HTTP.md)
+- [React](./React.md)
+- [TypeScript](./TypeScript.md)
 
 ## Motivação
 
