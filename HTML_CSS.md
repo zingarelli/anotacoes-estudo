@@ -56,15 +56,29 @@ História:
 
 - 1995: criação do CSS (Cascading Style Sheet);
 
-**Tags estruturais**: não precisam ter uma tag de fechamento. São tags de informação.
+**Tags estruturais**: São tags de informação, que organizam o documento ou a página. Exemplos: `<header>`, `<main>`, `<nav>`.
 
-**Tags de conteúdo**: precisam ter uma tag de fechamento. Exemplo: `<html>...</html>`
+**Tags de conteúdo**: são as tags que incluem aquilo que a pessoa usuária irá ver na página/documento. Exemplo: `<p>`, `<h1>`, `<img>`, `<a>`.
+
+**Elementos vazios**: são elementos HTML que não possuem nós filhos, ou seja, eles possuem somente a tag de abertura, mas **não possuem a tag de fechamento**. São chamados de *void elements* em inglês.
+
+- isso é uma *tag* de abertura: `<p class='intro'>`
+
+- isso é uma *tag* de fechamento: `</p>`
+
+- isso é um *elemento* HTML: `<p class='intro'>Olá mundo!</p>`
+
+- isso é um *elemento* vazio (e também a *tag* em si): `<input type='text'>`
+
+- apesar desta distinção entre tag e elementos, vez ou outra elas serão usadas como sinônimos no texto;
+
+- em XHTML, elementos vazios recebem uma barra ao final da tag. Essas são chamadas tags auto-fecháveis (*self-closing tags*). Por exemplo: `<input type='text'  />`. No HTML essa barra ao final de um elemento vazio é ignorada, ou seja, não é necessária, mas algumas pessoas desenvolvedoras preferem usá-las para deixar o código mais fácil de ler e válido como documento XML.
 
 ## Algumas tags e suas definições
 
 **Use sempre o [site da MDN](https://developer.mozilla.org/) como referência!**
 
-`<!DOCTYPE html>` : tag estrutural. Por padrão, DOCTYPE vem escrita em maiúsculo; escrever somente html indica ao navegador para aplicar a versão mais recente disponível do HTML. É a primeira tag a ser escrita na sua página HTML.
+`<!DOCTYPE html>` : tag estrutural. Por padrão, DOCTYPE vem escrita em maiúsculo; escrever somente `html` indica ao navegador para aplicar a versão mais recente disponível do HTML. É a primeira tag a ser escrita na sua página HTML.
 
 - se fosse uma versão anterior, teria que informar também o DTD (Document Type Definition). Exemplo HTML 4: 
 
@@ -72,21 +86,21 @@ História:
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 ```
 
-`<html>`: tag de conteúdo. Engloba todo o conteúdo a ser renderizado na página. O atributo `lang` informa em qual idioma a página foi criada (o Chrome, por exemplo, usa essa informação para dar a opção de traduzir o conteúdo da página para outro idioma). Exemplo: `<html lang="pt-br">...<html>`.
+`<html>`: tag estrutural. Engloba todo o conteúdo a ser renderizado na página. O atributo `lang` informa em qual idioma a página foi criada (o Chrome, por exemplo, usa essa informação para dar a opção de traduzir o conteúdo da página para outro idioma). Exemplo: `<html lang="pt-br">...<html>`.
 
 `<meta charset="UTF-8">`: outra tag estrutural. Vai dentro da tag `<head>`. Passa informações ao navegador. O atributo `charset` informa qual conjunto de caracteres o navegador deve usar (UTF-8, por exemplo, possibilita um texto com acentos e outros caracteres utilizado na maioria dos idiomas).
 
 `<title>` : é a tag de conteúdo que informa ao navegador o título para aparecer na aba do navegador, na barra de tarefas, etc. Vai dentro da tag `<head>`.
 
-`<strong>` : tem significado **semântico** de que aquele conteúdo é um destaque; serve para dar importância ao conteúdo que essa tag engloba. Na tela, aparece como negrito.
+`<strong>` : tem significado **semântico** de que aquele conteúdo é um destaque; serve para dar importância ao conteúdo que essa tag engloba. Na tela, os navegadores costumam renderizar seu conteúdo em negrito.
 
-`<em>` : tem significado **semântico** de dar ênfase ao conteúdo. Na tela, aparece como itálico.
+`<em>` : tem significado **semântico** de dar ênfase ao conteúdo. Na tela, os navegadores costumam renderizar seu conteúdo em itálico.
 
 `<b>` e `<i>` : **não** possuem significado semântico dentro do HTML. São tags somente de **renderização** do texto. Já `<strong>` e `<em>` são chamados de "estados lógicos", fazem a separação entre apresentação e conteúdo.
 
-`<h1>` : tag que dá muita importância ao conteúdo dentro dela. Pode ser aplicada também em imagens. Deixa o navegador entender que aquela parte é muito importante semanticamente (esse significado semântico foi introduzido ho HTML5). Deve ser usada somente **uma vez por página** por questões de SEO (embora nada impeça de você utilizar mais de uma vez).
+`<h1>` : tag que dá muita importância ao conteúdo dentro dela. Pode ser aplicada também em imagens. Deixa o navegador entender que aquela parte é muito importante semanticamente (esse significado semântico foi introduzido pelo HTML5). Embora nada impeça de você utilizá-la várias vezes, o recomendável é ser usada somente **uma vez por página**, por questões de SEO.
 
-`<img>` : aparentemente, não é mais necessário fechar a tag com `/`. Insere uma imagem à página.
+`<img>` : Um dos void elements, insere uma imagem à página.
 
 - `alt`: é o atributo utilizado para descrever a imagem (principalmente para questões de acessibilidade);
 
@@ -100,7 +114,7 @@ História:
 >
 ```
 
-`<picture>`: é um elemento que possibilita escolher imagens diferentes, dependendo do tamanho da tela, que você define. Ele precisa conter um ou mais elementos `<source>`, colocados no início, e um elemento `<img>`, que é colocado no final. A imagem que será carregada dependerá do tamanho da tela, otimizando o tráfego de dados e sem a necessidade de uma regra no CSS para qual imagem mostrar. Exemplo:
+`<picture>`: essa tag possibilita ao navegador mostrar imagens diferentes, dependendo do tamanho ou orientação da tela, que podem ser definidos pelos atributos `srcset` e `media`. Ela precisa conter um ou mais elementos `<source>`, colocados no início, e um elemento `<img>`, que é colocado no final. O `<img>` mostrará a imagem escolhida em algum dos elementos `<source>` ou, caso nenhum deles sirva, irá exibir o conteúdo de seu próprio atributo `src` (o que é chamado de "*fallback*"). Essa abordagem com a tag `<picture>` otimiza o tráfego de dados sem a necessidade de uma regra no CSS para qual imagem mostrar. Exemplo:
 	
 ```html
 <picture>
@@ -129,19 +143,19 @@ História:
 
 `<nav>`: tag introduzida no HTML5, serve para indicar que aquele conteúdo é um menu de navegação.
 
-`<iframe>`: ainda existe e é utilizado geralmente para acesso a algum serviço externo (exibir um mapa, um vídeo, algum conteúdo de rede social). É inline ( iframe significa "inline frame"), então, se quiser fazer alguma estilização visual (margin, por exemplo), é necessário envolvê-lo em um div e então aplicar o CSS (dica: deixe a width da div no mesmo tamanho da width do CSS inline do iframe)).
+`<iframe>`: ainda existe e é utilizado geralmente para acesso a algum serviço externo (exibir um mapa, um vídeo, algum conteúdo de rede social). É inline ( iframe significa "inline frame"), então, se quiser fazer alguma estilização visual (margin, por exemplo), é necessário envolvê-lo em um div e então aplicar o CSS (dica: deixe a width da div no mesmo tamanho da width do CSS inline do iframe).
 
 ### Formulários
 
 `<input>`: toda tag de input tem que ter um tipo (apesar de que o `type="text"` seja padrão) e um identificador. Por padrão, seu display é inline-block.
 
-- input do tipo `submit` já tem um texto padrão, caso nenhum seja dado, baseado na língua definida para a página. No caso de pt-br, é "Enviar";
+- input do tipo `submit` já tem um texto padrão implementado pelos navegadores, caso nenhum texto seja atribuído. Esse texto padrão é baseado na língua definida para a página. No caso de pt-BR, é "Enviar";
 
 - input do tipo `radio`: quando quero que somente uma opção seja selecionada, dentre várias, devo inserir o mesmo valor para o atributo name em todos os input do tipo `radio`;
 
 - http://mobileinputtypes.com: esse site mostra visualmente como serão os inputs em um celular. Bom para verificar acessibilidade do seu site em um aparelho celular (tela pequena);
 
-- `required`: atributo que vai dentro da tag `input` para indicar que aquele campo é obrigatório. O botão do submit não irá processar a requisição enquanto o campo não for preenchido. Também faz algumas validações como, por exemplo, se o e-mail foi preenchido no padrão de e-mail. Também pode ser utilizado na tag `<textarea>`;
+- `required`: atributo que vai dentro da tag `input` para indicar que aquele campo é obrigatório. Em formulários, o botão do submit não irá processar a requisição enquanto o campo não for preenchido. Também faz algumas validações como, por exemplo, se o e-mail foi preenchido no padrão de e-mail. Também pode ser utilizado na tag `<textarea>`;
 
 - `placeholder`: é o texto que aparece esmaecido no input como sugestão do que deve constar no campo.
 
@@ -150,7 +164,7 @@ História:
  - Exemplo: 
  
  ```html
- <label for = "id_input">Teste</label>
+ <label for="id_input">Teste</label>
  ```
  
  - se eu clicar na label, automaticamente vou para o campo do input. Por padrão, seu display é inline.
@@ -209,7 +223,9 @@ seletor {
 
 - é melhor aplicar estilos a **classes** ao invés de tags HTML, pois as tags podem ser alteradas no decorrer do desenvolvimento, e aí os estilos aplicados a elas podem não corresponder mais ao que era esperado na apresentação da página. Aplicando o estilo à classe garante que, mesmo se a tag for alterada, os estilos se mantenham para aquela parte da página. Além disso, uma mesma classe pode ser utilizada por diferentes tags, todas recebendo o mesmo estilo.
 
-- o nome da classe deve ser algo que remeta à função do elementoa ser estilizado: "titulo-principal", "banner", "input-padrao", "box-menu". O comportamento (como será alinhado, tamanho da fonte, cor) deve ser inserido no CSS e não no nome da classe.
+- o nome da classe deve ser algo que remeta à função do elemento a ser estilizado: "titulo-principal", "banner", "input-padrao", "box-menu". O comportamento (como será alinhado, tamanho da fonte, cor) deve ser inserido no CSS e não no nome da classe.
+
+	- isso, no entanto, não parece ser um padrão. Em alguns cursos foi dito o oposto.
 
 ## Como adicionar CSS
 
@@ -236,7 +252,7 @@ seletor {
 
 ```html
 <head>
-	<link rel="stylesheet" href="caminho até o arquivo">
+	<link rel="stylesheet" href="caminho até o arquivo css">
 </head>
 ```
 
@@ -256,7 +272,7 @@ Exemplo muito utilizado: https://meyerweb.com/eric/tools/css/reset/reset.css
 
 - `:root`: é um seletor de pseudo-classe que seleciona o elemento root da árvore que representa o documento (no HTML, ele seleciona o elemento `<html>`). É uma convenção utilizá-lo para declarar variáveis globais no CSS;
 
-- seletor `*`: é um seletor global, seleciona TODOS os elementos do HTML. As propriedades dentro do seletor `*` são aplicadas a todos os elementos do documento;
+- seletor `*`: é um seletor global. Quando sozinho, seleciona **TODOS** os elementos do HTML. As propriedades dentro do seletor `*` são aplicadas a todos os elementos do documento. Pode também ser aplicado em conjunto com um seletor específico para selecionar todos os filhos diretos de um seletor (exemplo: `div.wrapper > *` irá aplicar estilos a todos os elementos *diretamente* descendentes de uma div com a classe wrapper);
 
 - precedência na aplicação do CSS: !important >  inline style (HTML) > id > class > tag
 
@@ -428,7 +444,7 @@ Modifier: define um estilo visual específico para um elemento, que modifica som
 
  Exemplo:
 
-```css
+```html
 <div class="bloco bloco--borda">`
 	<p class="bloco__elemento" >...</p>
 	<p class="bloco__elemento--erro">...</p>
@@ -562,7 +578,7 @@ O Grid é outra forma de remanejar os elementos dentro de um container (neste ca
 
 - `grid-template-rows`: a ideia é a mesma que para colunas;
 
-- quando é necessário repetir várias vezes linhas/colunas de mesmo tamanho, é possível utilizar a palavra `repeat`. Exemplo repetindo o valor `1fr` quatro vezes: 
+- quando é necessário repetir várias vezes linhas/colunas de mesmo tamanho, é possível utilizar a função `repeat`. Exemplo repetindo o valor `1fr` quatro vezes: 
 
 ```css
 grid-template-columns: repeat(4, 1fr);
@@ -580,7 +596,9 @@ grid-template-columns: repeat(4, 1fr);
 	
 	- é também possível informar valores diferentes para linhas e colunas, passando dois valores separados por espaço: `gap: <valor_linha> <valor_coluna>`;
 
-	- se quiser espaçamento somente entre linhas e colunas, é possível utilizar as propriedades `row-gap` e `column-gap`.
+	- se quiser espaçamento somente entre linhas e colunas, é possível utilizar as propriedades `row-gap` e `column-gap`;
+
+	- essa propriedade também pode ser utilizada como o Flexbox ou em conjunto com a propriedade `column-count`.
 
 - Dica do instrutor para pensar no layout da página com Grid: tirar um print do design da página (que pode ser, por exemplo, um design feito no Figma ou um arquivo PSD). Com esse print, utilizar o Paint ou algum editor de imagem e desenhar à mão linhas e colunas no print. Isso dará uma noção de quantas linhas e quantas colunas serão necessárias para ajustar todos os elementos em um grid.
 
@@ -643,7 +661,9 @@ Há uma ferramenta muito útil nos navegadores que possibilita visualizar como o
 
 - você também pode tentar abrir o DevTools clicando com o botão direito em algum elemento da página e selecionando a opção `Inspecionar elemento`. 
 
-O ícone para visualizar o conteúdo em diferentes tamanhos (dois retângulos, um maior outro menor, simbolizando um tablet e um celular) costuma ficar no topo esquerdo do DevTools, ao lado do ícone de inspeção de elemento (uma setinha do mouse em cima de um quadrado). 
+O ícone para visualizar o conteúdo em diferentes tamanhos (dois retângulos, um maior outro menor, simbolizando um tablet e um celular) costuma ficar no topo esquerdo do DevTools, ao lado do ícone de inspeção de elemento (uma setinha do mouse em cima de um quadrado). Veja um exemplo na imagem abaixo, capturada no navegador Google Chrome:
+
+![a imagem mostra o DevTools aberto no Google Chrome, com um quadrado vermelho destacando o ícone que possibilita mudar o layout da página simulando outro dispositivo ou tamanho de tela](https://github.com/zingarelli/anotacoes-estudo/assets/19349339/d3773a68-f103-4860-bac1-04179e679288)
 
 É possível ajustar diferentes tamanhos, bem como dimensões pré-definidas para alguns celulares, e também a posição (vertical ou horizontal).
 
