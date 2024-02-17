@@ -145,7 +145,7 @@ O retorno do dataset é uma *string*. O valor pode ser **modificado**, bastando 
 
 - dentro de uma função, `var` é vista por *todos* na função, *inclusive* se for declarada em *blocos internos* (dentro de um if, por exemplo). Já `let`, se declarada dentro de um bloco `if` dentro da função, será vista *somente pelo bloco* `if`, e não pela função inteira.
 
-`const nome`: boa prática é declarar constantes em SNAKE_UPPPER_CASE.
+`const nome`: boa prática é declarar constantes em SNAKE_UPPER_CASE.
 
 - diferente das variáveis, `const` **precisa ser inicializada com algum valor**, senão irá subir uma exceção no console;
 
@@ -167,7 +167,7 @@ Diferença para `var`: ela tem um escopo mais abrangente, então se possível é
 
 ## Comparação
 
-`==` : irá comparar os valores. O interpretador irá tentar descobrir o "valor primitivo" entre as duas comparações, por isso às vezes o retorno pode trazer alguma surpresa ("0" == 0 é true, por exemplo);
+`==` : irá comparar os *valores*. O interpretador irá tentar descobrir o "valor primitivo" entre os dois valores/variáveis que estão sendo comparados, por isso às vezes o retorno pode trazer alguma surpresa (`"0" == 0` resulta em `true`, por exemplo);
 
 `===` : comparação idêntica: tanto o **valor** quanto o **tipo** têm que ser iguais;
 
@@ -175,7 +175,7 @@ Comparadores lógicos: `&&,` `||` e `!`
 
 ## Arrays
 
-Em JavaScript, dentro de um mesmo array pode haver elementos de diversos tipos, inclusive objetos e outros arrays.
+Em JavaScript, dentro de um mesmo array pode haver elementos de tipos **diferentes**, inclusive objetos e outros arrays.
 
 - para adicionar itens: `push(novo_item)` (adiciona ao **final**) e `unshift(novo_item)` (adiciona ao **início**);
 
@@ -183,19 +183,21 @@ Em JavaScript, dentro de um mesmo array pode haver elementos de diversos tipos, 
 
 - `splice(indice, quantos, item_1...item_n)`: remove a partir do `indice`, `quantos` itens você informar (`quantos` é opcional). Se informar outros itens (também opcional), splice irá *ADICIONAR* os itens a partir do `indice` e, caso `quantos` for informado, irá antes remover os itens a partir de `indice` para depois adicionar os novos itens. O método retorna um **novo array**;
 
-- `slice(indice, quantos)`: faz um recorte; cria um novo array com `quantos` itens a partir de `indice` do array em que o método foi invocado. Necessário tomar cuidado quando o array possui objetos, pois o `slice()` faz uma ["shallow copy"](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy) do array.
+- `slice(inicial, final)`: faz um recorte; cria um novo array com os itens do array em que o método foi invocado, começando a partir do índice `inicial` (inclusivo) até o índice `final` (exclusivo, ou seja, não será incluído no novo array). 
+    - o segundo parâmetro é opcional; caso não seja utilizado, o recorte é feito até o último elemento do array (inclusivo, neste caso);
+    - necessário tomar cuidado quando o array possui objetos, pois o `slice()` faz uma ["shallow copy"](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy) do array.
 
 - `foreach(function(element, index, arr), thisValue)`: método que executa uma função; `function` e `element` são obrigatórios, os outros são opcionais. A função pode ser definida dentro ou fora do método (se fora do método, somente faz a chamada da função, sem argumentos);
 
     - também pode ser mais direto com uma arrow function: `forEach((element, index, arr) => {...})`, `index` e `arr` são opcionais
 
 - reticências (`...`) antes de um array (`...arr`) pode indicar um **spread** ou um **rest**:
-    - Spread: acontece quando, por exemplo, você passa um array como **argumento a uma função**; neste caso, o array será *desmembrado* e seus elementos serão *tratados um por um*
-    - Rest: é o oposto do spread, quando usado na **DEFINIÇÃO de uma função**, *agrupa* em um array os elementos que vêm depois das reticências; deve ser o **último parâmetro** na definição da função.
+    - Spread operator: acontece quando você quer "desempacotar" ou desmembrar os elementos de um array. Você pode usar para copiar os elementos de um array para outro array, sem precisar passar os valores um por um.
+    - Rest parameter: é o oposto do spread, ajuntando elementos em um array. Pode ser usado na **definição de uma função**, quando você não sabe a quantidade de parâmetros que ela vai ter (*rest* vem de "resto"). Você aplica o rest parameter como o **último** parâmetro da função, *agrupando* em um array todos os argumentos que vierem a mais quando a função é invocaada. 
 
 ```js
-function foo(argA, argB, ...args); 
-//tudo que vier a partir do 3º parâmetro será agrupado em um array args dentro da função
+function foo(paramA, paramB, ...otherParams); 
+// tudo que vier a partir do 3º parâmetro será agrupado em um array aqui definido como otherParams, que pode ser usado dentro da função
 ```
 
 ## Condicionais e loops
@@ -209,17 +211,17 @@ var valores = [0, 1, 2, 'três'];
 
 // i como índice; é o for clássico
 for(let i = 0; i < valores.length; i++){
-    console.log(valores[i]); //0, 1, 2, 'três'
+    console.log(valores[i]); // 0, 1, 2, 'três'
 }
 
 // i como ÍNDICE, percorrendo array e objeto
 for(i in valores){
-    console.log(i); //índices 0, 1, 2, 3
+    console.log(i); // índices 0, 1, 2, 3
 }
 
 // i como VALOR, somente para array e outras estruturas iteráveis (como strings)
 for(i of valores){
-    console.log(i); //valores 0, 1, 2, 'três'
+    console.log(i); // valores 0, 1, 2, 'três'
 }
 ```
 
@@ -262,7 +264,7 @@ Quando a função é **atribuída a uma variável** (chamado de "função de exp
 var soma = function() { 
     return 1 + 2; 
 }; 
-//para chamar a função, use soma();
+// para chamar a função, use soma();
 ```
 ### IIFE
 
@@ -294,6 +296,8 @@ Vamos tentar novamente:
 
 - São formas de usar o `this` como referência a um objeto dentro do escopo de funções. O `bind()` não executa imediatamente, enquanto `call()` e `apply()` sim.
 
+- O W3Schools possui bons artigos explicando [call](https://www.w3schools.com/js/js_function_call.asp), [apply](https://www.w3schools.com/js/js_function_apply.asp) e [bind](https://www.w3schools.com/js/js_function_bind.asp), incluindo exemplos que podem ser testados online.
+
 ### Arrow function 
 
 São anônimas e também podem ser atribuídas a uma variável
@@ -318,7 +322,7 @@ var soma = () => {
 
 ## Objetos 
 
-Declarados entre `{};` possuem **propriedades** e **métodos**.
+Declarados entre `{}` possuem **propriedades** e **métodos**.
 
 ```js
 let objeto = {
@@ -341,7 +345,7 @@ let objeto = {
 
 - posso adicionar novas propriedades: `objeto.novaPropriedade = 'sou uma nova propriedade'`;
 
-- posso deletar propriedades com o comando `delete`; ao tentar acessá-las, irá retornar "undefined": `delete objeto.novaPropriedade`
+- posso deletar propriedades com o comando `delete`; ao tentar acessá-las após remoção, irá retornar `undefined`: `delete objeto.novaPropriedade`
 
 - posso também inicializar um objeto vazio: `let novoObj = {}`;
 
@@ -442,6 +446,37 @@ No JS, **não** há herança múltipla. Neste caso, você pode utilizar de compo
 
 Composição pode ser usada quando você quer usar o comportamento de outra classe, e não necessariamente **ser**  uma instância por completo daquela classe.
 
+Exemplo de composição gerado pelo ChatGPT
+
+```javascript
+// Classe que será composta
+class Motor {
+  constructor() {
+    this.velocidade = 0;
+  }
+
+  // Método da classe Motor
+  acelerar(incr) {
+    this.velocidade += incr;
+  }
+}
+
+// Classe que contém uma instância de Motor (composição)
+class Carro {
+  constructor() {
+    this.motor = new Motor(); 
+    // Carro agora tem uma propriedade "motor", 
+    // que é um objeto da classe Motor
+  }
+}
+
+// Utilizando a composição para acessar métodos do objeto Motor
+const meuCarro = new Carro();
+meuCarro.motor.acelerar(50);
+console.log(`Velocidade atual: ${meuCarro.motor.velocidade}`); // Saída: Velocidade atual: 50
+
+```
+
 ### Propriedades e métodos estáticos
 
 Propriedades e métodos estáticos são declarados com a palavra reservada `static` antes do nome da variável:
@@ -455,24 +490,31 @@ class Quadrado {
 }
 ```
 
-Essa propriedades/métodos pertencem **à classe**, e não a uma instância da classe. Assim, quando uma instância é criada, estas propriedades/métodos não precisam ser recriados, pois já existem na classe.
+Essas propriedades/métodos pertencem **à classe**, e não a uma instância da classe. Assim, quando uma instância é criada, estas propriedades/métodos **não** são acessíveis quando chamados a partir da instância. Por outro lado, você pode acessar estas propriedades/métodos diretamente da classe, sem a necessidade da criação de uma instância (um exemplo: `Date.now()`). 
 
-O acesso pode ser feito de duas maneiras: pelo nome da Classe ou pela propriedade `constructor`. O acesso diretamente da instância da classe **não** irá funcionar.
+O acesso a propriedade e métodos estáticos pode ser feito de duas maneiras: 
+
+1. diretamente da classe, sem a necessidade da criação de uma instância. 
+
+2. por uma instância da classe, utilizando a propriedade `constructor` (o `constructor` nesse caso permite o acesso à classe).
 
 ```js
-console.log(Quadrado.tipo); 
+// acesso pela classe
+console.log(Quadrado.tipo); // quadrado
 
+// acesso usando constructor
 const meuQuadrado = new Quadrado();
-console.log(meuQuadrado.constructor.tipo); 
-console.log(meuQuadrado.constructor.calculaPerimetro(4));
+console.log(meuQuadrado.constructor.tipo); // quadrado
+console.log(meuQuadrado.constructor.calculaPerimetro(4)); // 16
 
-// irá retornar undefined, pois a propriedade é da Classe
+// o acesso direto à propriedade estática da classe pela instância irá retornar undefined
 console.log(meuQuadrado.tipo); 
 
-// irá dar erro, pois o método é da Classe
+// já o acesso ao método irá dar erro
 console.log(meuQuadrado.calculaPerimetro(4));
-
 ```
+
+**Observação**: como a instância não "conhece" as propriedades e métodos da classe, você pode definir propriedades/métodos de mesmo nome para a instância. Isso no entanto, pode dificultar a leitura/entendimento do código.
 
 ### Propriedades privadas 
 
@@ -513,6 +555,8 @@ console.log(minhaConta.saldo); // 1450
 ### Métodos privados
 
 Métodos também podem ser privados, bastando adicionar `#` antes da declaração do método. Para serem executados, devem ser chamados com a `#`. (`this.#metodoPrivado()`).
+
+Vale uma observação: no DevTools do navegador ou no Node, é possível que você consiga acessar propriedades e métodos privados. Isso é um "relaxamento" da própria ferramenta para auxílio dos desenvolvedores.
 
 ### Polimorfismos
 
@@ -591,7 +635,7 @@ retorno_da_promise
     .finally('faz mais uma coisa, pode ser um callback')
 ```
 
-Mais detalhes sobre isso abaixo
+Mais detalhes:
 
 - propriedade `result`: é o resultado da Promise, que pode ser undefined, um valor, um objeto Error;
 
@@ -620,7 +664,7 @@ Promises também podem ser tratadas em funções assíncronas, **sem necessidade
 Quando temos um **conjunto de promises**, podemos utilizar o método `all()` para **aguardar todas serem resolvidas** e então tratadas.
 
 ```js
-Promise.all(<conjunto_de_promises>).then(<faz alguma coisa>)
+Promise.all(/* conjunto_de_promises */).then(/* faz alguma coisa */)
 ```
 
 ```js
@@ -647,7 +691,7 @@ p
 
 ## API (Application Programming Interface)
 
-É um intermediário entre o front-end e o back-end (ou entre o cliente e o servidor); acessada por meio de URLs; também pode ser utilizada por outras APIs.
+É um intermediário entre o Front End e o Back End  (ou entre o cliente e o servidor); acessada por meio de URLs; também pode ser utilizada por outras APIs.
 
 - muito comum que o resultado de uma API seja um JSON;
 
@@ -657,7 +701,7 @@ p
 
 - boa prática: criar uma constante para a url: BASE_URL
 
-- padrões de API Web: RPC, Soap e REST (o mais utilizado atualmente; verbos GET e POST no caso do Front End).
+- padrões de API Web: RPC, Soap e REST. REST é o mais utilizado atualmente; verbos GET e POST no caso do Front End.
 
 ## D.O.M.
 
