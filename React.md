@@ -23,7 +23,7 @@ https://github.com/stoyan/reactbook2
 
 ## Usando a biblioteca React
 
-Aqui vou explicar o básico de como utilizar o React, com o intuito de compreender os conceitos iniciais de como a biblioteca foi construída. Na prática, **não é assim que se desenvolve em React**: a maneira mais moderna é por meio de JSX, explicado em uma [Seção posterior](#jsx). 
+Aqui vou demonstrar os primórdios de como utilizar o React, com o intuito de compreender os conceitos iniciais de como a biblioteca foi construída. Na prática, **não é assim que se desenvolve em React**: a maneira mais moderna é por meio de JSX, explicado em uma [Seção posterior](#jsx). 
 
 Para utilizar o React, a maneira mais básica é baixar a biblioteca para uma pasta, onde você desenvolverá sua aplicação. Também será necessário um "add-on" chamado **"ReactDOM"**. Você pode nomear as pastas e os arquivos como desejar. 
 
@@ -66,20 +66,23 @@ Um jeito simples de testar o React é adicionando o código a seguir em outra ta
 
 Um objeto `React` é o que você usa no código para acessar outras tecnologias do React, aqui chamadas de "APIs".
 
-O objeto `ReactDOM` possui métodos para renderizar a aplicação no navegador. Entenda "renderizar" no sentido de mostrar o HTML na página.
+O objeto `ReactDOM` possui métodos para renderizar a aplicação no navegador. Entenda "renderizar" no sentido de mostrar o conteúdo HTML na página.
 
 ### Método `React.createElement()`
 
 Este é o método que cria um componente React.
 
-O primeiro parâmetro é o elemento a ser criado (a tag). O segundo parâmetro é um objeto com as propriedades que esse elemento terá (os atributos DOM). O terceiro parâmetro (e os seguintes) corresponde ao filho deste elemento. Você pode ter quantos filhos desejar, utilizando o método `React.createElement()` novamente.
+O primeiro parâmetro é o elemento a ser criado (a tag HTML). O segundo parâmetro é um objeto com as propriedades que esse elemento terá (os atributos DOM). O terceiro parâmetro (e os seguintes) corresponde ao filho deste elemento. Você pode ter quantos filhos desejar, utilizando o método `React.createElement()` novamente de forma aninhada.
 
 O exemplo mais abaixo utiliza o método para criar o seguinte código:
 
 ```html
 <h1 id='myHeading'>
     <span>
-        Olá <em>maravilhoso</em>
+        Olá 
+        <em>
+            maravilhoso
+        </em>
     </span>
      mundo!
 </h1>
@@ -126,7 +129,9 @@ Internamente, este método cria um objeto JavaScript representando o elemento e 
 
 ### JSX
 
-Como pôde ser visto no exemplo anterior, aninhar elementos usando JavaScript e o método `React.createElement` cria um código feio e difícil de ler. É para resolver isso que entra a **sintaxe JSX**, que é XML dentro de um JavaScript. Com o JSX, é possível criar um código mais limpo e fácil de ler, e que na prática é escrever HTML dentro do JS.
+Como pôde ser visto no exemplo anterior, aninhar elementos usando JavaScript e o método `React.createElement` cria um código "feio" e que vai ficando cada vez mais difícil de ler à medida que novos elementos vão sendo adicionados. É para resolver isso que entra a **sintaxe JSX**, que é XML dentro de um JavaScript. Com o JSX, é possível criar um código mais limpo e fácil de ler, e que na prática é semelhante a escrever HTML dentro do JS.
+
+Mesmo exemplo anterior, escrito com JSX:
 
 ```js
 // usando JSX para criar os elementos
@@ -144,9 +149,12 @@ ReactDOM.render(
 );
 ```
 
+O acrônimo JSX pode significar **J**ava**S**cript**X**ML
+ou **J**avaScript **S**yntax e**X**tension. A [W3Schools](https://www.w3schools.com/react/react_jsx.asp) adota JavaScript XML.
+
 O JSX é uma **tecnologia separada** do React. Escrever o código com JSX é a **forma mais moderna** de criar componentes React.
 
-Como ele utiliza o XML, você **precisa fechar todas as tags HTML**, bem como as outras que você irá criar quando começar a fazer seus próprios componentes. Ou seja, `<br />` e não `<br>`, `<img />` e não `<img>`, etc.
+O JSX segue as regras de XML, ou seja, você **precisa fechar todas as tags HTML**, bem como as outras que você irá criar quando começar a fazer seus próprios componentes. Por exemplo, `<br />` e não `<br>`, `<img />` e não `<img>`, etc.
 
 É necessário **transpilar** o JSX para um código JS válido, que os navegadores possam entender. Transpilar é o processo de reescrever um código de uma sintaxe para outra sintaxe. Uma maneira de transpilar JSX para JS é utilizando a biblioteca Babel. Você pode [baixá-la](https://unpkg.com/babel-standalone/babel.min.js) para a mesma pasta em que se encontra a biblioteca React e a reactDOM, e depois incluí-la em seu código.
 
@@ -157,16 +165,13 @@ Como ele utiliza o XML, você **precisa fechar todas as tags HTML**, bem como as
 <script type="text/babel">seu JSX vem aqui</script>
 ```
 
-O acrônimo JSX pode significar **J**ava**S**cript**X**ML
-ou **J**avaScript **S**yntax e**X**tension. A [W3Schools](https://www.w3schools.com/react/react_jsx.asp) considera JavaScript XML.
-
 Você também pode **passar valores e expressões em JS** dentro do JSX. Para isso, você deve englobar a expressão/valor dentro de chaves (`{}`). É possível aninhar outras `{}` se você tiver outro conteúdo JSX dentro da expressão.
 
-**A partir deste ponto, os exemplos irão utilizar o JSX ao invés do método `React.createElement`.**
+> **A partir de agora, os exemplos irão utilizar o JSX ao invés do método `React.createElement`.**
 
 ## Criando seus próprios componentes
 
-Você pode definir um componente customizado de duas maneiras: **function components** (a maneira mais moderna atualmente) e **class components** (criando uma classe que estende de `React.Component`.
+Você pode definir um componente customizado de duas maneiras: **function components** (a maneira mais moderna atualmente) e **class components** (criando uma classe que estende de `React.Component`).
 
 É válido entender a sintaxe de class components para poder trabalhar com aplicações mais antigas (legadas) ou até mesmo entender algum tutorial disponível na internet. Desenvolvedores acostumados com linguagens orientada a objetos provavelmente se sentirão mais à vontade com class components.
 
@@ -175,7 +180,8 @@ Você pode definir um componente customizado de duas maneiras: **function compon
 Uma maneira de criar uma function component é atribuir uma função anônima (ou arrow function) para uma variável. Esta variável será seu componente. O retorno da função é a UI que você quer que o componente renderize.
 
 - a convenção é que o nome do componente **comece com letra maiúscula**;
-- para usar o componente, você **cria uma tag** com o nome do componente.
+
+- para adicionar o componente ao seu HTML, você **usa uma tag** com o nome do componente.
 
 Exemplo como uma função anônima:
 
@@ -198,8 +204,16 @@ Exemplo utilizando arrow function:
 
 ```js
 const MeuComponente = () => {
-    return <span>Meu primeiro componente!</span>
+    return <span>Meu primeiro componente!</span>;
 };
+```
+
+Você também pode criar como se fosse uma função nomeada:
+
+```js
+function MeuComponente() {
+  return <span>Meu primeiro componente!</span>;
+}
 ```
 
 ### Class components
@@ -221,7 +235,7 @@ ReactDOM.render(
 );
 ```
 
-**Nota**: se o seu retorno tiver **mais de uma linha**, é necessário envolver o conteúdo **em parênteses** logo após a cláusula `return`. Não pode quebrar uma linha após `return`, senão o JS irá interpretar que seu retorno é `undefined` (ele entende que é `return;`):
+**Nota**: se você quiser **quebrar linhas** no retorno, é necessário envolver o conteúdo **em parênteses** logo após a cláusula `return`. O `return` **não** pode ficar sozinho na linha, senão o JS irá interpretar que seu retorno é `undefined` (ele entende que é `return;`). Segue um exemplo correto:
 
 ```js
 class MeuComponente extends React.Component {
@@ -241,7 +255,7 @@ class MeuComponente extends React.Component {
 
 É possível **passar valores** para seu componente utilizando propriedades, ou simplesmemente "props". Essas propriedades são acessadas via o objeto `props`, que é somente leitura.
 
-Em **class components**, você acessa por meio do **`this.props`**. Para utilizar um valor de prop no JSX você utiliza o `{}`:
+Em **class components**, você acessa por meio do **`this.props`**. Para utilizar um valor de prop no JSX você a coloca dentro de `{}`:
 
 ```js
 class MeuComponenteComProps extends React.Component {
@@ -251,7 +265,7 @@ class MeuComponenteComProps extends React.Component {
 }
 ```
 
-Em **function components**, o `this` geralmente se refere ao objeto global, então não usamos o `this.props`. As props nesse caso estão disponíveis como **primeiro parâmetro** da função.:
+Em **function components**, o `this` geralmente se refere ao objeto global, então não temos um `this.props` (lembre-se que o function component é criado como uma função). As props nesse caso são acessadas no **primeiro parâmetro** da função. Por convenção, usamos o nome "props" para esse parâmetro:
 
 ```js
 const MeuComponenteComProps = function(props) {
@@ -283,18 +297,27 @@ Você **passa propriedades** como se fossem atributos em uma tag HTML. Isso serv
 <NomeEProfissao name="Matheus" />
 ```
 
+**Nota:** em versões mais atuais do JavaScript (ES6), você pode passar valores default aos parâmetros da função **diretamente na definição da função**. Segue o mesmo exemplo com parâmetros default na função:
+
+```js
+const NomeEProfissao = function({name, job = 'estudante'}) {
+    return <span>Meu nome é <em>{name}</em>, e sou {job}</span>;
+}
+```
+
 ### Tipando props
 
-Você pode utilizar o TypeScript para tipar seu projeto React (isso é visto com detalhes em uma anotação à parte no meu repositório de anotações). Mas também existem bibliotecas que adicionam tipos às props. Uma delas é a `prop types`. 
+Você pode utilizar o TypeScript para tipar seu projeto React (isso é visto com detalhes no meu [arquivo sobre TypeScript](/TypeScript.md) disponível neste repositório de anotações). Mas também existem bibliotecas que adicionam tipos às props. Uma delas é a `prop types`.
 
 Faça o download do arquivo para a pasta `/react`: https://unpkg.com/prop-types/prop-types.js
 
-Adicione a biblioteca como um novo script:
+Adicione à biblioteca como um novo script:
+
 ```html
 <script src="react/prop-types.js"></script>
 ```
 
-Quando uma prop é tipada, atribuir um valor de um tipo diferente a ela gera um erro no console (um warning, na verdade, a aplicação continuará rodando caso esse valor não quebre seu código).
+Quando uma prop é tipada, atribuir um valor de um tipo diferente a ela gera um erro no **console** (um warning, na verdade, a aplicação continuará rodando caso esse valor não quebre alguma parte do seu código).
 
 ```js
 // fora do bloco em que o componente foi definido
@@ -321,15 +344,15 @@ Você pode verificar os outros tipos existentes em PropTypes digitando `PropType
 
 *Aqui é explicado como usar estados em componentes de **classe**. Há uma Seção específica para [componentes de função](#estados-e-hooks-em-function-components), em que utilizamos hooks.*
 
-O React possui um conceito de "estado", `state`, que é um **objeto** representando algum dado que o componente usa para se renderizar. Quando o `state` **é alterado**, o React *reage* fazendo uma nova renderização do componente, isto é, **seu conteúdo no DOM é reconstruído** (na prática, o método `render()` está sendo chamado novamente). 
+O React possui um conceito de "estado" (`state`), que é um **objeto** representando algum dado que o componente usa para se renderizar. Quando o `state` **é alterado**, o React *reage* fazendo uma nova renderização do componente, isto é, **seu conteúdo no DOM é reconstruído** (na prática, o método `render()` está sendo chamado novamente). 
 
 O `state` é opcional. Um componente sem `state` é chamado de *stateless*. Já um componente com `state` é chamado de *stateful*. 
 
-Você pode **acessar** o estado usando `this.state` (lembre-se que estamos tratando de class components). Agora para **modificá-lo**, é utilizado o `this.setState()`. A verdade é que é possível modificar atribuindo um valor diretamente a `this.state`, mas isso **não é recomendado**. Então, use o `this.setState()` (a única exceção é ao *inicializar* o estado). 
+Você pode **acessar** o estado usando `this.state` (lembre-se que estamos tratando de class components). Agora para **modificá-lo**, é utilizado o `this.setState()`. A verdade é que é possível modificar o estado atribuindo um valor diretamente a `this.state`, mas isso **não é recomendado**. Então, use o `this.setState()` (a única exceção é ao *inicializar* o estado). 
 
-Para tornar o componente em stateful, você inicializa o estado no construtor do componente. Aí então, você pode causar uma mudançao no estado por meio de algum evento.
+Para tornar o componente  stateful, você inicializa o estado no construtor do componente. Aí então, você pode causar uma mudança no estado por meio de algum evento.
 
-Exemplo de um componente `<ContadorDeCaracteres>`, em que contamos os caracteres dentro de um elemento `textarea`. O estado é o texto dentro da `textarea`: cada vez que esse texto muda, o componente é renderizado novamente (re-renderizado) com a quantidade de caracteres atualizada:
+Exemplo de um componente `<ContadorDeCaracteres>`, em que contamos os caracteres dentro de um elemento `textarea` e exibimos a contagem em um elemento `h3`. O estado é o texto dentro da `textarea`: cada vez que esse texto muda, o componente é renderizado novamente (constumamos falar "re-renderizado") com a quantidade de caracteres atualizada:
 
 ```js
 class ContadorDeCaracteres extends React.Component {
@@ -385,7 +408,7 @@ Há três fases principais:
 
 - Mount: quando o componente é "montado", ou seja, adicionado ao DOM;
 - Update: toda vez que uma mudança ocorre;
-- Unmount: quando o componente é "desmontado", removido do DOM.
+- Unmount: quando o componente é "desmontado", ou seja, removido do DOM.
 
 Há outras fases intermediárias e respectivos métodos que as representam. Destas, duas são mais comumente utilizadas:
 
@@ -393,7 +416,24 @@ Há outras fases intermediárias e respectivos métodos que as representam. Dest
 
 - `componentDidUpdate(previousProps, previousState, snapshot)`: o componente acaba de ser atualizado. Neste estágio é possível acessar os valores anteriores que estavam nas props e no state (`previousProps, previousState`) e comparar com os valores atualizados (`this.props` e `this.state`).
 
-O ciclo de vida completo é: `constructor(props)`, `componentWillMount`, `componentDidMount`, (caso as props mudem) `componentWillReceiveProps(nextProps)`, (caso as props ou estado mudem) `shouldComponentUpdate(nextProps, nextState)`, `componentWillUpdate(nextProps, nextState)`, `componentDidUpdate(prevProps, prevState)`, `componentWillUnmount`.
+O ciclo de vida completo é: 
+
+- `constructor(props)`,
+- `componentWillMount`,
+
+- `componentDidMount`,
+
+- (caso as props mudem) 
+`componentWillReceiveProps(nextProps)`,
+- (caso as props ou estado mudem) 
+`shouldComponentUpdate(nextProps, nextState)`,
+
+- `componentWillUpdate(nextProps, nextState)`,
+
+- `componentDidUpdate(prevProps, prevState)`,
+
+- `componentWillUnmount`.
+
 
 *São muitos detalhes, então não vou entrar a fundo no ciclo de vida.* 
 
@@ -489,9 +529,9 @@ Aqui, `clickHandler` é uma propriedade do class component, para a qual é atrib
 Os chamados **hooks** foram adicionados ao React na versão 
 **v16.8**, permitindo a criação de function components stateful, ou seja, adicionando a possibilidade de gerenciar estados.
 
-Um hook é uma **função** que permite utilizar várias funcionalidades do React, não apenas estados. É fácil conhecer um hook pelo seu nome: **todos levam o prefixo `use`**.
+Um hook é uma **função** que permite utilizar várias funcionalidades do React, não apenas estados. É fácil identificar um hook pelo seu nome: por convenção, **todos levam o prefixo `use`**.
 
-Além dos hooks disponíveis na biblioteca, como `useState` ou `useEffect`, você também pode criar seu próprio hook customizado, lembrando de manter a convenção de começar o nome do hook com `use`. 
+Além dos hooks disponíveis na biblioteca, como `useState` ou `useEffect`, você também pode criar seu próprio hook customizado, lembrando de manter a convenção de usar o prefixo `use`. 
 
 ### `useState()`
 
@@ -518,7 +558,7 @@ Quando é necessário atualizar o estado, você utiliza a função updater:
 setNome('Felipe Souza');
 ```
 
-Como visto em seções anteriores, atualizações de estado causam uma nova renderização do componente. Variáveis de estado podem ser passadas para outros componentens. Isso faz com que atualizações na variável causem a renderização de cada componente em que elas são utilizadas, o que permite uma grande flexibilidade em **atualizar diferentes partes da UI dependentes daquele estado**. 
+Como visto em seções anteriores, atualizações de estado causam uma nova renderização do componente. Variáveis de estado podem ser passadas via props para outros componentes. Isso faz com que atualizações na variável causem a renderização de cada componente em que elas são utilizadas, o que permite uma grande flexibilidade em **atualizar diferentes partes da UI dependentes daquele estado**. 
 
 Você pode criar quantos hooks de estado desejar, criando assim diversas variáveis de estado e suas funções updater. Você também pode criar um objeto de estado que guarda diferentes variáveis de estado como propriedades (mas neste caso gera um acoplamento, o que nem sempre é desejável quando as variáveis não guardam uma relação entre si).
 
@@ -527,9 +567,9 @@ Não é necessário se preocupar com o binding do `this` nas funções de callba
 
 ### `useEffect()`
 
-Esse hook substitui os métodos do ciclo de vida `componentDidMount()` e `componentWillUnmount()`. Ele pode ser usado como um "efeito colateral" de um componente. A principal tarefa de um componente é renderizar algo, então podemos considerar como "efeitos colaterais" quaisquer outras tarefas que o componente precise realizar além da renderização (como buscar dados ou configurar events listeners).
+Esse hook substitui os métodos do ciclo de vida `componentDidMount()` e `componentWillUnmount()`. Ele pode ser usado como um "efeito colateral" de um componente. A principal tarefa de um componente é renderizar algo, então podemos considerar como "efeitos colaterais" quaisquer outras tarefas que o componente precise realizar além da renderização (como buscar dados em uma API ou configurar events listeners).
 
-O `useEffect()` recebe dois argumentos: uma função callback, que será chamada pelo React no momento apropriado, e um array opcional de dependências. Essas dependências são variáveis que serão "observadas": sempre que houver uma **alteração nessas variáveis**, a função **callback será invocada**.
+O `useEffect()` recebe **dois argumentos**, com o segundo sendo opcional: uma função callback, que será chamada pelo React no momento apropriado, e um array de dependências. Essas dependências são variáveis que serão "observadas": sempre que houver uma **alteração nessas variáveis**, a função **callback será invocada**.
 
 - se um **array vazio** for passado como dependência, a função callback é chamada **apenas uma vez**, quando o componente renderizar (similar ao `componentDidMount()`);
 
@@ -585,12 +625,14 @@ Da mesma forma que em `useState`, você pode ter múltiplos `useEffect` para tra
 const [data, dispatch] = useReducer(funcaoReducer, dadosIniciais);
 ```
 
-A função **reducer** recebe dois argumentos - um estado antigo e uma ação - e **retorna um novo estado**. A ação representa algo que aconteceu na aplicação e que requer uma alteração (como uma interação do usuário, por exemplo). As ações são despachadas e, em seguida, a função reducer é chamada pelo React. Dessa forma, todas as alterações em um estado são tratadas dentro de um reducer, em vez de várias partes do componente lidarem com as alterações de estado (elas chamam a função `dispatch()` retornada por `useReducer()` com a ação que precisa ser realizada). A função reducer **não precisa ser implementada dentro do componente**.
+O useReducer retorna um estado (atribuído a `data`), que já pode vir com um valor inicial (informado em `dadosIniciais`). Ela também retorna uma função `dispatch`.
+
+O primeiro argumento de `useReducer` é a função **reducer**. Ela, por sua vez, recebe dois argumentos - um estado antigo e uma ação - e **retorna um novo estado**. A ação representa algo que aconteceu na aplicação e que requer uma alteração (como uma interação do usuário, por exemplo). As ações são despachadas (por meio do `dispatch`) e, em seguida, a função `reducer` é chamada pelo React. Dessa forma, todas as alterações em um estado são centralizadas no `reducer`, em vez de várias partes do componente lidarem com as alterações de estado (caso elas queiram que o estado mude, devem enviar a ação apropriada por meio do `dispatch`). A função reducer **não precisa ser implementada dentro do componente**.
 
 ```js
 function funcaoReducer(estadoAntigo, acao) {
     const novoEstado = {}; // ou qualquer outro tipo do seu estado
-    // faça alguma coisa com o estadoAntigo e a acao
+    // verifique a acao recebida e modifique novoEstado
     return novoEstado;
 }
 ```
@@ -599,9 +641,9 @@ O React vai verificar se o novo estado retornado por um reducer é diferente do 
 
 A **ação é um objeto** que contém uma propriedade `type` e uma propriedade opcional `payload` (que também pode ser outro objeto com informações adicionais e não precisa ser chamado de "payload" - qualquer nome é aceitável, desde que você use o mesmo nome ao usar as propriedades da ação no reducer). Ela é **passada como argumento** para a função `dispatch()`.
 
-Na função reducer, você pode ter cláusulas `if/else` ou um `switch` para determinar o que fazer com cada `type` de ação, e pode usar as informações de `payload` para um refinamento do que fazer em cada ação.
+Na função `reducer`, você pode ter cláusulas `if/else` ou um `switch` para determinar o que fazer com cada `type` de ação, e pode usar as informações de `payload` para um refinamento do que fazer em cada ação.
 
-O exemplo abaixo mostra como usar `dispatch()` passando um objeto de ação como argumento. Este objeto é o segundo parâmetro da função reducer. Uma função reducer poderia verificar que essa ação é um `incrementCount` e atualizar uma variável de estado contadora com o valor `incrementValue` recebido do `payload`.
+O exemplo abaixo mostra como usar `dispatch()` passando um objeto de ação como argumento. Este objeto é o segundo parâmetro da função `reducer`. O `reducer` poderia verificar que essa ação é um `incrementCount` e atualizar uma variável de estado contadora com o valor `incrementValue` recebido do `payload`.
 
 ```html
 <button onClick={() => dispatch({
@@ -614,7 +656,7 @@ O exemplo abaixo mostra como usar `dispatch()` passando um objeto de ação como
 </button>
 ```
 
-A função `dispatch()` pode ser passada a outros componentes via props. Assim, outros componentes podem alterar o estado. Dessa forma, o `useReducer` pode ser uma alternativa para o Redux, que é uma biblioteca para gerenciamento de estados. O Redux é um assunto a parte e eu ainda não aprendi muito sobre ele (aqui nas anotações há seções para a [ContextAPI](#gerenciando-estados-com-a-context-api) e o [Recoil](#gerenciando-estados-com-recoil), que também fazem gerenciamento de estados).
+A função `dispatch()` pode ser passada a outros componentes via props. Assim, outros componentes podem solicitar uma alteração no estado. Dessa forma, o `useReducer` pode ser uma alternativa para o Redux, que é uma biblioteca para gerenciamento de estados. O Redux é um assunto a parte e eu ainda não aprendi muito sobre ele. Outras alternativas para gerenciamento de estado são  a [ContextAPI](#gerenciando-estados-com-a-context-api) e o [Recoil](#gerenciando-estados-com-recoil), que possuem seções específica aqui neste arquivo..
 
 ### `useRef()`
 
@@ -635,14 +677,16 @@ function InputComFoco() {
   const inputEl = useRef(null); // ou useRef();
   // inputEl.current por enquanto é null
   
-  // quando essa função é chamada `current` agora aponta para o elemento de input
+  // quando essa função é chamada após o componente 
+  // ter sido renderizado, `current` agora aponta 
+  // para o elemento de input
   const onButtonClick = () => {    
     inputEl.current.focus();
   };
 
   return (
     <>
-      <!-- adiciono inputEl no atributo ref, fazendo a ligação entre ele e o código do componente -->   
+      <!-- ligando inputEl e esse elemento de input -->   
       <input ref={inputEl} type="text" />
       <button onClick={onButtonClick}>Foco no input</button>
     </>
@@ -685,7 +729,7 @@ function AlgumComponente() {
 
 Ao trabalhar com arrays e usá-los para criar uma lista de elementos (um `<td>` ou um `<li>`, por exemplo), o React requer que cada filho em uma lista tenha um identificador único. Isso é interno ao React, para que ele saiba quais elementos foram alterados e precisam ser atualizados no DOM.
 
-Para fazer isso, você adiciona uma propriedade `key` a cada elemento. Essa propriedade não será exibida no HTML. Você pode usar o índice do elemento do array como valor da chave, embora isso nem sempre seja recomendável, pois elementos podem ser removidos ou reordenados, fazendo com que esse índice seja mutável:
+Para fazer isso, você adiciona uma propriedade `key` a cada elemento. Essa propriedade não será exibida no HTML. Você pode usar o índice do elemento do array como valor da chave, embora isso **nem sempre seja recomendável**, pois elementos podem ser removidos ou reordenados, fazendo com que esse índice seja mutável:
 
 ```js
 for(index in this.props.headers) {
@@ -700,7 +744,9 @@ A função `map()` é muito útil quando se trabalha com arrays em React.
 Você pode chamar `map()` em um array para executar uma função callback em cada item do array; `map` irá **retornar um novo array** com os resultados da função callback. A função callback pode receber o elemento ou o elemento e seu índice como parâmetros.
 
 ```js
-// retorna um array de elementos th, usando o conteudo do item "header" a cada iteração. Considere "headers" como sendo um array
+// considere "headers" como sendo um array de strings
+// map retorna um array de elementos th, usando o 
+// conteúdo e o índice de cada elemento em headers. 
 this.props.headers.map((header, index) => <th key={index}>{header}</th>)
 ```
 
@@ -717,6 +763,8 @@ this.props.headers.map((header, index) => <th key={index}>{header}</th>)
 
 ## Create-React-App (CRA)
 
+> **Nota:** Em 2023 o CRA foi descontinuado e seu uso já não é recomendado. Alguns substitutos a ele são o [Vite](https://vitejs.dev/guide/) e o [Next.js](#nextjs) (há uma Seção sobre o Next neste arquivo de anotações). Eu mantive essa Seção do CRA como referência e também por abordar assuntos que ainda fazer parte de um projeto React, como o `package.json` e a pasta `node_modules`. 
+
 O CRA é um conjunto de scripts Node.js e suas dependências que torna fácil **configurar** um projeto React e criar um **processo de build** para fazer o deploy.
 
 - Você pode encontrar instruções para instalar o Node em https://nodejs.org
@@ -731,7 +779,9 @@ Isso levará algum tempo e criará um diretório chamado "nomeDoSeuProjeto" com 
 
 ### Arquivo `package.json`
 
-Este arquivo é encontrado no diretório raiz do projeto e contém várias configurações sobre o aplicativo. Por exemplo, ele lista todas as dependências necessárias para rodar o projeto (a biblioteca React e também todas as outras bibliotecas necessárias). Quando você precisa instalar o projeto (usando `npm install` ou `npm i` - são sinônimos), essas dependências serão baixadas para uma pasta `node_modules`.
+Este arquivo é encontrado no diretório raiz do projeto e contém várias configurações sobre o aplicativo. Por exemplo, ele lista todas as dependências necessárias para rodar o projeto (a biblioteca React e também todas as outras bibliotecas necessárias). O CRA irá criar este arquivo e algumas dependências necessárias para começar o seu projeto.
+
+Quando você precisa instalar o projeto (usando `npm install` ou `npm i` - são sinônimos), essas dependências serão baixadas para uma pasta chamada `node_modules`.
 
 Exemplo de um `package.json` com algumas dependências.
 
@@ -751,7 +801,7 @@ Exemplo de um `package.json` com algumas dependências.
 
 ### Pasta `node_modules`
 
-Essa pasta é onde todas as dependências listadas no `package.json` são instaladas. Essa pasta também está localizada no diretório raiz do aplicativo.
+Essa pasta é onde todas as dependências listadas no `package.json` são instaladas. Essa pasta também está localizada no diretório raiz do aplicativo. Ao invocar uma função importada de uma biblioteca externa, o React irá procurá-la nessa pasta.
 
 Você pode importar dependências dessa pasta para seus arquivos JS:
 
@@ -760,7 +810,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 ```
 
-Esta pasta geralmente é gigante e possui muitos arquivos e subpastas. Ela **não deve ser incluída ao compartilhar seu código ou controlá-lo por versão**. Como as dependências estão listadas no `package.json`, você pode instalá-las manualmente ao baixar o projeto, usando `npm i` (execute esse comando no diretório raiz do seu projeto).
+Esta pasta geralmente é gigante e possui muitos arquivos e subpastas, por isso, é recomendado **não incluí-la em seu repositório remoto, caso o projeto esteja versionado (no GitHub por exemplo)**. Como as dependências estão listadas no `package.json`, você pode instalá-las manualmente ao baixar o projeto, usando `npm i` (execute esse comando no diretório raiz do seu projeto).
 
 ### Named imports
 
@@ -786,7 +836,7 @@ Este é o comando para construir e criar um package da aplicação. O build é a
 
 ### Organização de arquivos
 
-O CRA gera vários arquivos e pastas.
+O CRA gera vários arquivos e pastas, trazendo uma estrutura inicial de projeto. Você pode, no entanto, modificá-la e criar sua própria estrutura de pastas e arquivos.
 
 A **página index do HTML** é encontrada em `/public/index.html` e contém uma `<div id="root"></div>` onde a mágica do React acontecerá. **Estilos gerais**, aplicáveis ​​a toda a página, podem ser encontrados em `/src/index.css`.
 
@@ -855,7 +905,7 @@ Finalizo minhas anotações sobre ele por aqui (11/01/2023).
 
 O [React Router](https://reactrouter.com/en/main) é uma biblioteca para gerenciar rotas dentro de uma SPA (Single Page Application). **O conceito de SPA é dar ao usuário uma experiência de navegação dentro de uma única página**, de modo que ao clicar em algum link a página não é totalmente recarregada: **somente os elementos e dados necessários são atualizados no DOM**. 
 
-Entenda "rotas" como sendo aquele texto que vem após a URL da aplicação. Por exemplo: `http://meusite.com/`**`rota-para-outra-pagina`**. Pode ser vista como um sinônimo para "página".
+Entenda "rotas" como sendo aquele texto que vem após a URL da aplicação. Por exemplo: `http://meusite.com/rota-para-outra-pagina`. Pode ser vista como um sinônimo para "página".
 
 Comando para instalar a biblioteca (o `@6` indica que será instalada a versão 6):
 
@@ -865,7 +915,7 @@ Comando para instalar a biblioteca (o `@6` indica que será instalada a versão 
 
 ## Componentes do React Router
 
-*A biblioteca está em constante evolução, com novos componentes sendo adicionados e outros removidos ou renomeados, então vale a pena verificar a documentação de cada versão no [site oficial](https://reactrouter.com/en/main).*
+> A biblioteca está em constante evolução, com novos componentes sendo adicionados e outros removidos ou renomeados, então vale a pena verificar a documentação de cada versão no [site oficial](https://reactrouter.com/en/main).
 
 Estes são os componentes mais usado na versão 6:
 
@@ -906,8 +956,8 @@ export default function DefaultTemplate() {
 }
 ```
 
-- Qual a diferença no uso do `<Outlet />` e o uso da prop `children`? 
-    - Ambas irão renderizar elementos filhos, no entanto, `children` é renderizado quando o component pai envolve o componente filho. Já `<Outlet />` não precisa envolver os filhos, desde que eles sejam o elemento das rotas aninhadas. Além disso, `<Outlet />` é específico para rotas e não tem efeito fora delas. Em outras palavras, `<Outlet />` renderiza **rotas-filho** e `children`, **elementos-filho**.
+> Qual a diferença no uso do `<Outlet />` e o uso da prop `children`? 
+> - Ambas irão renderizar elementos filhos, no entanto, `children` é renderizado quando o componente pai envolve o componente filho. Já `<Outlet />` não precisa envolver os filhos, desde que eles sejam o elemento das rotas aninhadas. Além disso, `<Outlet />` é específico para rotas e não tem efeito fora delas. Em outras palavras, `<Outlet />` renderiza **rotas-filho** e `children`, **elementos-filho**.
 
 O `path` da rota mãe pode ser qualquer rota, não necessariamente `/`. As rotas filhas serão descendentes do caminho que você der à rota mãe caso você coloque um *caminho relativo* (sem o `/` no início) no `path` delas. Caso o caminho de uma rota filha seja o mesmo da mãe, você pode substituir `path="/"` por `index` (sem valor, é um booleano true por padrão) na rota filha.
 
@@ -932,9 +982,9 @@ O `path` da rota mãe pode ser qualquer rota, não necessariamente `/`. As rotas
 
     - em versões anteriores à do react router 6, o hook utilizado era o `useHistory()`;
 
-    - existe também o componente `<Navigate />`. O funcionamento é semelhante ao do hook? Existem diferenças ou preferência no uso de um ou outro? -> Resposta Neiton no fórum:  Apesar de ambos terem a mesma finalidade, que é navegar entre as rotas, eles têm diferenças importantes. O **hook** `useNavigate` é uma função que retorna um objeto contendo um método navigate. Esse método pode ser utilizado para navegar para uma rota específica. Ele é utilizado **dentro de um componente funcional**. Já o componente **<Navigate />** é um componente que **pode ser utilizado dentro de um componente funcional ou de classe** para navegar para uma rota específica. Ele é muito útil quando você precisa navegar para uma rota em resposta a um evento, como um clique em um botão. A principal diferença entre os dois é que o hook useNavigate é mais flexível e permite que você navegue para uma rota em qualquer lugar do seu componente. Já o componente <Navigate /> é mais específico e deve ser utilizado dentro do corpo do componente. Em resumo, se você precisa navegar para uma rota em resposta a um evento, use o componente <Navigate />. Se você precisa navegar para uma rota em qualquer lugar do seu componente, use o hook useNavigate.
+    - existe também o componente `<Navigate />`. O funcionamento é semelhante ao do hook? Existem diferenças ou preferência no uso de um ou outro? -> Resposta monitor no fórum Alura:  Apesar de ambos terem a mesma finalidade, que é navegar entre as rotas, eles têm diferenças importantes. O **hook** `useNavigate` é uma função que retorna um objeto contendo um método navigate. Esse método pode ser utilizado para navegar para uma rota específica. Ele é utilizado **dentro de um componente funcional**. Já o componente `<Navigate />` é um componente que **pode ser utilizado dentro de um componente funcional ou de classe** para navegar para uma rota específica. Ele é muito útil quando você precisa navegar para uma rota em resposta a um evento, como um clique em um botão. A principal diferença entre os dois é que o hook useNavigate é mais flexível e permite que você navegue para uma rota em qualquer lugar do seu componente. Já o componente `<Navigate />` é mais específico e deve ser utilizado dentro do corpo do componente. Em resumo, se você precisa navegar para uma rota em resposta a um evento, use o componente `<Navigate />`. Se você precisa navegar para uma rota em qualquer lugar do seu componente, use o hook `useNavigate`.
 
-- `useParams()`: retorna um conjunto de pares "chave: valor" com os parâmetros enviados via URL. Por exemplo, na URL `http://meusite.com/posts/1`, o parâmetro da rota `posts` é `1`). Os parâmetros podem ser enviados ao `path` das rotas utilizando um seletor com a nomenclatura `:nomeDoParametro` após a rota. O hook irá retornar o par `nomeDoParametro: valor`; para acessar o valor, basta usar a notação de ponto (`.nomeDoParametro`) ou fazer o destructuring do objeto de retorno. Exemplo de código:
+- `useParams()`: retorna um conjunto de pares "chave: valor" com os parâmetros enviados via URL. Por exemplo, na URL `http://meusite.com/posts/1`, o parâmetro da rota `posts` é `1`). Os parâmetros podem ser enviados ao `path` das rotas utilizando um seletor com a nomenclatura `:nomeDoParametro` após a rota. O hook irá retornar o par `nomeDoParametro: valor`. Para acessar o valor, basta usar a notação de ponto (`.nomeDoParametro`) ou fazer o destructuring do objeto de retorno. Exemplo de código:
 
     ```js
     // --- dentro do JSX que contém as rotas
@@ -954,7 +1004,7 @@ O `path` da rota mãe pode ser qualquer rota, não necessariamente `/`. As rotas
         const { sectionId, postId } = useParams();
         ```
 
-- `useSearchParams()`: trabalha com os parâmetros enviados pela URL do modo "convencional", que é utilizando **query params** (também chamadas de "query strings"), em que os parâmetros são enviados após `?` e concatenados por `&` na URL (exemplo `http://meusite.com/posts`**`?sectionId=1&postId=7`**). O retorno desse hook é um objeto do tipo URLSearchParams. Exemplo de código:
+- `useSearchParams()`: trabalha com os parâmetros enviados pela URL do modo "convencional", que é utilizando **query params** (também chamadas de "query strings"), em que os parâmetros são enviados após `?` e concatenados por `&` na URL (exemplo `http://meusite.com/posts?sectionId=1&postId=7`). O retorno desse hook é um objeto do tipo URLSearchParams. Exemplo de código:
 
 ```js
 // --- neste caso path não possui seletores
@@ -976,7 +1026,7 @@ Query params são mais comuns para realizar buscas e filtros de resultados, por 
 
 # Gerenciando estados com a Context API
 
-A Context API faz parte da biblioteca padrão do react (ou seja, o import de suas funcionalidades é direto de `import { ... } from 'react'`).
+A Context API faz parte da biblioteca padrão do React (ou seja, o import de suas funcionalidades é direto de `import { ... } from 'react'`).
 
 A Context API provê variáveis (e funções) que podem ser utilizadas por diversos componentes sem a necessidade de passá-las via props. Isso previne o prop drilling.
 
@@ -1055,7 +1105,7 @@ A constante que recebe o `createContext()` também irá possuir uma propriedade 
 
 # Gerenciando estados com Recoil
 
-*Os conceitos de Recoil foram dados em um curso de React com TypeScript, então alguns códigos de exemplo estarão com tipagem.*
+> Os conceitos de Recoil foram dados em um curso de React com TypeScript, então alguns códigos de exemplo estarão com tipagem.
 
 O Recoil é outra biblioteca que possibilita o gerenciamento de estados em uma aplicação React. 
 
@@ -1065,7 +1115,7 @@ Instalação:
 
 ## Context API vs Recoil
 
-Durante o curso que ensinou Recoil, resolvi **utilizar a chatGPT (que aceitou ser chamada de "Chat" e tratada pelos pronomes ela/dela)** para me ajudar nas minhas dúvidas. Isso foi feito a partir de 13/04/23.
+Durante o curso que ensinou Recoil, resolvi **utilizar a chatGPT (que aceitou ser chamada de "Chat" e tratada pelos pronomes ela/dela)** para me ajudar nas minhas dúvidas. Isso foi feito a partir de 13/04/23. Segue a tradução de uma conversa em inglês feita com ela:
 
 **Pergunta**: qual é o mais relevante com relação ao gerenciamento de estados em React: Context API ou Recoil?
 
@@ -1253,7 +1303,7 @@ const eventos = useRecoilValue(eventosFiltradosState);
 
 ### Seletores para eventos assíncronos
 
-Seletores também podem ser usados para lidar com **operações assíncronas**, de modo a obter dados que vem de uma fonte externa (uma API, um arquivo, etc), que geralmente retornam Promises. Nesse caso, eles não necessariamente vão derivar um estado ou manipular átomos. Sua função get somente irá retornar algum dado.
+Seletores também podem ser usados para lidar com **operações assíncronas**, de modo a obter dados que vêm de uma fonte externa (uma API, um arquivo, etc), que geralmente retornam Promises. Nesse caso, eles não necessariamente vão derivar um estado ou manipular átomos. Sua função get somente irá retornar algum dado.
 
 O retorno de um seletor assíncrono pode ser usado para atribuir um valor default para um átomo, como pode ser visto no exemplo abaixo. 
 
@@ -1284,7 +1334,7 @@ export const listaDeEventosState = atom<IEvento[]>({
 });
 ```
 
-Quando algum componente do Recoil **depende de um resultado assíncrono**, é necessário envolvê-lo em um componente React chamado `<Suspense />`, que irá renderizar alguma coisa enquanto a requisição é realizada. Essa "alguma coisa" é inserida na prop `fallback` desse componente, e pode ser uma string ou outro componente (você pode utilizá-la para exibir uma mensagem de loading, por exemplo).
+Quando algum componente do Recoil **depende de um resultado assíncrono**, é necessário envolvê-lo em um componente React chamado `<Suspense />`, que irá renderizar alguma coisa enquanto a requisição é processada. Essa "alguma coisa" é inserida na prop `fallback` desse componente, e pode ser uma string ou outro componente (você pode utilizá-la para exibir uma mensagem de loading, por exemplo).
 
 No exemplo abaixo, `<ListaDeEventos>` é um componente que renderiza os eventos recebidos via API. O texto "Carregando eventos..." será exibido na tela enquanto se espera o término da chamada assíncrona que traz os eventos da API. Ou seja, o conteúdo da `div` só irá aparecer na tela quando a Promise for resolvida.
 
@@ -1298,7 +1348,7 @@ No exemplo abaixo, `<ListaDeEventos>` é um componente que renderiza os eventos 
 
 A abordagem utilizando seletor assíncrono e o componente `<Suspense />` é uma das soluções possíveis com o Recoil. No entanto, abordagens mais "tradicionais" utilizando o `useEffect` também são válidas.
 
--> Resposta do Vinicios no fórum: "A principal diferença entre as duas abordagens é que o **seletor assíncrono e o componente Suspense** são específicos do Recoil e foram criados para lidar com o **gerenciamento de estado de forma mais eficiente e organizada**, enquanto o `useEffect` é um hook padrão do React que pode ser utilizado em qualquer situação que envolva efeitos colaterais. Ambas as abordagens são válidas e podem ser utilizadas de acordo com a necessidade do projeto e preferência do desenvolvedor. O importante é entender as diferenças e vantagens de cada uma delas para escolher a melhor opção em cada situação."
+- Resposta do instrutor no fórum Alura: "A principal diferença entre as duas abordagens é que o **seletor assíncrono e o componente Suspense** são específicos do Recoil e foram criados para lidar com o **gerenciamento de estado de forma mais eficiente e organizada**, enquanto o `useEffect` é um hook padrão do React que pode ser utilizado em qualquer situação que envolva efeitos colaterais. Ambas as abordagens são válidas e podem ser utilizadas de acordo com a necessidade do projeto e preferência do desenvolvedor. O importante é entender as diferenças e vantagens de cada uma delas para escolher a melhor opção em cada situação."
 
 ## Debug de estados
 
