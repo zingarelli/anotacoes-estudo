@@ -1713,11 +1713,19 @@ Isso é útil, principalmente, no caso de componentes que renderizam listas, sen
 
 ```js
 import { memo } from 'react';
+
+// abordagem 1 - usando memo no export
 function Item() {
     // ...
 }
 // chama a função memo na hora de exportar o componente
 export default memo(Item);
+
+// abordagem 2 - usando memo na definição
+const Item = React.memo(() => {
+  // ...
+});
+export default Item;
 ```
 
 A função `memo()` funciona quando **utilizada no export do componente** e aceita um segundo parâmetro opcional, em que você pode passar uma função comparadora que informa se o componente deve ou não ser re-renderizado. Essa função comparadora recebe dois argumentos: `prevProps` e `nextProps`. Quando não é passado um segundo parâmetro, é feito por padrão uma comparação "shallow".
@@ -1741,7 +1749,8 @@ O exemplo abaixo mostra o uso tanto da função `memo()` para memoizar o compone
 ```js
 import React, { memo, useMemo } from 'react';
 function Searchbar() {
-    // ícone será renderizado somente uma vez, quando o Searchbar é montado
+    // ícone será computado somente uma vez na montagem 
+    // de Searchbar e reutilizado em re-renders
     const searchIcon = useMemo(() => <CgSearch size={20} color='#4C4D5E' />, []);    
     return (
         <div>
@@ -1757,7 +1766,7 @@ Assim como em `memo()`, o hook `useMemo()` deve ser utilizado com **parcimônia*
 
 ## `useCallback()`
 
-Este hook é o utilizado para memoizar a **definição de uma função**. É útil quando **montar** a função é custoso. Por exemplo, toda vez que o componente é re-renderizado, uma função não memoizada é montada novamente, podendo impactar a perfomance. Ao memoizar a função, estamos criando um "cache" dela em memória.
+Este hook é o utilizado para memoizar a **definição de uma função**. É útil quando **montar** a função é custoso. Por exemplo, toda vez que o componente é re-renderizado, uma função não memoizada é recriada e alocada na memória; se o componente é re-renderizado diversas vezes, isso pode impactar a perfomance. Ao memoizar a função, estamos criando um "cache" dela em memória, e não mais várias instâncias.
 
 A definição da função é passada como primeiro argumento, e o segundo argumento é um array de dependências, contendo as entradas a serem monitoradas e que podem causar a mudança na função memoizada (passando um array vazio, a função não irá mudar). Quando algumas dessas entradas são modificadas, a função deve ser construída novamente.
 
@@ -1779,9 +1788,9 @@ Resumindo:
 
 - `memo`: memoiza um **function component**, útil para evitar re-render desnecessário de um componente; 
 
-- `useMemo`: guarda referência ao **resultado** de uma função; útil quando a **execução** da função é custosa;
+- `useMemo`: memoiza **resultado** de uma função computada; útil quando a **execução** da função é custosa;
 
-- `useCallback`: guarda referência à **definição** de uma função, útil quando **montar** esta função é custoso.
+- `useCallback`: memoiza a **função em si**, útil quando **criar** esta função é custoso.
 
 ---
 
@@ -1962,7 +1971,7 @@ Também possui uma extensão no VS Code.
 
 # Testes com Jest e React Testing Library 
 
-*Essa seção possui muitos códigos de exemplo, o quais foram copiados e adaptados dos projetos que eu desenvolvi durante os cursos. Eles podem não ser interessantes ou difíceis de entender para quem não conhece o projeto... Mantive eles aqui com a intenção de ao menos a pessoa saber como o código deve ser escrito.*
+> Essa seção possui muitos códigos de exemplo, o quais foram copiados e adaptados dos projetos que eu desenvolvi durante os cursos. Eles podem não ser interessantes ou difíceis de entender para quem não conhece o projeto... Mantive eles aqui com a intenção de ao menos a pessoa saber como o código deve ser escrito.*
 
 Duas bibliotecas famosas para testes de projetos React são o **Jest** e a **React Testing Library (RTL)**. O CRA já traz ambas, com algumas configurações e um script para rodar testes (ele irá rodar em watch mode):
 
@@ -2766,7 +2775,7 @@ Partials podem ser **importadas** por outros arquivos e outras partials, utiliza
 @import './abstract/base';
 ```
 
-- para arquivos `.sass`, o VS Code inclui o nome com o underline e a extensão `.sass`, mas também funcionou ao removê-los...
+- para arquivos `.sass`, o autocomplete do VS Code inclui o nome com o underline e a extensão `.sass`, mas também funcionou ao removê-los...
 
 Futuramente, a regra `@import` cairá em **desuso** e será substituída pela `@use`.
 
@@ -3084,9 +3093,9 @@ A numeração de versão pode seguir a convenção chamada ["versionamento semâ
 
     "version": "0.1.0"
 
-- primeiro dígito (major): quando incrementado, indica que o código possui mudanças que não são compatíveis com versões anteriores. Costuma começar em 1; se for zero, significa que ainda não teve uma primeira release;
+- primeiro dígito (major): quando incrementado, indica que o código possui mudanças que **não** são compatíveis com versões anteriores (uma *breaking change*). Costuma começar em 1; se for zero, significa que ainda não teve uma primeira release;
 
-- segundo dígito (minor): quando incrementado, indica que o código possui mudanças, mas se mantém compatível com versões anteriores;
+- segundo dígito (minor): quando incrementado, indica que o código possui mudanças, mas se mantém compatível com versões anteriores. Pode ser adição de novas features, por exemplo;
 
 - terceiro dígito (patch): quando incrementado, indica que o código possui somente pequenas mudanças para correção de bugs, também se mantém compatível com versões anteriores.
 
