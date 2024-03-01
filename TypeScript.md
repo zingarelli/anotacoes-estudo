@@ -2,6 +2,8 @@
 
 As seções a seguir dão uma noção geral do TypeScript como linguagem. Ao final, há uma seção específica tratando do [TypeScript aplicado ao React](#typescript-e-react), com informações e códigos exemplificando as tipagens em um projeto React.
 
+Muitas vezes, para economizar digitação, faço referência ao JavaScript como JS e ao TypeScript como TS.
+
 ## Documentação oficial 
 
 Site para a documentação oficial: https://www.typescriptlang.org/docs/.
@@ -10,7 +12,7 @@ Site para a documentação oficial: https://www.typescriptlang.org/docs/.
 
 - [Flavio Henrique de Souza Almeida](https://www.linkedin.com/in/fl%C3%A1vio-henrique-almeida-a6315747/)
 
-# Typescript
+# TypeScript
 
 É uma **linguagem** e também uma **camada adicional** ao JavaScript (chamam também de "superset" do JS), que dá ao JS um sistema de tipos para as variáveis. Com o TS, haverá uma compilação do código, já informando ao programador qualquer erro de tipagem que for encontrado. Sem o TS, erros de tipagem apareceriam somente em tempo de execução, ou seja, após o código ter sido deployado (imagine descobrir esse erro somente em produção). 
 
@@ -184,11 +186,16 @@ Exemplo criado pela ChatGPT:
 function add(a: number, b: number): number {
   return a + b;
 }
+
+// mesmo exemplo, mas como  uma arrow function
+const add = (a: number, b: number): number => a + b;
 ```
 
 ## Classes e atributos privados 
 
-### No ES6 (ES2015)
+### Em versões mais novas do JS
+
+> Não consegui localizar a partir de qual versão começou a valer o que está escrito abaixo. *Acredito* que seja a partir do ES2022.
 
 Os atributos **privados** só podem ter seus valores definidos pelo **construtor** da classe ou **métodos setters**. Não é possível atribuir um novo valor somente acessando o atributo. Caso tente fazer isso, pode ser até que seja criado um novo atributo com esse valor. Não é possível nem mesmo acessar esse atributo individualmente (precisa de um getter).
 
@@ -264,7 +271,7 @@ Neste caso, não é preciso criar métodos getter para esses atributos, pois ele
 
 O `readonly` possui uma falha: quando sua variável ou atributo é de um tipo mais complexo, como um `Date`, mesmo se você marcá-la como `readonly`, a variável ainda possuirá **acesso aos métodos `set`** do objeto Date, podendo então ser **modificada**.
 
-O que pode ser feito nesse caso é o que o instrutor chama de *programação defensiva*, em que, ao invés de retornarmos a variável/atributo que seja de um tipo complexo, retornamos uma **cópia**. Assim, caso seja modificada, a modificação não irá alterar a referência original. Exemplo:
+Nesse caso, podemos aplicar o que o instrutor chama de *programação defensiva*, em que, ao invés de retornarmos a variável/atributo que seja de um tipo complexo, retornamos uma **cópia**. Assim, caso seja modificada, a modificação não irá alterar a referência original. Exemplo:
 
 ```ts
 private _data: Date
@@ -274,6 +281,8 @@ get data(): Date {
     return new Date(this._data.getTime());
 }
 ```
+
+> Mas nesse exemplo ele usou um atributo privado, e não um readonly. Não entendi... Talvez ele tenha se confundido com readonly quando na verdade ele estava falando sobre private.
 
 ## `constructor` simplificado no TS
 
@@ -301,6 +310,7 @@ Exemplo no modo simplificado (o instrutor chama de 'atalho'):
 ```ts
 export class Negociacao {
     // crio somente o construtor, sem declarar as propriedades fora dele
+    // elas serão inicializadas quando o construtor for chamado
     constructor( 
         private _data: Date, 
         private _quantidade: number, 
@@ -335,7 +345,7 @@ add(1, 2); // OK
 add(3, 5, 9); // também OK
 ```
 
-Os parâmetros opcionais **devem vir por último**, após todos os parâmetros obrigatórios (você não pode, por exemplo, declarar um parâmetro como opcional e em seguida, declarar um parâmetro como obrigatório).
+**Atenção:** os parâmetros opcionais **devem vir por último**, após todos os parâmetros obrigatórios (você não pode, por exemplo, declarar um parâmetro como opcional e em seguida, declarar um parâmetro como obrigatório).
 
 Na implementação da função, é necessário verificar se o parâmetro foi passado ou não, para evitar erros. 
 
@@ -371,7 +381,7 @@ No caso de métodos `protected` herdados, caso haja **sobrescrita** do método (
 
 ### Sobrescrita e sobrecarga de métodos
 
-Quando quiser que as classes filhas implementem um método que está na classe mãe (sobrescrita), você pode fazer a classe mãe jogar um erro, auxiliando o dev a lembrar que o método deve ser implementado na classe filha. Exemplo:
+Quando quiser que as classes filhas implementem um método que está na classe mãe (sobrescrita, ou override em inglês), você pode fazer a classe mãe jogar um erro, auxiliando o dev a lembrar que o método deve ser implementado na classe filha. Exemplo:
 
 ```ts
 template(texto: string): string {
@@ -381,7 +391,7 @@ template(texto: string): string {
 
 **Observação:** esse erro irá acontecer em tempo de *execução*. O melhor, nesse caso, é transformar essa classe em uma classe abstrata e esse método em um método abstrato (ver seção sobre [classe abstrata](#classe-abstrata)).
 
-No caso de o método possuir um argumento cujo tipo *muda* na classe filha (um caso de sobrecarga), é necessário o **uso de `Generics`**. A classe mãe será de um tipo T (`<T>`) e os argumentos que serão modificados também serão marcados com esse mesmo `T`. Desse jeito, você informa que o tipo é "type", cabendo ao dev colocar qual tipo ele irá utilizar e manter a consistência do tipo informado. Exemplo:
+No caso de o método possuir um argumento cujo tipo *muda* na classe filha, é necessário o **uso de `Generics`**. A classe mãe será de um tipo T (`<T>`) e os argumentos que serão modificados também serão marcados com esse mesmo `T`. Desse jeito, você informa que o tipo é "type", cabendo ao dev colocar qual tipo ele irá utilizar e manter a consistência do tipo informado. Exemplo:
 
 ```ts
 // classe Mãe
@@ -391,11 +401,15 @@ export class View<T> {
 }
 
 // classe Filha
+// o tipo T agora é ListaNegociacoes e deve ser mantida essa 
+// consistência em todos os métodos que possuem um tipo T
 export class NegociacoesView extends View<ListaNegociacoes> {
     template(listaNegociacoes: ListaNegociacoes): string { ... }
 }
 
 ```
+
+> não estou certo se isso seria considerado como sobrecarga (overload) do método ou simplesmente uma sobrescrita.
 
 É possível dar **mais de um tipo** genérico, dando um nome a cada um deles (`T`, `K`, por exemplo); cada um pode ser então utilizado em diferentes posições da classe (como um tipo para um argumento, outro tipo para um retorno, etc):
 
@@ -441,6 +455,8 @@ update(arg1?: any, arg2?: any): any {
 
 **Ainda não tenho certeza se isso está totalmente correto**, pois não consegui testar a sobrescrita do método por classes filhas (dá erro de incompatibilidade de tipos). Mais informações [neste link](https://howtodoinjava.com/typescript/function-overloading/).
 
+> Na documentação do TS, eles mostram essa possibilidade, mas consideram como sendo um override. No caso, na classe filha você adiciona o parâmetro (ou parâmetros) como opcional e faz uma condição no corpo do método para chamar o `super()` da mãe caso o parâmetro não seja recebido: ver a seção "Overriding Methods" [neste link](https://www.typescriptlang.org/docs/handbook/2/classes.html#extends-clauses).
+
 ### Classe abstrata
 
 Não é possível criar uma instância diretamente de uma classe abstrata. Ela é herdada por uma classe filha, e será essa classe filha que o dev irá utilizar para criar instâncias. 
@@ -465,11 +481,15 @@ O modificador `abstract` **não** precisa ser utilizado ao implementar o método
 
 Quando um objeto "extende" de outro, ele também pode assumir o tipo de sua classe mãe. Ou seja, na hora de criar uma variável, o tipo dela pode ser **tanto o da classe filha quanto o da classe mãe**.
 
-## Interfaces e API
-
-A interface é uma maneira de tipar dados recebidos de uma API. Ela pode ser utilizada para definir a forma que esses dados serão recebidos.
+## Interfaces
 
 Uma interface é criada com a palavra chave `interface`. Nela, podemos informar propriedades e seus tipos. No entanto, **não podemos** atribuir valores, nem usar modificadores nas propriedades e nem definir implementações a ela.
+
+A interface pode ser utilizada para **tipar** uma variável que seja um objeto. Uma vantagem é que haverá autocomplete das propriedades que ela possui, e será informado erro caso o nome da propriedade seja digitado errado. Além disso, facilita a renomeação de uma propriedade (no VS Code, utlizando a tecla `F2` fará com que a propriedade seja automaticamente renomeada onde ela for chamada no código).
+
+### Interfaces e API
+
+A interface é uma maneira de tipar dados recebidos de uma API. Ela pode ser utilizada para definir a forma que esses dados serão recebidos.
 
 ```ts
 export interface NegociacoesDoDia {
@@ -479,16 +499,14 @@ export interface NegociacoesDoDia {
 }
 ```
 
-A interface pode ser utilizada para **tipar** uma variável. A vantagem é que, quando a interface é utilizada, haverá autocomplete das propriedades que ela possui, e será informado erro caso o nome da propriedade seja digitado errado. Além disso, caso na API seja mudado algum nome, basta renomear a propriedade correspondente na interface e o VS Code irá automaticamente renomeá-la em todos os arquivos (tem que renomear, utilizando o `F2`, senão essa parte automática não acontece).
-
 ### Interfaces e classes
 
-Interfaces também podem possuir métodos e serem utilizadas por classes. Nesse caso, a interface funcionaria como um "contrato"; quando a classe implementa uma interface (keyword `implements`), ela assume que irá implementar os métodos definidos na interface. 
+Interfaces também podem possuir métodos e serem utilizadas por classes. Nesse caso, a interface funcionaria como um "contrato"; quando a classe implementa uma interface (keyword `implements`), ela assume que irá implementar os métodos definidos na interface. Ou seja, neste caso a interface define como uma classe é e **o que** deve fazer, mas não define **como** ela vai fazer isso.
 
 ```ts
 // declaração de interface
 export interface Imprimivel {
-    paraTexto(): string;
+    paraTexto(): string; // declaração de método a ser implementado
 }
 ```
 
@@ -499,15 +517,22 @@ export class Negociacao implements Imprimivel{
 }
 ```
 
-Acaba sendo parecido com uma classe abstrata, mas como a interface não possui implementações nem valores, ela serve mais para obrigar uma classe a implementar certos métodos. Além disso, não existe herança múltipla no TS para classes (há uma exceção, ver abaixo), então não posso estender de mais de uma classe, mas **posso implementar mais de uma interface**.
+#### E a classe abstrata?
 
-### Interfaces e herança
+Uma interface acaba sendo parecida com uma classe abstrata, mas como a interface não possui implementações nem valores, ela serve mais para obrigar uma classe a implementar certos métodos. Já a classe abstrata pode ter alguns métodos implementados nela, além de métodos abstratos que classes filhas deverão implementar. 
 
-Interfaces também podem utilizar de herança, com um adicional: **é possível herança múltipla**. Ou seja, uma interface pode estender de várias interfaces. 
+Além disso, uma diferença importante é que não existe herança múltipla no TS para classes, mas isso é possível para interfaces, ou seja, **uma interface pode estender outras interfaces**.
+
+### Herança múltipla e composição
+
+Como informado anteriormente, **é possível herança múltipla** em interfaces. Quando uma interface estende de outras, ela está adquirindo os comportamentos dessas outras interfaces (mas não os está implementando!). Uma classe que implementa esta interface deverá implementar **todos** os comportamentos, seja os próprios da interface, quanto os herdados das interfaces pai. 
 
 ```ts
+// suponha que Imprimivel e Comparavel são duas outras interfaces
 export interface Modelo<T> extends Imprimivel, Comparavel<T> {}
 ```
+
+Uma classe **pode implementar mais de uma interface**. Isso, no entanto, não é um caso de herança múltipla (a classe não herda da interface, apenas concorda em implementar seus métodos), mas sim um caso de **combinação**.
 
 **Pergunta**: o arquivo JS gerado é somente uma linha de código `export {};`. Por quê?
 
@@ -581,10 +606,10 @@ private _inputData: HTMLInputElement | null;
 
 // opção 2: fazer o casting do que a variável deve receber na atribução
 // aqui, você está assumindo a responsabilidade de que receberá um valor não-nulo (se vier um null, haverá erro em tempo de execução)
-this._inputData: document.querySelector('#data') as HTMLInputElement;
+this._inputData = document.querySelector('#data') as HTMLInputElement;
 
 // outra forma de cast (menos recomendada)
-this._inputData: <HTMLInputElement>document.querySelector('#data');
+this._inputData = <HTMLInputElement>document.querySelector('#data');
 
 // uma variável quando não é tipada é tratada como any (que já aceita null)
 const form = document.querySelector('.form');
@@ -600,7 +625,7 @@ A vantagem do `strictNullChecks` é perceber, em tempo de compilação, momentos
 
 ## Decorator
 
-*Esse é um conceito estranho e complicado. Necessário paciência e testes para entender.*
+> Esse é um conceito estranho e complicado. Necessário paciência e testes para entender.
 
 O TS possui um recurso chamado "Decorator", que é uma função que possui um código que pode ser inserido dentro de outros códigos para executar algum comando que se repete ou é comum a todos eles. Diferente de uma função, partes do Decorator podem executar antes de um bloco de código onde ele é inserido e partes depois (por exemplo, para fazer um teste de performance de um bloco de código).
 
@@ -791,7 +816,7 @@ update(texto: T): void {
 }
 ```
 
-- Este método faz **parte do JS** e pode ser utilizado em projetos não-TS.
+> Este método faz **parte do JS** e pode ser utilizado em projetos não-TS.
 
 ### Debugando o código TS
 
