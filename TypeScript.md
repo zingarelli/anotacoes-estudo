@@ -855,7 +855,7 @@ Quando você **já possui um projeto React desenvolvido** e desejá **migrá-lo*
 
 - `--save`: flag que informa para salvar no `package.json` os pacotes que serão instalados. É uma flag opcional a partir das versões 5.0.0 do npm;
 
-- `@types/{node, react, react-dom, jest}`: são **bibliotecas com tipagens adicionais** (que não vêm por padrão no TS) para node, react, react-dom e jest. Você adiciona as bibliotecas conforme o que há de dependência em seu arquivo `package.json` (se seu projeto não tem o jest como dependência, por exemplo, não há necessidade de instalar a tipagem para ele).
+- `@types/{node, react, react-dom, jest}`: são **bibliotecas com tipagens adicionais** (que não vêm por padrão no TS) para node, react, react-dom e jest. Se seu projeto não tem o jest como dependência, por exemplo, não há necessidade de instalar a tipagem para ele.
 
 Após instalado, precisamos criar um **arquivo de configuração `tsconfig.json`**, que contém as "regras" que desejamos que o TS siga ao avaliar/validar o código. Essas configurações dão flexibilidade para que a validação seja mais (ou menos) rigorosa. Este arquivo pode ser criado na mão ou via NPX (que já cria um arquivo com algumas configurações iniciais):
 
@@ -867,7 +867,7 @@ No `tsconfig.json`, você pode adicionar a linha a seguir para informar que o JS
 
 [Documentação do tsconfig](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) e [propriedades explicadas](https://www.typescriptlang.org/tsconfig).
 
-## Criando um projeto novo com CRA e template TypeScript
+## Criando um projeto novo React + TypeScript com CRA
 
 Quando se trata de um **projeto React novo**, é possível criá-lo com um template TypeScript utilizando o CRA (Create React App do npm). O comando para criar um projeto dessa forma é: 
 
@@ -875,9 +875,21 @@ Quando se trata de um **projeto React novo**, é possível criá-lo com um templ
 
 - Se quiser, também pode adicionar o comando `--use-npm` para forçar a utilização do NPM na criação do app. Isso é útil quando se tem tanto o NPM quanto o Yarn (que é outro gerenciador de pacotes) instalados na máquina - o CRA dá preferência ao Yarn neste caso;
 
-- Atualmente (2023), o **CRA tem sido preterido** por outras tecnologias mais modernas e performáticas, como Next.js. Alguns devs até recomendam não utilizar mais o CRA. Por enquanto, ainda não conheço as outras tecnologias.
+## Criando um projeto novo React + TypeScript com Vite
 
-Será criado um arquivo `tsconfig.json` já com algumas configurações. O restante da estrutura é a de um CRA padrão. 
+Atualmente (2023), o **CRA tem sido preterido** por outras tecnologias mais modernas e performáticas, como Next.js. Alguns devs até recomendam não utilizar mais o CRA. Além do Next.js, outra alternativa é usar o [Vite](https://vitejs.dev/guide/).
+
+[Este artigo da Alura](https://www.alura.com.br/artigos/vite-criar-aplicacao-react-typescript) mostra como usar o Vite para criar um projeto novo em React, usando também o TypeScript. Basicamente, você tem duas opções para criação:
+
+Opção interativa, em que você segue os prompts na tela. Comece a interação digitando:
+
+    npm create vite@latest
+
+Opção direta, em que você especifica o React e o TypeScript:
+
+    npm create vite@latest nome-do-projeto -- --template react-ts
+
+Seja utilizando o CRA ou o Vite, será criado um arquivo `tsconfig.json` já com algumas configurações. 
 
 ## Plugin para o CSS modules
 
@@ -887,7 +899,7 @@ Esse plugin auxilia o VS Code a entender o CSS modules como sendo um módulo Typ
 
 - O `-D` indica que será utilizado somente em tempo de desenvolvimento. É sinônimo da flag `--save-dev` e é opcional para versões do NPM ^5.0.0.
 
-O seguinte código também devem ser adicionado ao arquivo `tsconfig.json`:
+O seguinte código também deve ser adicionado ao arquivo `tsconfig.json`:
 
 ```json
 {
@@ -912,7 +924,7 @@ Em React, é possível criar absolute imports por meio de um arquivo `jsconfig.j
 }
 ```
 
-Eu explico mais sobre absolute imports nas anotações sobre React.
+Eu explico mais sobre absolute imports nas [anotações sobre React](./React.md).
 
 ## Extensão dos arquivos
 
@@ -938,11 +950,96 @@ Maaaas é importante lembrar que o uso do `React.FC` não é obrigatório. Algum
 
 Hoje em dia, na prática em projetos em produção, não se usa mais essa abordagem ([aqui tem uma discussão no github interessante sobre isso](https://github.com/facebook/create-react-app/pull/8177)). Ele era o padrão e, no meio do caminho, **o time do React acabou por não encorajar mais esse tipo de abordagem**."
 
-## Tipagem de props
+## Exemplos de Tipagem com Class Components
 
-Um padrão que pode ser seguido para **tipar as props** de um componente é **usando interfaces**. Dentro do próprio componente (ou em um arquivo externo, se preferir), podemos definir uma interface (convenção de nome `NomeDoComponenteProps` ou só `Props`) e nessa interface listar as props que são aceitas e seus tipos.
+### Tipagem e uso de props
 
-Exemplo criando uma interface e a utilizando para tipar as props de um componente `<Banner />`:
+```ts
+// Button.tsx
+// tipando a prop "texto"
+class Button extends React.Component<{ texto: string }> {
+    render() {
+        return (
+            <button>{this.props.texto}</button>
+        )
+    }
+}
+export default Button;
+
+// usando o componente
+<Button texto='Adicionar' />
+```
+
+### Tipagem e uso de children
+
+É o mesmo exemplo anterior, agora utilizando o children ao invés de uma prop personalizada.
+
+```ts
+// Button.tsx
+class Button extends React.Component<{ children: ReactNode }> {
+    render() {
+        return (
+            <button>{this.props.children}</button>
+        )
+    }
+}
+export default Button;
+
+// usando o componente
+<Button>Adicionar</Button>
+```
+
+## Exemplos de Tipagem com Function Components
+
+### Tipagem e uso de props
+
+Fazendo um destructuring das props e depois tipando cada uma individualmente:
+
+```ts
+// Item.tsx
+// primeiro declara as props, depois informa o tipo de cada uma
+export default function Item({ task, duration }: { task: string, duration: string }) {
+    return (
+        <li>
+            <h3>{task}</h3>
+            <span>{duration}</span>
+        </li>
+    )
+}
+```
+
+### Alternativa utilizando interfaces
+
+Um padrão que pode ser seguido para **tipar as props** de um componente (seja function ou class component) é **usando interfaces**. Dentro do próprio componente (ou em um arquivo externo, se preferir), podemos definir uma interface e nessa interface listar as props que são aceitas e seus tipos. 
+
+Uma convenção de nome para interfaces é usar `NomeDoComponenteProps` ou só `Props`. Outra convenção de nome é colocar o prefixo `I` (de interface): `INomeDaInterface`. 
+
+Uma opção de organização é criar uma pasta "types" para armazenar essas interfaces de tipo:
+
+Exemplo 1: 
+
+```tsx
+// types/ITasks.tsx
+export interface ITasks {
+    task: string;
+    duration: string
+}
+
+// components/Item.tsx
+import { ITasks } from '../types/ITasks';
+
+// a tipagem é mais simples e fácil de ler
+export default function Item({ task, duration }: ITasks) {
+    return (
+        <li>
+            <h3>{task}</h3>
+            <span>{duration}</span>
+        </li>
+    )
+}
+```
+
+Exemplo 2`:
 
 ```ts
 // Banner.tsx
@@ -961,13 +1058,6 @@ const Banner = ({ enderecoImagem, textoAlternativo}: BannerProps) => {
 }
 
 export default Banner;
-```
-
-Funções como props também podem ser tipadas em uma interface: 
-
-```ts
-//Exemplo de tipagem de uma prop que é função, não retorna nada e recebe como parâmetro uma string:
-aoAlterado: (valor: string) => void;
 ```
 
 ## Tipagem de props que são objetos
@@ -1069,91 +1159,6 @@ Caso não queira ser específico no tipo do evento, é possível utilizar um tip
 onChange={ e => ... }
 ```
 
-## Exemplos de Tipagem com Class Components
-
-### Tipagem e uso de props
-
-```ts
-// Button.tsx
-// tipando a prop "texto"
-class Button extends React.Component<{ texto: string }> {
-    render() {
-        return (
-            <button>{this.props.texto}</button>
-        )
-    }
-}
-export default Button;
-
-// usando o componente
-<Button texto='Adicionar' />
-```
-
-### Tipagem e uso de children
-
-É o mesmo exemplo anterior, agora utilizando o children ao invés de uma prop personalizada.
-
-```ts
-// Button.tsx
-class Button extends React.Component<{ children: ReactNode }> {
-    render() {
-        return (
-            <button>{this.props.children}</button>
-        )
-    }
-}
-export default Button;
-
-// usando o componente
-<Button>Adicionar</Button>
-```
-
-## Exemplos de Tipagem com Function Components
-
-### Tipagem e uso de props
-
-Fazendo um destructuring das props e depois tipando cada uma individualmente:
-
-```ts
-// Item.tsx
-// primeiro declara as props, depois informa o tipo de cada uma
-export default function Item({ task, duration }: { task: string, duration: string }) {
-    return (
-        <li>
-            <h3>{task}</h3>
-            <span>{duration}</span>
-        </li>
-    )
-}
-```
-
-### Alternativa utilizando interfaces
-
-Outra **convenção de nome** para interfaces é colocar o prefixo `I` (de interface): `INomeDaInterface`. Também por convenção, podemos **criar uma pasta "types" para armazenar essas interfaces** de tipo:
-
-```tsx
-// types/ITasks.tsx
-export interface ITasks {
-    task: string;
-    duration: string
-}
-
-// /components/Item.tsx
-import { ITasks } from '../types/ITasks';
-
-// a tipagem é mais simples e fácil de ler
-export default function Item({ task, duration }: ITasks) {
-    return (
-        <li>
-            <h3>{task}</h3>
-            <span>{duration}</span>
-        </li>
-    )
-}
-```
-
-Essa tipagem utilizando interfaces **também pode ser aplicada a class components**.
-
 ### Tipagem de funções como props
 
 Quando passo uma função como prop, ela também deve ser tipada. Para isso, deve-se adicionar tipagem aos **argumentos** e também ao **retorno**. Posso fazer isso informando o nome da função e seu tipo como uma arrow function, fazendo a tipagem dentro dessa arrow function. Caso a função não retorne nada, seu tipo de retorno é `void`.
@@ -1169,7 +1174,7 @@ A tipagem de funções em **class components é feita da mesma maneira**.
 
 ## Organização de pastas
 
-Uma boa prática é criar uma pasta `shared/interfaces` (ou somente `interfaces`) para colocar as interfaces de entidades que são utilizadas por diferentes componentes da aplicação. Cria-se uma interface por arquivo, com a convenção `INomeDoComponente.ts` (ts, pois não irá produzir um JSX). Desse modo, centralizo as tipagens de entidades, facilitando o reuso e a manutenção.
+Uma boa prática é criar uma pasta `shared/interfaces` (ou somente `interfaces`) para colocar as interfaces de entidades que são utilizadas por diferentes componentes da aplicação. Cria-se uma interface por arquivo. Desse modo, centralizo as tipagens de entidades, facilitando o reúso e a manutenção.
 
 ```ts
 // shared/interfaces/IColaborador.ts:
