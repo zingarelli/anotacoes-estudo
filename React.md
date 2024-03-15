@@ -1478,6 +1478,29 @@ http.get<IRestaurante[]>('restaurantes/')
 http.delete(`restaurantes/${restaurante.id}/`)
 ```
 
+### Interceptors
+
+O Axios disponibiliza [interceptadores (interceptors)](https://github.com/axios/axios?tab=readme-ov-file#interceptors), que eu posso adicionar à minha instância do axios para lidar com as requests e responses antes de elas serem enviadas/devolvidas. Por exemplo, em uma chamada GET, posso usar um interceptador de request para passar dados à propriedade `headers` da request. No exemplo abaixo, estou enviando um token de autenticação na propriedade `Authorization` que se encotra no `headers` da requisição. Assim, códigos que utilizem essa instância do axios não precisam se preocupar em saber qual é o token ou como obtê-lo.
+
+```ts
+// no mesmo arquivo em que uma instância do axios foi criada em uma variável chamada http
+
+// interceptador de requisições (requests)
+http.interceptors.request.use(function (config) {
+    // essa função será chamada antes do envio da request
+    // envio do token pelo header da requisição
+    const access_token = sessionStorage.getItem('token');
+    if (access_token && config.headers) {
+        config.headers.Authorization = `Bearer ${access_token}`
+    }
+    return config;
+}, function (error) {
+    // essa função será chamada se a request der algum erro
+    console.log('Ocorreu um erro no interceptor do axios!')
+    return Promise.reject(error);
+});
+```
+
 ## Envio de conteúdo binário usando `FormData`
 
 Quando queremos enviar ao backend algum **conteúdo binário** (o upload de uma imagem, por exemplo), não é possível o envio de um JSON, que só trafega texto. 
@@ -1677,6 +1700,29 @@ className={classNames(
     styles.filtros__filtro,
     styles['filtros__filtro--ativo']
 )}
+```
+
+## Biblioteca  `Intl`
+
+O React possui a biblioteca `Intl`, que auxilia na internacionalização de alguns dados, devolvendo-os formatado adequadamente à localização da pessoa usuária. Por exemplo, para devolver um número no formato da moeda brasileira, podemos criar uma função formatadora:
+
+```ts
+const formataMoeda = Intl.NumberFormat('pt-br', { style: 'currency', currency:'BRL' });
+console.log(formataMoeda.format(126.9)); // R$ 126,90
+```
+
+## Problemas com data exibida no dia anterior
+
+Imprimir datas usando o `Date` do JavaScript às vezes pode causar efeitos inesperados como a data do dia anterior sendo impressa (devido a questões de fuso horário). Uma forma de imprimir a data correta é fazer uma função formatadora que leve em conta o fuso do computador em que a aplicação estiver rodando:
+
+```ts
+const formataData = (data: Date) => {
+    const timezoneOffset = data.getTimezoneOffset()
+    data.setMinutes(data.getMinutes() + timezoneOffset) // ajuste do tempo para a máquina rodando o app
+    return data.toLocaleDateString()
+}
+console.log(formataData(new Date("2022-08-01"))) // 01/08/2022
+console.log(new Date("2022-08-01").toLocaleDateString()) // 31/07/2022
 ```
 
 ---
