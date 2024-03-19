@@ -239,6 +239,8 @@ git stash
 
 Salva os arquivos em um **local temporário** da sua máquina, por exemplo, para alterações que eu ainda não terminei mas que não vou commitar por enquanto. Desse modo, essas alterações não são perdidas. Isso não afeta branches, ou seja, você pode salvar arquivos no stash e fazer modificações/navegações entre branches. Atenção: ao fazer isso, seu código será revertido para o do último commit.
 
+`git stash save <mensagem>`: permite que você adicione uma mensagem ao salvar os arquivos no stash.
+
 `git stash list`: lista todas as modificações que foram salvas no stash (caso você tenha usado o comando git stash mais de uma vez)
 
 `git stash apply numero_da_lista`: traz de volta as modificações que foram salvas e faz um merge com as outras alterações que foram feitas desde então. O `numero_da_lista` é o numero que vem entre chaves na lista informada pelo `git stash list` e que você quer recuperar (`stash@{0}:`).
