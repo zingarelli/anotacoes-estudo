@@ -281,6 +281,8 @@ const NomeEProfissao = function({name, job}) {
 }
 ```
 
+Dica: você pode dar um outro nome às propriedades do destructuring, passando o novo nome após um sinal de dois pontos (`{ name: fullName, job: currentJob }`). Isso é algo inerente do JavaScript, e não do React.
+
 Você pode passar valores default usando a propriedade `defaultProps`, que já vem disponível em componentes. Dentro dela, você define a propriedade e seu valor default:
 
 ```js
@@ -1724,6 +1726,10 @@ const formataData = (data: Date) => {
 console.log(formataData(new Date("2022-08-01"))) // 01/08/2022
 console.log(new Date("2022-08-01").toLocaleDateString()) // 31/07/2022
 ```
+
+## Ícones para "loading"
+
+O site [Loading.io](https://loading.io/css) disponibiliza 12 ícones diferentes de loading feitos puramente com CSS. Você pode selecionar o que deseja e copiar o HTML/CSS para renderizá-lo em sua página. Esses ícones estão gratuitos, sob a [licença CC0](https://creativecommons.org/public-domain/cc0/).
 
 ---
 
@@ -3328,6 +3334,81 @@ Caso encontre problemas no deploy, adicione esta entrada no `package.json` para 
 "engines": {
     "node": "16.x"
 },
+```
+
+--- 
+
+# React Query
+
+É uma [biblioteca famosa](https://tanstack.com/query/latest/docs/framework/react/overview) que se oferece como alternativa ao data fetching e ao gerenciamento dos estados do servidor.
+
+Necessário instalar. No curso, foi utilizada a versão 4.6.0.
+
+    npm i @tanstack/react-query@4.6.0
+
+**Observação:** a partir da versão 5, algumas funções foram alteradas (o `useQuery` é uma delas). Então as explicações escritas aqui **valem para a versão 4** e podem não estar mais corretas para a versão 5.
+
+De uma maneira semelhante a como estruturamos o código para uso da Context API, para que componentes possam usar o que o React Query oferece, eles devem ser descendentes de um componente chamado `<QueryClientProvider>`. Este componente requer uma instância da classe `QueryClient`. Exemplo de código:
+
+```ts
+// cliente para efetuar o data fetching
+const queryClient = new QueryClient();
+
+function App() {
+  return (
+    // componente que disponibiliza o React Query para seus componentes-filhos
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Rotas />
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+}
+```
+
+## Hook `useQuery`
+
+Para obter dados da API, podemos usar o **hook `useQuery`**, passando dois parâmetros: uma `queryKey` e uma `queryFn`.
+
+- a `queryKey` é um array que contém uma string que você passa para dar um nome único para a query. Caso a função em `queryFn` use variáveis que podem mudar de valor, você passa a variável como próximo elemento no array (é mais fácil entender no código de exemplo a seguir);
+
+- a `queryFn` é uma função que você define para fazer de fato a obtenção dos dados (a "query"). Essa função deve retornar uma promise ou um erro.
+
+A `useQuery` retorna uma série de propriedades. Dentre elas estão:
+
+- `data`: retorna os dados da promise, caso tenha sido executada com sucesso;
+
+- `isLoading`: um booleano que informa se a query já terminou;
+
+- `error`: para caso alguma coisa dê errada.
+
+Ambos `data` e `isLoading` são parecidos com variáveis de estado (que você não precisa se preocupar em declarar ou gerenciar), sendo atualizadas pelo próprio `useQuery` e **causam um re-render no componente** quando mudam.
+
+Consulte a [documentação](https://tanstack.com/query/v4/docs/framework/react/reference/useQuery) para mais informação sobre outros parâmetros e propriedades.
+
+Você pode tipar `data` e `error`. Para isso, use dois generics em `useQuery`, sendo que o primeiro irá tipar `data` e o segundo, `error`. Veja no exemplo:
+
+Exemplo de código:
+
+```ts
+const { slug } = useParams();
+
+// data fetching com React Query
+// no destructuring, posso renomear uma propriedade passando o novo nome após ":"
+const { data: categoria, isLoading, error } = useQuery<ICategoria, AxiosError>(
+    // queryKey é o primeiro parâmetro e está passando a variável slug como dependência
+    ['categoriaPorSlug', slug], 
+    // queryFn é o segundo parâmetro e está chamando uma função definida em outro código
+    () => obterCategoriaPorSlug(slug || '')
+)
+
+if (error) {
+        console.log(error.message);
+        return <h1>Que vergonha! Alguma coisa deu errado!</h1>
+    }
+
+// renderiza um ícone de loading enquanto os dados não foram carregados
+if (isLoading) return <Loader />
 ```
 
 ---
