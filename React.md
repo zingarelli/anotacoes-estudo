@@ -3580,7 +3580,7 @@ Com o GraphQL, podemos também **criar variáveis e usá-las como argumentos par
 
 A variável é definida entre parênteses após o nome da query. O nome da variável deve iniciar com `$` e pode ser qualquer nome (ou seja, no exemplo abaixo `$categoriaId` podia ser `$catId` ou qualquer outra coisa). Ela precisa ter um tipo (o GraphQL tem seu próprio conjunto de tipos e também é possível definir novos tipos). Você passa a variável como argumento para algum campo (novamente entre parênteses), associando a variável ao campo que você quer filtrar.
 
-Por exemplo, se queremos obter livros de uma categoria específica, podemos fazer: 
+Por exemplo, se quisermos obter livros de uma categoria específica, podemos fazer: 
 
 ```ts
 const OBTER_LIVROS = gql`
@@ -3610,6 +3610,24 @@ const { data } = useQuery<{ livros: ILivro[] }>(OBTER_LIVROS, {
 ```
 
 - os parâmetros são opcionais. Quando não enviados à query, ela executa como se não houvesse um filtro. Ou seja, no exemplo acima, caso nenhum parâmetro fosse enviado, `data` retornaria os campos solicitados para os livros de todas as categorias.
+- é possível criar parâmetros que sejam obrigatórios. Para isso, adicione `!` após o tipo. Ao tornar um parâmetro obrigatório, caso ele não seja enviado, será retornado um erro. Exemplo de query com parâmetro obrigatório:
+
+```ts
+const OBTER_LIVROS = gql`
+  query ObterLivros($categoriaId: Int!) {
+    livros(categoriaId: $categoriaId) {
+      id,
+      imagemCapa,
+      slug,
+      titulo,
+      opcoesCompra {
+        preco,
+        id
+      }
+    }
+  }
+`
+```
 
 ## `refetch`
 
@@ -3650,11 +3668,11 @@ const buscarLivros = (e: React.FormEvent<HTMLFormElement>) => {
 
 ## Variáveis reativas
 
-É uma forma de **gerenciar estados locais**, disponibilizada pelo Apollo Client. Similar ao `useState`, quando um componente usa uma variável reativa (por meio do rook `useReactiveVar`), ele será **re-renderizado caso essa variável reativa seja atualizada**. No entanto, diferente do `useState`, que só pode ser utilizado em componentes, uma variável reativa pode ser utilizada em outras partes da aplicação, e não somente em componentes.
+É uma forma de **gerenciar estados locais**, disponibilizada pelo Apollo Client. Similar ao `useState`, quando um componente usa uma variável reativa (por meio do hook `useReactiveVar`), ele será **re-renderizado caso essa variável reativa seja atualizada**. No entanto, diferente do `useState`, que só pode ser utilizado em componentes, uma variável reativa pode ser utilizada em outras partes da aplicação, e não somente em componentes.
 
 Para criar uma variável reativa, é utilizado o método `makevar`. Ele irá devolver uma **função**, que atua tanto como um getter quanto um setter da variável reativa. Ou seja, para obter o valor de uma variável reativa, você chama a função sem argumentos; já para modificar o valor da variável reativa, você chama a função e passa como argumento o novo valor que você quer atribuir à variável reativa.
 
-- uma convenção é adicionar o sufixo -Var para o nome da  variável reativa.
+- uma convenção é adicionar o sufixo `-Var` para o nome da  variável reativa.
 
 ```ts
 // criando uma variável reativa 
@@ -3695,6 +3713,61 @@ export const useLivros = (categoria: ICategoria) => {
 ```
 
 Com isso, podemos encapsular toda a parte de consulta em um código à parte, que chama a `useQuery` e atualiza o estado da variável reativa, e então usar somente a variável reativa no componente por meio do hook `useReactiveVar`, separando as responsabilidades.
+
+## Mutations
+
+Mutation é a forma de adicionar/atualizar dados no GraphQL. As mutations que estão disponíveis para uso são listadas na aba "DOCS" do playground (imagino que a pessoa responsável pelo back-end cria essas mutations). 
+
+Para usar uma mutation no GraphQL, usamos a palavra-chave `mutation`, damos um nome a ela, e então adicionamos a mutation que queremos usar, passando os parâmetros se necessário.
+
+```graphql
+mutation MinhaMutation($id: Int!) {
+  nomeDaMutation(id: $id)
+}
+```
+
+### `useMutation`
+
+Este é o hook que utilizamos para executar uma mutation. Ele devolve uma tupla, sendo que o primeiro elemento é a função que executa a mutation no graphQL (podemos dar o nome que quisermos a essa função). O segundo elemento é um objeto com os resultados da execução da mutation; dentre eles, temos a propriedade booleana `loading`, que é true se a query ainda estão em execução. 
+
+Basta então executar a função retornada pelo `useMutation` e, caso a mutation precise de algum parâmetro, enviamos à função em um objeto com a propriedade `variables`. 
+
+```ts
+const ADICIONAR_ITEM = gql`
+mutation AdicionarItem($item: ItemCarrinhoInput!) {
+  adicionarItem(item: $item)
+}
+`
+
+const [nomeParaAFuncao, { loading }] = useMutation(ADICIONAR_ITEM);
+
+const adicionarItemCarrinho = (item: IItemCarrinho) => {
+    nomeParaAFuncao({
+        variables: {
+            item: {
+                livroId: item.livroId,
+                opcaoCompraId: item.opcaoCompra.id,
+                quantidade: item.quantidade
+            }
+        }
+    })
+}
+```
+
+#### `refetchQueries`
+
+O `useMutation` aceita um segundo parâmetro, que é um objeto com opções. Uma dessas opções é a propriedade chamada `refetchQueries`. Ela é um array em que você pode passar as queries que deseja que sejam executadas novamente após uma mutation. Por exemplo, após uma mutation que modifica a quantidade de um item do carrinho, você pode solicitar o refetch da query que obtém dados do carrinho, de modo a receber os itens e valores atualizados.
+
+  - esse array aceita tanto uma string com o nome de uma query que já foi executada (query nomeada dentro de um gql) quanto uma variável que tenha a template literals com a função `gql` da query.
+
+```ts
+const adicionarAoCarrinho = useMutation(ADICIONAR_ITEM, {
+    // faço novamente a query de obter carrinho toda vez que a função de mutation for 
+    // chamada, de modo a atualizar o carrinho. OBTER_CARRINHO é uma variável que contém
+    // a template literals com a função gql que executa uma query chamada obterCarrinho
+    refetchQueries: [OBTER_CARRINHO]
+});
+```
 
 ---
 
