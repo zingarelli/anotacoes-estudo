@@ -2,7 +2,11 @@
 
 ## Instrutores
 
-[Vinicius Dias](https://www.linkedin.com/in/cviniciussdias/) 
+- [Vinicius Dias](https://www.linkedin.com/in/cviniciussdias/) 
+
+- [Gabrielle Ribeiro Gomes](https://www.linkedin.com/in/gabrielleribeiro/)
+
+- [Rodrigo da Silva Ferreira Caneppele](https://www.linkedin.com/in/rcaneppele)
 
 Cursos: 
 
@@ -10,7 +14,13 @@ Cursos:
 
 - ["Git e GitHub: estratégias de ramificação, Conflitos e Pull Requests"](https://www.alura.com.br/curso-online-git-github-branching-conflitos-pull-requests)
 
-*Com algumas anotações do curso de GIT do Bootcamp TQI | DIO*.
+*Com algumas anotações do curso de GIT do Bootcamp TQI | DIO*
+
+Atualização 2024:
+
+- [Git e GitHub: compartilhando e colaborando em projetos](https://cursos.alura.com.br/course/git-github-compartilhando-colaborando-projetos)
+
+- [Git e GitHub: dominando controle de versão de código](https://cursos.alura.com.br/course/git-github-dominando-controle-versao-codigo)
 
 ## Introdução
 
@@ -20,23 +30,23 @@ As letras que formam GIT não têm um significado, mas é alvo de sarcasmo do pr
 
 Git precisa ser instalado na máquina (no Linux às vezes já vem instalado). 
 
-- Link: https://git-scm.com/
+> Link: https://git-scm.com/
 
-Uma das **vantagens** do Git sobre outros sistemas de controle de versão é que com o Git você tem uma versão no seu repositório local, na sua máquina, podendo trabalhar em cima dessa versão e depois fazer o push para o repositório remoto. Possível **trabalhar "offline" e de modo distribuído** (cada pessoa tem o arquivo em seu repositório local, depois devem ser resolvidos os problemas de merge entre alterações diferentes em um mesmo arquivo).
+Uma das **vantagens** do Git sobre outros sistemas de controle de versão é que com o Git você tem uma versão no seu repositório local, na sua máquina, podendo trabalhar em cima dessa versão e depois fazer o push para o repositório remoto, ou seja, um repositório acessado por todos da equipe, o que centraliza todas as mudanças. Possível **trabalhar "offline" e de modo distribuído** (cada pessoa tem o arquivo em seu repositório local, depois devem ser resolvidos os problemas de merge entre alterações diferentes em um mesmo arquivo).
 
 ## Definições
 
 **VCS**: Version Control System.
 
-O **Git** é a **ferramenta** para o versionamento; o **GitHub** é um **repositório remoto** de código
+O **Git** é a **ferramenta** para o versionamento; o **GitHub** é um **repositório remoto** de código.
 
-- o GitHub é muito utilizado pelos programadores e também pode servir de "vitrine"/portifólio para aqueles que procuram por um emprego na área, de modo a poderem mostrar aos recrutadores os projetos que desenvolvem ou já desenvolveram.
+> O [GitHub](https://github.com) é muito utilizado pelos programadores e também pode servir de "vitrine"/portifólio para aqueles que procuram por um emprego na área, de modo a poderem mostrar aos recrutadores os projetos que desenvolvem ou já desenvolveram.
 
 **Git Bash**: é um terminal de comando que pode ser instalado durante a instalação do Git. Lembra o Vim. Os comandos para navegar em pastas e tal são iguais aos do Linux. Também tem umas cores para tornar a interface mais amigável e facilitar a leitura/execução dos comandos. 
 
-- Mas é possível também chamar o Git pelo CMD do Windows (acertando as variáveis no PATH). 
+> É possível também chamar o Git pelo CMD do Windows (acertando as variáveis no PATH). 
 
-- Você também pode clicar com o botão direito na pasta em que está seu código e selecionar para abrir com o Git Bash; com isso, ele será aberto já no caminho para esta pasta.
+> Você também pode clicar com o botão direito na pasta em que está seu código e selecionar para abrir com o Git Bash; com isso, ele será aberto já no caminho para esta pasta.
 
 ## Versionamento e repositórios
 
@@ -53,6 +63,33 @@ O Git versiona **repositórios**, ou seja, é necessário **criar uma pasta** pa
 - no caso de pastas, digite o caminho até a pasta (relativo à raiz do repositório) e insira a barra / no final do nome da pasta;
 
 - informar o nome de uma pasta faz com que **todo conteúdo dentro dela (incluindo subpastas)** também seja ignorado.
+
+- também é possível ignorar todos os arquivos de uma extensão, por meio da máscara `*.nome_da_extensao`
+
+Exemplos: 
+
+```
+# exemplo de comentario
+arquivo_ignorado.c
+
+# quando ha somente a barra no final, ignora 
+# todas as pastas que tenham o nome pasta
+# Ex: confidencial/, docs/confidencial, etc 
+# serao ignorados
+confidencial/
+
+# uma barra no comeco ou no meio indica um
+# caminho relativo, entao sera ignorada 
+# somente essa pasta
+# Nesse exemplo, somente docs/segredo/ sera
+# ignorado
+docs/segredo/
+
+# ignorando todos os arquivos .tmp
+*.tmp
+```
+
+> O site [gitignore.io](https://www.toptal.com/developers/gitignore/) disponibiliza templates de gitgnore para diversas linguagens de programação.
 
 ### Repositório remoto
 
@@ -108,6 +145,12 @@ Resolvidos os conflitos, segue o processo de commit dessas mudanças e, aí ent�
 
 ## Comandos git
 
+Segue abaixo uma lista de comandos git, com uma descrição do que fazem e como executá-los no terminal. Essa lista é uma referência e não está em uma ordem específica.
+
+### `--help`
+
+Essa é uma **opção** que você pode adicionar a qualquer comando git (exemplo: `git status --help`) para obter um manual de como o comando funciona e quais opções ele aceita. Em versões atuais, esse manual será aberto no navegador, e não na linha de comando.
+
 ### `git init`
 
 ```bash
@@ -139,7 +182,7 @@ Os dois comandos acima servem para informar o nome e e-mail de quem está trabal
 git status
 ```
 
-Dá detalhes sobre os arquivos em seu repositório. Por exemplo, o comando informa se há arquivos que foram criados ou modificados e que ainda não foram commitados ou enviados ao repositório central. Também informa em qual branch você está trabalhando.
+Dá detalhes sobre os arquivos em seu repositório. Por exemplo, o comando informa se há arquivos que foram criados ou modificados e que ainda não foram commitados ou enviados ao repositório remoto. Também informa em qual branch você está trabalhando.
 
 ### `git add`
 
@@ -167,15 +210,11 @@ Informa ao git que o arquivo deverá ser adicionado ao próximo commit a ser exe
 git commit -m "descricao_curta_de_seu_commit"
 ```
 
-Commita suas alterações que estão em "stage", para serem salvas no repositório remoto. As alterações são de fato salvas no repositório remoto por meio do [`git push`](#git-push).
+"Commita" suas alterações que estão em "stage", e as prepara para serem salvas no repositório remoto. Ou seja, é um jeito de informar alterações que foram feitas no projeto para resolver uma tarefa, corrigir um bug, etc. 
 
-### `git reset`
+Isso ajuda a manter um histórico de modificações no projeto e quais arquivos foram alterados/adicionados/removidos. Por meio de outros comandos git, podemos usar esse histórico para "navegar no tempo" do projeto, verificando como ele estava em diferentes etapas.
 
-```bash
-git reset --soft HEAD~1
-```
-
-**Desfaz** seu último commit, mas **mantém** as alterações que haviam sido feitas. Útil quando, por exemplo, você commitou, mas viu que faltou uma pequena alteração. Ao invés de aplicar a alteração e criar um novo commit, você pode usar esse comando para desfazer o commit, aplicar a alteração, e então commitar. Seria como um "`Ctrl+Z`".
+> As alterações "commitadas" ficam salvas no repositório **local**. Para de fato salvá-las no repositório remoto, utilizamos o comando [`git push`](#git-push).
 
 ### `git log`
 
@@ -183,11 +222,37 @@ git reset --soft HEAD~1
 git log
 ```
 
-Existe o histórico de commits feitos, em ordem decrescente de data, trazendo nome e email de quem commitou, o código Hash e a mensagem de cada commit.
+Exibe o histórico de commits feitos, em ordem decrescente de data, trazendo nome e email de quem commitou, o código Hash e a mensagem de cada commit.
 
-`git log --oneline`: histórico resumido; mostra somente parte do hash e mensagem de cada commit. Facilita quando você só quer ler as mensagens de cada commit;
+> `git log --oneline`: histórico resumido; mostra somente parte do hash e mensagem de cada commit. Facilita quando você só quer ler as mensagens de cada commit para uma consulta rápida;
 
-`git log -p`: histórico detalhado: mostra também as alterações feitas por cada commit.
+> `git log -p`: histórico detalhado: mostra também as alterações (diff) feitas por cada commit em relação ao commit anterior.
+
+> `git log --graph`: mostra os commits com alguns símbolos auxiliares no começo de cada linha (`|`, `\`, `/`) para criar "bifurcações" na linha do tempo, de modo a facilitar a visualização de branches e merges que aconteceram. O símbolo `|` indica que os commits estão seguindo uma linha direta, ou seja, pertencem a uma mesma branch (geralmente a main). O símbolo `/` indica quando uma branch começou e o `\` indica o momento em que houve um merge dessa branch. Desse modo, você consegue ver o histórico de commits de uma maneira identada, permitindo verificar o histórico por branches.
+
+### `git show`
+
+```bash
+git show hash_do_commit
+```
+
+Mostra o commit específico e também o diff dele com o commit anterior a ele.
+
+> Se você omitir o `hash_do_commit`, será mostrado o commit do HEAD (geralmente é o último commit).
+
+### `git diff`
+
+```bash
+git diff
+```
+
+Mostra as **diferenças** no código atual e o código do último commit, caso você tenha modificações nos códigos que ainda não estão em stage. 
+
+E se for mais de um arquivo? Ele vai mostrar as diferenças arquivo por arquivo; a linha de comando dá indicações de quando um arquivo termina e um novo será mostrado.
+
+> `git diff hash_commmit_X..hash_commmit_Y`: mostra as diferenças desde o `hash_commmit_X` até o `hash_commmit_Y`. Se **X for um commit mais antigo que Y**, serão mostradas as diferenças em ordem **cronológica**. Caso X seja um commit mais novo que Y, as diferenças serão mostradas em ordem cronológica reversa (meio que mostrando o que será desfeito de X para Y).
+
+> o mesmo comando pode ser aplicado para nome de branches.
 
 ### `git remote`
 
@@ -197,7 +262,13 @@ git remote add nome_do_repositorio_remoto endereco_para_o_repositorio_remoto
 
 Cria uma ligação entre o repositório local e um repositório remoto. O endereço pode ser tanto uma pasta da própria máquina (precisa ser preparada com o `git init --bare`), quanto uma URL (para um repositório online criado no GitHub, por exemplo). O `nome_do_repositorio_remoto` é o nome que você dará para esse repositório remoto, e que será necessário na hora do `push`/`pull`. A convenção é usar o nome "origin".
 
-`git remote -v`: lista os repositórios remotos.
+> Para listar todos os repositórios remotos vinculados ao seu repositório local, use o comando: `git remote -v`. Se quiser só ver o nome dos repositórios, omita o `-v`.
+
+> Para remover (desvincular) um repositório remoto: `git remote remove nome_do_repositorio_remoto`.
+
+> Para atualizar o caminho de um repositório remoto: `git remote set-url nome_do_repositorio_remoto novo_endereco_para_o_repositorio_remoto`
+
+> Para renomear um repositório remoto: `git remote rename nome_atual novo_nome`
 
 ### `git push` 
 
@@ -223,9 +294,9 @@ Comando oposto ao `push`, baixa os arquivos do repositório remoto e tenta adici
 
 - Há um segundo argumento `[nome_da_branch]` que você pode passar para indicar que você quer atualizar sua branch local com o conteúdo da branch remota indicada. **Tome cuidado para não atualizar a branch local errada** ao usar esse argumento. Quando não passado, o pull será feito da branch local em que você está. 
 
-O que acontece com os arquivos que você alterou e ainda não commitou após um `pull`? Perde os dados? Os arquivos alterados não são baixados?
+**Pergunta**: O que acontece com os arquivos que você alterou e ainda não commitou após um `pull`? Perde os dados? Os arquivos alterados não são baixados?
 
-Resposta: se os arquivos estiverem alterados no repositório remoto e também foram modificados no repositório local (mas ainda não commitados), ao fazer o `pull` o git irá emitir um erro de que o arquivo será sobrescrito pelo merge. A solução que o git informa é commitar o arquivo que está modificado no repositório local ou usar o `git stash` antes de fazer o pull (ver mais abaixo sobre o [`git stash`](#git-stash)).
+**Resposta**: se os arquivos estiverem alterados no repositório remoto e também foram modificados no repositório local (mas ainda não commitados), ao fazer o `pull` o git irá emitir um erro de que o arquivo será sobrescrito pelo merge. A solução que o git informa é commitar o arquivo que está modificado no repositório local ou usar o `git stash` antes de fazer o pull (ver mais abaixo sobre o [`git stash`](#git-stash)).
 
 - Se optar por commitar, ao fazer o `git pull` o próprio git irá tentar fazer o merge das modificações que estão no repositório remoto e no local;
 
@@ -239,29 +310,19 @@ git stash
 
 Salva os arquivos em um **local temporário** da sua máquina, por exemplo, para alterações que eu ainda não terminei mas que não vou commitar por enquanto. Desse modo, essas alterações não são perdidas. Isso não afeta branches, ou seja, você pode salvar arquivos no stash e fazer modificações/navegações entre branches. Atenção: ao fazer isso, seu código será revertido para o do último commit.
 
-`git stash save <mensagem>`: permite que você adicione uma mensagem ao salvar os arquivos no stash.
+> `git stash save "sua mensagem aqui"`: permite que você adicione uma mensagem ao salvar os arquivos no stash.
 
-`git stash list`: lista todas as modificações que foram salvas no stash (caso você tenha usado o comando git stash mais de uma vez)
+- o comando mais atual é `git stash push -m "sua mensagem aqui"`
 
-`git stash apply numero_da_lista`: traz de volta as modificações que foram salvas e faz um merge com as outras alterações que foram feitas desde então. O `numero_da_lista` é o numero que vem entre chaves na lista informada pelo `git stash list` e que você quer recuperar (`stash@{0}:`).
+> `git stash list`: lista todas as modificações que foram salvas no stash (caso você tenha usado o comando git stash mais de uma vez). Cada modificação ganha um número na lista (um índice na pilha do stash), facilitando seu acesso
 
-`git stash drop numero_da_lista`: remove o que foi salvo na stash
+> `git stash apply numero_da_lista`: traz de volta as modificações que foram salvas e faz um merge com as outras alterações que foram feitas desde então. O `numero_da_lista` é o número que vem entre chaves na lista informada pelo `git stash list` e que você quer recuperar (exemplo: `stash@{0}:`). Esse comando **não** remove o item da stash.
 
-`git stash pop`: traz as modificações do último `git stash` feito e o remove da lista do stash (é uma combinação de `git stash apply 0` e `git stash drop`); é como um pop de pilha.
+> `git stash drop numero_da_lista`: remove o que foi salvo na stash, no índice passado em `numero_da_lista`.
 
-### `git diff`
+> `git stash pop`: traz as modificações do último `git stash` feito e o remove da lista do stash (é uma combinação de `git stash apply 0` e `git stash drop`); é como um pop de pilha.
 
-```bash
-git diff
-```
-
-Mostra as **diferenças** no código atual e o código do último commit, caso você tenha modificações no arquivo. 
-
-E se for mais de um arquivo? Ele vai mostrar as diferenças arquivo por arquivo; a linha de comando dá indicações de quando um arquivo termina e um novo será mostrado.
-
-`git diff hash_commmit_X..hash_commmit_Y`: mostra as diferenças desde o `hash_commmit_X` até o `hash_commmit_Y`
-
-- o mesmo pode ser aplicado para branches.
+> `git stash clear`: limpa todas as modificações salvas no stash. Use com cautela.
 
 ### `git clone`
 
@@ -269,14 +330,17 @@ E se for mais de um arquivo? Ele vai mostrar as diferenças arquivo por arquivo;
 git clone caminho_do_repositorio_remoto nome_para_a_pasta_local
 ```
 
-Clona um projeto, ou seja, baixa os arquivos de um repositório remoto para a máquina e salva em uma pasta com o `nome_para_a_pasta_local`. 
+Clona um projeto, ou seja, baixa os arquivos de um repositório **remoto** para uma pasta da sua máquina com o `nome_para_a_pasta_local`. 
 
-- se quiser salvar o repositório na pasta corrente (e ela estiver **vazia**), basta usar o ponto (`.`) no lugar.
-- se você não passar o `nome_para_a_pasta_local`, será criada uma pasta com o nome do repositório clonado. Por exemplo, caso o `caminho_do_repositorio_remoto` seja `https://github.com/zingarelli/anotacoes-estudo.git`, será criada a pasta `anotacoes-estudo` e o conteúdo do repositório será salvo dentro dela.
+> Se quiser salvar o repositório na pasta corrente (e ela estiver **vazia**), basta usar o ponto (`.`) ao invés de `nome_para_a_pasta_local`: `git clone caminho_do_repositorio_remoto .`
+
+> Se você **não passar** o `nome_para_a_pasta_local`, será criada uma pasta com o nome do repositório clonado. Por exemplo, usando o comando `git clone https://github.com/zingarelli/anotacoes-estudo.git`, será criada a pasta `anotacoes-estudo` e o conteúdo do repositório será salvo dentro dela.
 
 Com o projeto clonado, é possível alterar os arquivos, commitar e fazer push para o repositório remoto. 
 
-O caminho pode ser a URL de um repositório online ou o caminho para uma pasta na máquina local.
+> Caso o projeto não seja seu, será necessário ter permissão da pessoa dona do projeto para que seu usuário possa fazer push.
+
+O `caminho_do_repositorio_remoto` pode ser a URL de um repositório online ou o caminho para uma pasta na máquina local.
 
 O  nome do repositório remoto será "`origin`" para o projeto clonado, mas pode ser renomeado com `git remote rename nome_atual novo_nome`.
 
@@ -286,13 +350,25 @@ O  nome do repositório remoto será "`origin`" para o projeto clonado, mas pode
 git branch nome_da_nova_branch
 ```
 
-Cria nova branch, porém, **não** a ativa como principal; você continuará na branch atual.
+Cria nova branch, porém, **não** a ativa como principal; você continuará na branch atual. Se você quiser criar uma nova branch e já ativá-la como principal, pode usar o comando:
 
-`git branch -M novo_nome_da_branch`: comando para renomear a branch atual. 
+```bash
+git checkout -b nome_da_nova_branch
+```
 
-`git checkout nome_da_branch` : altera a branch que será a ativa (move seu HEAD para esta nova branch), carregando a versão mais atual dos arquivos que estão nessa branch.
+- Atualmente, também temos o comando `git switch` para trabalhar com branches, substituindo o `git checkout``. O comando para criar a branch e ativá-la como principal fica:
+   
+```bash
+git switch -c nome_da_nova_branch`
+```
 
-`git checkout -b nome_da_nova_branch` : cria nova branch **e** já altera para ser a ativa.
+> `git branch -M novo_nome_da_branch`: comando para renomear a branch atual **localmente**. 
+
+> `git checkout nome_da_branch` ou `git switch nome_da_branch` : altera a branch que será a ativa (move seu HEAD para esta nova branch), carregando a versão mais atual dos arquivos que estão nessa branch.
+
+> `git branch -d nome_da_branch`: remove `nome_da_branch` do seu repositório **local**. Caso queira remover também do remoto, o comando é `git push nome_do_repositorio_remoto --delete nome_da_branch` (ou `git push nome_do_repositorio_remoto :nome_da_branch`).
+
+- É considerada uma boa prática remover branches após finalizar a feature que estava atrelada àquela branch, para manter o projeto limpo.
 
 ### `git checkout`
 
@@ -302,6 +378,8 @@ git checkout HASH_do_commit
 
 Navega para um commit específico do log. Serão carregados os arquivos desse commit, **PORÉM**, qualquer **alteração** feita no código, inclusive commits, **NÃO** entrará no histórico. Para que essas alterações entrem no histórico do projeto, você deve **criar uma branch** (pode usar o `git checkout -b nome_da_nova_branch` após ter navegado para o commit desejado).
 
+> Atualmente, o git fornece um comando alternativo, mais intuitivo: o [`git restore`](https://git-scm.com/docs/git-restore). Essa mudança veio por conta da confusão da dupla responsabilidade do `git checkout`, que serve tanto para mudar de branch quanto para restaurar arquivos navegando por commits.
+
 ### git merge
 
 ```bash
@@ -310,9 +388,11 @@ git merge outra_branch
 
 Faz um merge (combinação) da branch atual com o commit mais atual da `outra_branch`, para que as **duas ramificações se unam em uma só**. 
 
-Será aberto um texto no VIM (ou no editor de texto que você configurou) para incluir uma mensagem de commit de merge (no VIM, se não quiser escrever nada, digite `:x` e pressione `ENTER`; caso esteja no modo de INSERT, pressione `ESC` antes de digitar o `:x`). 
+Existe um método de merge chamado "fast-forward", que é quando a branch atual está somente "para trás" na linha do tempo de commits em relação à `outra_branch`. Neste caso, o git somente vai avançar a branch atual, fazendo com que ela "aponte" para o último commit da `outra_branch`. 
 
-No processo de merge, os commits anteriores da `outra_branch` **não entram** para a branch atual (mas eles ainda estarão no histórico da `outra_branch`, caso você faça um checkout nela).
+Existe um caso diferente em que a branch atual e a `outra_branch` divergiram, isto é, a partir de um ponto em comum, cada uma evoluiu para lados diferentes (houve commits tanto na branch_atual quanto na `outra_branch` após esse ponto em comum). Neste caso, o git também vai fazer com que a branch atual aponte para o último commit da `outra_branch`, e irá tentar mesclar as mudanças entre esse dois commits (o último da branch atual e o último da `outra_branch`). Caso não haja nenhum conflito, irá solicitar a inclusão de uma mensagem de commit de merge (caso abra o editor de texto VIM, se não quiser escrever nada, digite `:x` e pressione `ENTER`; caso esteja no modo de INSERT, pressione `ESC` antes de digitar o `:x`). 
+
+No processo de merge, os commits anteriores da `outra_branch` são **incorporados** à branch atual, ou seja, eles passam a fazer parte do histórico da branch atual. No entanto, os commits também continuam presentes no histórico da `outra_branch`, caso você faça um checkout nela. A visualização do log nestes caso fica mais fácil com o comando `git log --graph`.
 
 ### `git rebase`
 
@@ -320,9 +400,11 @@ No processo de merge, os commits anteriores da `outra_branch` **não entram** pa
 git rebase outra_branch
 ```
 
-Traz todos os commits da `outra_branch` para a branch atual e atualiza as modificações. Os commits da `outra_branch` serão inseridos na "linha do tempo" dos commits a partir do momento em que houve a criação da `outra_branch`, e na frente destes seguirão os commits que foram feitos na branch atual. O último commit da branch atual será considerado como o ativo. Não gera um commit de merge.
+Traz todos os commits da `outra_branch` para a branch atual e atualiza as modificações. Os commits da `outra_branch` serão inseridos na "linha do tempo" dos commits a partir do momento em que houve a criação da `outra_branch`, ou seja, o head da branch atual é movido para o último commit da `outra_branch` e as mudanças feitas em cada commit da branch atual serão aplicadas, commit a commit, após este último commit de `outra_branch`. Ou seja, novos commits são gerados (uma nova chave hash) e o head da branch atual vai avançando commit por commit, até chegar no último commit que havia na branch atual. Ao final, temos uma "linha do tempo" única novamente para a branch atual, unificada com as mudanças de `outra_branch`.
 
-- lembre-se do site para uma experiência visual de merge, rebase, etc: https://git-school.github.io/visualizing-git/
+Como as mudanças são aplicadas commit a commit, conflitos podem acontecer e devem ser resolvidos também commit a commit.
+
+> Lembre-se do site para uma experiência visual de merge, rebase, etc: https://git-school.github.io/visualizing-git/
 
 ### `git restore`
 
@@ -332,11 +414,13 @@ git restore nome_do_arquivo
 
 Comando antigo (versões mais velhas do Git): `git checkout -nome_do_arquivo`.
 
-Funciona como um `Ctrl+Z` para um arquivo, quando eu quero **descartar** as alterações feitas em um arquivo que está com o **status "modified"**. Irá restaurar o arquivo corrente ao meu repositório local. 
+Funciona como um `Ctrl+Z` para um arquivo (ou vários arquivos), quando eu quero **descartar** as alterações feitas em um arquivo que está com o **status "modified"**. Irá restaurar o arquivo corrente ao meu repositório local. 
+
+   - Se quiser restaurar todos os arquivos, você pode usar o `git restore .`
 
 **Atenção**: você **perde** suas modificações ainda não commitadas no arquivo ou ainda não adicionadas ao stage. 
 
-**Atenção 2**: se você já tiver adicionado o arquivo ao stage (por meio do `git add nome_do_arquivo`), esse comando de checkout não irá funcionar; primeiro você precisará fazer o comando abaixo.
+**Atenção 2**: se você já tiver adicionado o arquivo ao stage (por meio do `git add nome_do_arquivo`), esse comando de restore não irá funcionar; primeiro você precisará fazer o comando abaixo.
 
 ```bash
 git restore --staged nome_do_arquivo
@@ -346,33 +430,71 @@ Serve para **remover** um arquivo que foi adicionado para ser commitado (ou seja
 
 Comando antigo (versões mais velhas do Git): `git reset HEAD nome_do_arquivo`.
 
+> `git restore --source=hash_do_commit nome_do_arquivo`: restaura o arquivo com base em como este arquivo se encontrava no commit informado em `--source`
+
 ### `git revert`
 
 ```bash
 git revert HASH_do_commit
 ```
 
-**Desfaz** o commit cujo hash você informou no comando. Irá desfazer esse commit e **gerar um novo commit para informar essa alteração**.
+**Desfaz** as mudanças efetuadas no commit cujo hash você informou no comando. Será **gerado um novo commit para informar essa alteração**, ou seja, o commit que você informou continuará acessível no histórico (no log).
 
-- não precisa passar o código hash completo. Pode passar somente os 7 caracteres iniciais
+> não precisa passar o código hash completo. Pode passar somente os 7 caracteres iniciais
+
+**Atenção**: desfaz as mudanças *somente* do commit informado no commando. Imagine que você fez o revert de um commit que está bem para trás do seu histórico. Aplicar o revert irá somente desfazer o que *aquele* commit alterou. Os outros commits que estão à frente deste no histórico serão **mantidos**. Quando você quer desfazer um commit e todos os outros que o procederam, você está aplicando um `git reset`, que é mais poderoso e **perigoso**.
+
+### `git reset`
+
+```bash
+git reset --hard HASH_do_commit_a_ser_mantido
+```
+
+Este comando remove de fato um ou mais commits do histórico de commits. Toda a sequência de commits no histórico de commits que vierem *depois* do commit informado no comando serão removidos. Por conta da flag `--hard`, as alterações feitas por essa sequência de commits será removida do código e eles serão **também removidos do histórico** de commits. Por conta disso, é um comando perigoso, que deve ser usado com atenção para não perder conteúdo.
+
+> O `git reset` é aplicado no seu repositório local. Cuidado caso o commit resetado já esteja no repositório remoto, pois isso altera o histórico de commits que outras pessoas têm em seu próprio repositório local. Para resetar também no repositório remoto, é um outro comando, não mencionado aqui.
+
+```bash
+git reset --soft HEAD~1
+```
+
+**Desfaz** seu último commit, removendo-o do histórico, mas **mantém** as alterações que haviam sido feitas (por conta da flag `--soft`). Útil quando, por exemplo, você commitou, mas viu que faltou uma pequena alteração. Ao invés de aplicar a alteração e criar um novo commit, você pode usar esse comando para desfazer o commit, aplicar a alteração, e então commitar. Seria como um "`Ctrl+Z`".
+
+> Uma alternativa melhor é usar o comando `git commit --amend`
+
+### `git commit --amend`
+
+```bash
+git commit --amend -m "sua_mensagem_editada"
+``` 
+
+Use esse comando para incluir novas alterações ao último commit e/ou editar a mensagem de commit. Ao invés de criar um novo commit, o último commit é "editado" com as novas alterações/mensagem, e um novo hash é gerado para ele.
+
+> Use a flag `--no-edit` se você não quer editar a mensagem original, mas sim somente incluir as alterações ao último commit
+
+Novamente **atenção**: use o amend caso o commit **não** tenha sido enviado para o repositório remoto, para não modificar o histórico de commits que já foi compartilhado com outras pessoas. É possível replicar a alteração para o repositório remoto, mas o comando não é mencionado aqui.
 
 ### `git tag`
 
 ```bash
-git tag -a nome_da_tag
+git tag nome_da_tag
 ```
 
-Cria uma tag, que seria como uma "versão" finalizada do projeto, um release do projeto, que não será mais modificado a partir daquele ponto. Novas modificações irão para a próxima tag (próxima release). 
+Cria uma tag para o último commit dado. Serve para nomear aquele commit. Pode ser utilizado, por exemplo, para dar um nome a uma "versão" finalizada do projeto, um release do projeto. 
 
-Pense como se você estivesse entregando a versão 1.0 do seu projeto, por exemplo (`git tag -a v1.0`).
+Imagine que você chegou a uma etapa importante do seu projeto e vai entregar a versão 1.0 dele. Neste caso, você pode usar `git tag v1.0`.
 
-- flag opcional `-m "mensagem"`: adiciona uma mensagem.
+> `git tag -a nome_da_tag -m "mensagem"`: chamada de "annotated tag" (opção `-a`), é possível adicionar uma mensagem à tag criada.
 
-- antes, o GitHub já adicionava a tag como release automaticamente, mas agora cabe ao próprio desenvolvedor navegar até a tag e gerar uma release
+   - annotated tags também criam outros metadados, como o nome do autor e data que a tag foi criada. Se quiser ver essas informações, use `git tag -v nome_da_tag` (não funciona para tags que não são annotated, chamadas de "lightweight tags").
 
-`git tag`: mostra todas as tags criadas.
+> `git tag`: mostra todas as tags criadas.
 
-`git push nome_do_repositorio_remoto nome_da_tag`: comando necessário para enviar a tag para o repositório remoto.
+> `git tag -d nome_da_tag`: remove a tag em seu repositório local.
+
+> `git push nome_do_repositorio_remoto nome_da_tag`: comando necessário para enviar a tag para o repositório remoto.
+
+> `git push nome_do_repositorio_remoto --tags`: envia todas as tags para o repositório remoto.
 
 ## Funcionalidades do GitHub
 
@@ -394,11 +516,15 @@ Atualizações no projeto original **não** serão pegas pelo `git pull`. Caso q
 
 ### Pull Request (PR)
 
-Caso deseje enviar as modificações feitas no seu projeto "forkado" para projeto original, você deve utilizar a funcionalidade de **Pull Request (PR)** do GitHub.
+Caso deseje enviar as modificações feitas no seu projeto "forkado" para projeto original, você utiliza a funcionalidade de **Pull Request (PR)** do GitHub.
 
 É possível enviar um título e um texto com as modificações feitas. O GitHub irá mostrar o diff dos arquivos modificados e também já avisa se consegue fazer o merge automático.
 
 O responsável pelo repositório original poderá analisar os PR e decidir se irá fazer ou não o merge da solicitação. Tudo isso é feito dentro do GitHub.
+
+> Você pode conferir na prática uma abertura de PR [neste vídeo](https://www.youtube.com/watch?v=cdL_F3FiSWI) do instrutor Vinicius Dias.
+
+> É possível também usar PR dentro de um projeto para o gerenciamento de branches. Ao invés de fazer o merge via linha de comando, você pode abrir um PR para uma branch que já foi desenvolvida, solicitando que ela seja incorporada à branch principal. O processo é semelhante ao descrito acima. 
 
 ## União de commits
 
@@ -425,7 +551,7 @@ Após essa interação, será gerado um novo commit para informar da ação que 
 
 ## Cherry-pick
 
-É o nome que se dá à ação de selecionar um commit específico e trazer para o HEAD da branch atual. Imagine, por exemplo, que há uma branch em que uma nova funcionalidade está sendo desenvolvida, mas ainda não está pronta. No entanto, uma modificação feita nessa branch está sendo necessária na branch principal (correção de um bug, por exemplo). É possível, neste caso, usar o `cherry-pick` para trazer para a branch principal somente o commit que possui essa modificação. Será feito um merge (ou deverão ser resolvidos os conflitos) e um novo commit será gerado.
+É o nome que se dá à ação de selecionar um commit específico e trazer para o HEAD da branch atual. Imagine, por exemplo, que há uma branch em que uma nova funcionalidade está sendo desenvolvida, mas ainda não está pronta. No entanto, uma modificação feita nessa branch está sendo necessária na branch principal (correção de um bug, por exemplo). É possível, neste caso, usar o `cherry-pick` para trazer para a branch principal somente o commit que possui essa modificação. Será feito um merge (ou deverão ser resolvidos os conflitos) e um novo commit será gerado, incluindo a mensagem do commit (se houver).
 
 Quando a nova funcionalidade na outra branch estiver finalizada e for feito o `git rebase`, não irá haver conflito com o commit que foi trazido pelo cherry-pick: o Git irá entender e organizar o histórico da maneira correta.
 
@@ -444,13 +570,13 @@ O git irá percorrer os commits intermediários, possibilitando olhar as altera�
 
 ## Blame
 
-Apesar do nome (culpar), o comando informa o último usuário que alterou cada linha do código em um arquivo. Informa também o hash do commit e data da modificação.
+Apesar do nome (culpar), o comando informa o último usuário que alterou *cada linha* do código em um arquivo. Informa também o hash do commit e data da modificação.
 
 ```bash
 git blame nome_do_arquivo
 ```
 
-Acredito que o VS Code tem uma extensão que faz a mesma coisa.
+O VS Code possui extensões que mostram visualmente essas informações na tela.
 
 ## Dicas e convenções
 
