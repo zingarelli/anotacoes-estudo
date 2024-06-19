@@ -4,14 +4,12 @@ Neste repositório eu disponibilizo minhas notas de estudo, separadas por tecnol
 
 [Clique aqui](#lista-de-anotações) para ver a lista de tópicos e o link para suas anotações.
 
-
 | :placard: Vitrine.Dev |     |
 | -------------  | --- |
 | :sparkles: Nome        | **Anotações de Estudo**
 | :label: Tecnologias | React, TypeScript, HTML, CSS, Javascript, Carreira, HTTP
 | :rocket: URL         | https://github.com/zingarelli/anotacoes-estudo
 | :fire: Curso     | Diversos
-
 
 ![](https://github.com/zingarelli/alura-books-ds/assets/19349339/61e84e43-31cb-45d8-a80e-b9305303a564#vitrinedev)
 
@@ -22,7 +20,6 @@ Faço a maior parte dos cursos na [Alura](https://www.alura.com.br), então o co
 Utilizei o livro ["React: Up & Running"](https://www.amazon.com.br/React-Up-Running-Stoyan-Stefanov/dp/1492051462/) no início das minhas anotações de React.
 
 A foto de capa deste repositório é de  <a href="https://unsplash.com/@tjerwin?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Trent Erwin</a> na <a href="https://unsplash.com/pt-br/fotografias/UgA3Xvi3SkA?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>.
-  
 
 ## Detalhes do projeto
 
@@ -50,6 +47,7 @@ A partir de abril/23 eu comecei a utilizar a [ChatGPT](https://chat.openai.com) 
 - [Protocolo HTTP](./Protocolo-HTTP.md)
 - [React](./React.md)
 - [TypeScript](./TypeScript.md)
+- [Next.js](./Next.md)
 
 ## Motivação
 
