@@ -48,6 +48,7 @@ A partir de abril/23 eu comecei a utilizar a [ChatGPT](https://chat.openai.com) 
 - [React](./React.md)
 - [TypeScript](./TypeScript.md)
 - [Next.js](./Next.md)
+- [MySQL](./MySQL.md)
 
 ## Motivação
 
