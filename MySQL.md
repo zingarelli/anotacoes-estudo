@@ -2,9 +2,9 @@
 
 ## Créditos
 
-Estas anotações são baseadas nos cursos da Alura para a formação ["Consultas com MySQL"](https://www.alura.com.br/formacao-consultas-mysql), ministrados por:
+Estas anotações são baseadas nos cursos da Alura para a formação ["Consultas com MySQL"](https://www.alura.com.br/formacao-consultas-mysql)[^1], ministrados por:
 
-- Beatriz Magalhães;
+- [Beatriz Magalhães](https://cursos.alura.com.br/user/beatriz280197);
 
 - [Victorino Vila](https://www.linkedin.com/in/victorino-vila-1a160/);
 
@@ -12,9 +12,17 @@ Estas anotações são baseadas nos cursos da Alura para a formação ["Consulta
 
 - [Igor Nascimento Alves](https://www.linkedin.com/in/igor-nascimento-alves-145910127/).
 
+[^1]: complementado por tópicos da formação [Conhecendo SQL](https://www.alura.com.br/formacao-conhecendo-sql).
+
+## Pratique SQL
+
+O site [SQL Murder Mystery](https://mystery.knightlab.com) (em inglês) permite praticar SQL por meio de um jogo interativo em que você é um detetive tentando solucionar um assassinato.
+
 ## Sobre o MySQL
 
 É um **SGBD** (Sistema de Gerenciamento de Banco de Dados) que utiliza a **linguagem SQL** (Structured Query Language) para manipulação de **dados** armazenados em forma de **tabelas**.
+
+> **Bancos de dados relacionais** armazenam os dados em tabelas, que se "comunicam"/"relacionam" entre si. Ou seja, as tabelas possuem informações que se ligam de alguma forma. O relacionamento é estabelecido por meio de chaves primária e estrangeira.
 
 Documentação versão 8.0: [link](https://dev.mysql.com/doc/refman/8.0/en/).
 
@@ -34,9 +42,13 @@ Seguem algumas convenções de nomes e definições que o MySQL usa (ou que os i
 
     - uma convenção da área é manter os comandos em letras maiúsculas e os nomes de tabelas, funções, etc, em letras minúsculas.
 
-- Modelo físico do banco de dados: acredito que seja o DER (Diagrama Entidade-Relacionamento). No MySQL Workbench, podemos ter uma versão "enhanced" do DER na opção Database -> Reverse Engineer...;
+- Modelo físico do banco de dados: conceito parecido com o DER (Diagrama Entidade-Relacionamento), só que mais detalhado. No MySQL Workbench, podemos ter uma versão "enhanced" do DER na opção Database -> Reverse Engineer...;
 
 - tupla: linha de uma tabela. Às vezes também escrevo nas anotações como sendo "registro" ou "entrada". Entenda todas como sinônimos.
+
+- Uso do ponto e vírgula (`;`): indica o fim de um comando. Embora não seja obrigatório em todas as consultas, a ausência dele pode dar dores de cabeça ou efeitos indesejados, por exemplo, quando você quer executrar múltiplos comandos de uma vez. Então é considerada boa prática adicioná-lo ao final de cada comando SQL;
+
+- Uso de aspas simples: quando tratar de strings, opte pelo uso de aspas simples. O MySQL também aceita aspas duplas, mas [há exceções](https://dev.mysql.com/doc/refman/8.4/en/string-literals.html).
 
 ## Tipo de dados
 
@@ -98,7 +110,7 @@ CREATE TABLE <nome_da_tabela> (
         FOREIGN KEY (hospedagem_id) REFERENCES hospedagens(hospedagem_id)
     );
     ```
-
+    
 ---
 
 ```sql
@@ -109,6 +121,27 @@ INSERT INTO <nome_da_tabela> VALUES (
 ```
 
 - Insere um novo dado (linha) na tabela. Os valores de cada coluna devem ser na mesma ordem em que as colunas estão na tabela.
+
+- Se quiser inserir múltiplas linhas, basta colocar os novos valores em parênteses, cada linha separada por vírgula.
+
+---
+
+```sql
+INSERT INTO <nome_da_tabela> (
+    <nome_coluna_a>, 
+    <nome_coluna_b>
+    <nome_coluna_c>, 
+    -- ...
+) 
+VALUES (
+    <valor_coluna_a>, 
+    <valor_coluna_b>, 
+    <valor_coluna_c>, 
+    -- ...
+);
+```
+
+- Você pode optar por escolher para quais colunas quer inserir dados, especificando o nome dessas colunas e colocando os valores na mesma sequência das colunas especificadas.
 
 ---
 
@@ -146,7 +179,7 @@ RENAME COLUMN <nome_da_coluna> TO <novo_nome_da_coluna>
 ```sql
 UPDATE <nome_da_tabela>
 SET <nome_da_coluna> = <novo_valor>
-WHERE <condicao>
+WHERE <condicao>;
 ```
 
 - atualiza uma coluna da tabela com um novo valor.
@@ -166,13 +199,31 @@ WHERE <condicao>;
 
 - aqui valem as mesmas observações feitas para a cláusula de `UPDATE`.
 
+    - **não esqueça da cláusula `WHERE`**;
+
+    - **não esqueça da cláusula `WHERE`**;
+
+    - **não esqueça da cláusula `WHERE`**;
+
+    - **não esqueça da cláusula `WHERE`**;
+
 - sempre vale a pena **ter um backup** do banco antes de prosseguir com qualquer operação de remoção de dados.
 
 - **atenção para o caso de chave estrangeira!** Caso a entrada a ser apagada contenha alguma coluna que é referenciada como chave estrangeira em uma ou mais tabelas, o comando **não** será executado e um erro será mostrado. Isso é feito para garantir a integridade do banco.
 
     - nesses casos, você deve verificar na mensagem de erro qual tabela possui a chave estrangeira e aplicar a remoção também a esta tabela, e aí então proceder com a remoção na tabela principal.
 
-    - existem algumas cláusulas na criação de uma tabela com chave estrangeira que possibilitam informar como a remoção do registro será tratada (por exemplo: `ON DELETE CASCADE`, `ON DELETE SET NULL`, etc); por padrão, a estratégia é restringir a remoção (`ON DELECT RESTRICT`).
+    - existem algumas cláusulas na criação de uma tabela com chave estrangeira que possibilitam informar como a remoção do registro será tratada (por exemplo: `ON DELETE CASCADE`, `ON DELETE SET NULL`, etc); por padrão, quando não especificado, a estratégia é restringir a remoção (`ON DELECT RESTRICT`).
+
+---
+
+```sql
+DROP TABLE <nome_da_tabela>;
+```
+
+- apaga a tabela inteira (tabela e seu conteúdo). Use com cautela e seguro de que realmente quer fazer isso.
+
+- as considerações sobre chave estrangeira mencionadas no comando `DELETE` também valem aqui.
 
 ## Consultas
 
@@ -207,6 +258,12 @@ SELECT * FROM <nome_da_tabela> WHERE <condicao>;
 
 ---
 
+```sql
+SELECT DISTINCT <nome_da_coluna> FROM <nome_da_tabela>;
+```
+
+A cláusula `DISTINCT` elimina os valores repetidos para a coluna (ou colunas) que você especificou, ou seja, retorna somente uma única ocorrência dos valores para esta coluna(s).
+
 ### Exemplos de consultas
 
 Para estes exemplos, suponha que a base de dados é de uma plataforma de aluguel de imóveis por temporadas curtas, tipo Airbnb.
@@ -232,7 +289,7 @@ GROUP BY cliente_id;
 
 - `AVG()` é uma função de agregação que calcula a média.
 
-- `AS` é utilizado quando queremos dar um "apelido" a uma coluna/resultado. Esse apelido aparece somente no resultado da consulta, ou seja, a coluna na tabela não é renomeada.
+- `AS` é utilizado quando queremos dar um "apelido" (*alias*) a uma coluna/resultado. Esse apelido aparece somente no resultado da consulta, ou seja, a coluna na tabela não é renomeada.
 
 - `GROUP BY` é utilizado quando usamos alguma função de agregação. Precisamos explicar qual tipo de agrupamento dos dados será feito para que a função seja corretamente aplicada.
 
@@ -249,7 +306,7 @@ ORDER BY media_dias_estadia DESC
 
 - `datediff()` é uma função para subtração entre valores do tipo `DATE`.
 
-- `ORDER BY` é a cláusula para ordenação do resultado baseado em alguma coluna. `DESC` indica ordenação decrescente.
+- `ORDER BY` é a cláusula para ordenação do resultado baseado em alguma coluna. `DESC` indica ordenação decrescente. Por padrão, a ordem é ascendente (`ASC`).
 
 ---
 
