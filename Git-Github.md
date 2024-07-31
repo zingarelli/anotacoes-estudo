@@ -359,7 +359,7 @@ git checkout -b nome_da_nova_branch
 - Atualmente, também temos o comando `git switch` para trabalhar com branches, substituindo o `git checkout``. O comando para criar a branch e ativá-la como principal fica:
    
 ```bash
-git switch -c nome_da_nova_branch`
+git switch -c nome_da_nova_branch
 ```
 
 > `git branch -M novo_nome_da_branch`: comando para renomear a branch atual **localmente**. 
