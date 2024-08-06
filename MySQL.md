@@ -287,11 +287,11 @@ GROUP BY cliente_id;
 
 - Consulta que está agrupando os clientes pelo ID e calculando uma média que eles gastam dentre os vários alugueis que já pagaram. 
 
-- `AVG()` é uma função de agregação que calcula a média.
+- `avg()` é uma **função de agregação** que calcula a média.
 
 - `AS` é utilizado quando queremos dar um "apelido" (*alias*) a uma coluna/resultado. Esse apelido aparece somente no resultado da consulta, ou seja, a coluna na tabela não é renomeada.
 
-- `GROUP BY` é utilizado quando usamos alguma função de agregação. Precisamos explicar qual tipo de agrupamento dos dados será feito para que a função seja corretamente aplicada.
+- `GROUP BY` pode ser utilizado em conjunto com algumas funções de agregação, como a `avg()`. Precisamos explicar qual tipo de agrupamento dos dados será feito para que a função seja corretamente aplicada.
 
 ---
 
