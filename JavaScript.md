@@ -24,6 +24,11 @@
 
 [Nayanne Batista](https://www.linkedin.com/in/nayannebatista/)
 
+
+### Livro
+
+Complementos a essas anotações foram feitas utilizando como referência o livro ["JavaScript: The Definitive Guide"](https://www.oreilly.com/library/view/javascript-the-definitive/9781491952016/), Seventh Edition, escrito por  David Flanagan, editora O'Reilly.
+
 ## Introdução
 
 O JavaScript (JS) é **baseado no ECMAScript** (ES), que por sua vez é uma linguagem de programação baseada em scripts padronizada pela Ecma International na especificação ECMA-262.
@@ -33,6 +38,10 @@ O JavaScript (JS) é **baseado no ECMAScript** (ES), que por sua vez é uma ling
 Não tem *nada a ver com Java*. O nome foi uma jogada de *marketing* para se aproveitar da popularidade crescente que Java estava adquirindo na época em que o JavaScript foi lançado (o nome inicial era Mocha, depois mudado para LiveScript e então JavaScript). 
 
 Pode ser utilizada também em dispositivos móveis, wearables (smartwatch, por exemplo), IoT (Alexa e Google Home, por exemplo), games, APIs.
+
+A **versão ES6** foi um marco importante na linguagem, introduzindo novos escopos de variáveis, arrow functions, classes, módulos, etc. Essa versão também é conhecida como **ES2015**, que é o ano de lançamento. 
+
+> A partir do ES6, as versões começaram a ser nomeadas pelo seu ano de lançamento (que é anual). Então temos ES2016, ES2017 e por aí vai.
 
 Um jeito de **rodar arquivos JS puro no terminal é instalar o Node.js**.
 
@@ -50,9 +59,42 @@ Local da tag script: o *ideal* é colocá-la **antes da tag de fechamento do bod
 
 Convenção de nome: utilizar o nome main.js para seu script principal.
 
-Uso do ponto e vírgula: é opcional, mas é **altamente recomendável** utilizá-lo, para evitar dores de cabeça.
-
 Frameworks e bibliotecas: oferecem facilidades para programar em JS, economizando tempo e facilitando algumas atividades. O React é considerado uma *biblioteca*.
+
+## Pontos de atenção da sintaxe
+
+Uso do ponto e vírgula: é opcional, mas é **altamente recomendável** utilizá-lo, para evitar dores de cabeça. Exemplo:
+
+```js
+let y = x + f
+(a+b).toString()
+```
+
+Por conta do uso do parênteses no início da segunda linha, o JS irá interpretar esse código como sendo a execução de uma função `f`:
+
+```js
+let y = x + f(a+b).toString()
+```
+
+---
+
+Quebra de linha após `return`: o JS irá interpretar como sendo o fim da sentença.
+
+```js
+return
+true;
+```
+
+Será interpretado como
+
+```js
+return;
+true;
+```
+
+Se precisar quebrar a linha no return, **use parênteses**. Isso é muito comum quando se trabalha com React.
+
+O mesmo vale para as palavras reservadas `throw`, `yield`, `break` e `continue`.
 
 ## Funções para manipular o DOM
 
@@ -134,6 +176,15 @@ O retorno do dataset é uma *string*. O valor pode ser **modificado**, bastando 
 `cadastro.dataset.tipo = 'remove-usuario'`
 
 ## Variáveis e escopo
+
+Podem começar com letra, underline (`_`) ou dólar (`$`). **Não** podem começar com **número**.
+
+```js
+let variavel123; // ok
+let 123variavel; // SyntaxError
+```
+
+> Embora a linguagem aceite qualquer caracter Unicode como identificador, a convenção é se ater a caracteres ASCII (ou seja, sem acentos ou letras de outros alfabetos)
 
 `var nome`: escopo **global e local** (local quando declarada dentro de uma função, por exemplo);
 
@@ -254,7 +305,7 @@ function nome(param_a, param_b, ...) {
         
         - "Você passa à função como argumento...";
 
-    - parâmetros podem ter valor padrão (estilo Python); isso foi implementado a partir do ES2015 (aka ES6);
+    - parâmetros podem ter valor padrão (estilo Python); isso foi implementado a partir do ES6;
 
     - o objeto `arguments` pode ser acessado dentro da função e traz, dentro de um array, todos os argumentos que a função recebeu;
 
@@ -307,6 +358,8 @@ var soma = () => {
     return 1 + 2; 
 };
 ```
+
+- os argumentos e a "flecha" (`() =>`) precisam estar na **mesma linha**;
 
 - tem muito mais detalhes; ver a documentação: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#syntax
 
@@ -407,7 +460,7 @@ Existem outras formas de criar objetos a partir de um modelo, como o uso de `Obj
 
 ## Classes 
 
-Surgiram a partir do ES6 (ou ES2015 - é a sexta versão do EcmaScript, lançada em 2015, daí os dois nomes). 
+Surgiram a partir do ES6. 
 
 Não existem nativamente no JS, mas podem ser criadas como forma de facilitar a escrita/entendimento (o tal do *syntax sugar*). Por trás dos panos, o que há são objetos, que herdam métodos e propriedades de protótipos.
 
