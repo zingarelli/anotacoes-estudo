@@ -53,7 +53,7 @@ RUN npm install
 ENTRYPOINT npm start 
 ```
 
-Existem vários outros comandos que podem ser usados.A [documentação](https://docs.docker.com/reference/dockerfile/) possui explicação e exemplo de todos eles.
+Existem vários outros comandos que podem ser usados. A [documentação](https://docs.docker.com/reference/dockerfile/) possui explicação e exemplo de todos eles.
 
 Para criar uma imagem, usamos o comando abaixo. A flag `-t` define uma tag (um nome) para a imagem. O ponto no final (`.`) indica que o diretório atual em que você está no terminal será usado para o build, então certifique-se de que esteja no diretório do `Dockerfile` ao rodar o comando:
 
@@ -65,7 +65,7 @@ Para criar uma imagem, usamos o comando abaixo. A flag `-t` define uma tag (um n
 
 > O Docker Desktop deve estar **rodando** na sua máquina para poder usar os comandos.
 
-> No Windows, execute com o **PowerShell**.
+> No Windows, execute os comandos abaixo no **PowerShell**.
 
 ---
 
@@ -73,7 +73,7 @@ Criar e executar um contêiner baseado em uma imagem:
 
     docker run caminho_ou_nome_da_imagem
 
-Se a imagem não estiver em sua máquina, o Docker irá procurar por ela no [Docker Hub](https://hub.docker.com). Caso não a encontre, irá gerar um erro.
+Se a imagem não estiver em sua máquina, por padrão o Docker irá procurar por ela no [Docker Hub](https://hub.docker.com). Caso não a encontre, irá gerar um erro.
 
 > O Docker Hub é um repositório de imagens. Você também pode fazer upload de uma imagem sua, mediante a criação de um login. É parecido com o GitHub.
 
@@ -139,9 +139,48 @@ Executar um comando em um contêiner que está em execução:
 
     docker exec containerId_ou_name comando
 
+## Docker Compose
+
+É uma ferramenta de coordenação (não confundir com orquestração, que é outro conceito), em que conseguimos, em um único arquivo, compor a execução de múltiplos contêineres em um mesmo ambiente, de maneira coordenada. Ao invés de sempre ficarmos subindo os contêineres pela linha de comando, conseguimos fazer isso em um arquivo.
+
+É utilizado um arquivo YAML (*Yet Another Markup Language* ou *YAML Ain't Markup Language*). Em versões mais antigas, o arquivo era `docker-compose.yml` ou `docker-compose.yaml`. Em versões atuais, o arquivo é `compose.yaml` (preferível) or `compose.yml`.
+
+Com o terminal na pasta em que se encontra esse arquivo, usamos o comando `docker compose up` para iniciar os contêineres e configurações listados no arquivo.
+
+O exemplo abaixo irá subir dois contêineres: um com o mongodb e outro com uma aplicação front-end chamada Alura Books. A alurabooks irá aguardar o contêiner do mongodb estar em execução antes de ser iniciada (por conta do `depends_on`). Ambos irão rodar em uma mesma rede, também configurada no arquivo.
+
+```yaml
+services:
+  mongodb:
+    image: mongo:4.4.6
+    container_name: meu-mongo
+    networks:
+      - compose-bridge
+
+  alurabooks:
+    image: aluradocker/alura-books:1.0
+    container_name: alura-books
+    networks:
+      - compose-bridge
+    ports:
+      - 3000:3000
+    depends_on:
+      - mongodb
+
+networks:
+  compose-bridge:
+    driver: bridge
+```
+
+- para rodar em modo "detached": `docker compose up -d`;
+
+- para listar os serviços criados pelo docker compose: `docker compose ps`;
+
+- para remover os contêineres criados pelo docker compose: `docker compose down`;
+
 ## Outros conceitos
 
-Explicação breve de outros conceitos vistos em aula. Meu foco foi nas aulas iniciais, porque era o conteúdo que eu precisava para avançar nos cursos de Front End. Os conceitos e comandos das outras aulas foram mais a fundo nas funcionalidades do Docker. Embora importantes, são mais voltados para a área de DevOps, então não vou fazer um resumo tão detalhado dessa parte.
+Explicação breve de outros conceitos vistos em aula. Meu foco foi nas aulas iniciais e na final, porque eram os conteúdos que eu precisava para avançar nos cursos de Front End (Next.js). Os conceitos e comandos das outras aulas foram mais a fundo nas funcionalidades do Docker. Embora importantes, são mais voltados para a área de DevOps, então não vou fazer um resumo tão detalhado dessa parte.
 
 **Volume:** é uma das maneiras de persistir dados ao usar contêineres (e a recomendada pelo Docker). Persistência significa manter no host os dados gerados ou usados pelo contêiner, mesmo no caso em que o contêiner é removido. Quando não usada alguma técnica de persistência, os dados gerados pelo contêiner são removidos quando ele é removido. Volumes também podem ser compartilhados entre contêineres. 
 
@@ -150,11 +189,3 @@ Explicação breve de outros conceitos vistos em aula. Meu foco foi nas aulas in
 **Bridge**: É uma das soluções do Docker para gerenciamento de rede (*network*) para os contêineres. Por padrão, os contêineres são colocados na mesma rede denominada *bridge*, cada um com seu próprio IP. Com isso, eles podem se comunicar via IP. Nisso a *bridge* se comporta como se fosse um switcher.
 
 - Podemos também criar nossa própria *bridge*, com configurações de rede mais customizadas. Isso possibilita, por exemplo, definir sub-redes, gateways e outras opções específicas. Contêineres nessa *bridge* customizada também podem se comunicar usando seus nomes (*hostnames*), ao invés do IP. Isso simula o DNS de uma rede interna.
-
-## Feeback 
-
-O áudio de algumas aulas e na transição de telas tem vezes que não está bom, está abafado. Isso é evidente no comecinho de todos os vídeos, em que quase nem dá para escutar de tão abafado que fica. 
-
-O instrutor demonstra muito conhecimento, mas fala muito rápido e com pausas muito curtas. Algumas explicações acabam ficando muito breves e surgem muitas dúvidas por conta disso (vide a quantidade de posts no fórum), enquanto outras são mais elaboradas. A aula sobre imagem e camadas, por exemplo, ficou muito rasa em teoria e fiquei sem entender o que de fato era uma camada. Precisei aprender em outras fontes externas à Alura. Com relação à parte prática, no entanto, não tenho reclamações: aqui o instrutor vai muito bem.
-
-Minha sugestão é complementarem o curso com material em texto aprofundando o conteúdo teórico apresentado nos vídeos.

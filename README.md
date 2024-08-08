@@ -23,7 +23,9 @@ A foto de capa deste repositório é de  <a href="https://unsplash.com/@tjerwin?
 
 ## Detalhes do projeto
 
-Separei minhas anotações em arquivos `.md`, cada um abordando um tópico diferente. A maioria se concentra no **Front End**, mas também há tópicos diversos como anotações sobre **Git**, desenvolvimento de **carreira** e protocolo **HTTP**. Há também um link para outro repositório em que tenho anotações de estudo sobre **Machine Learning**, especificamente voltado para problemas de Classificação; como são vários notebooks, deixei um repositório separado para esses estudos. 
+Separei minhas anotações em arquivos `.md`, cada um abordando um tópico diferente. A maioria se concentra no **Front End**, mas também há tópicos diversos como anotações sobre **Git**, desenvolvimento de **carreira** e protocolo **HTTP**. 
+
+Há também um link para outro repositório em que tenho anotações de estudo sobre **Machine Learning**, especificamente voltado para problemas de Classificação; como são vários notebooks, deixei um repositório separado para esses estudos. 
 
 Você pode ver a lista dos tópicos de estudo [nesta seção do README](#lista-de-anotações), com um link para ir direto ao arquivo das anotações. 
 
@@ -40,6 +42,7 @@ A partir de abril/23 eu comecei a utilizar a [ChatGPT](https://chat.openai.com) 
 - [Acessibilidade Web](./Acessibilidade.md)
 - [Cloud Computing](./Cloud.md)
 - [Desenvolvimento de Carreira](./Desenvolvimento-Carreira.md)
+- [Docker](./Docker.md)
 - [Git e o GitHub](./Git-Github.md)
 - [HTML & CSS](./HTML_CSS.md)
 - [JavaScript](./JavaScript.md)
