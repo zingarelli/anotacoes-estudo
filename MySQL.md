@@ -293,6 +293,8 @@ GROUP BY cliente_id;
 
 - `GROUP BY` pode ser utilizado em conjunto com algumas funções de agregação, como a `avg()`. Precisamos explicar qual tipo de agrupamento dos dados será feito para que a função seja corretamente aplicada.
 
+    - após agrupado, você pode aplicar um filtro à consulta usando o `HAVING`. É semelhante ao `WHERE`, porém, específico para conjuntos agrupados.
+
 ---
 
 ```sql
@@ -328,7 +330,7 @@ LIMIT 10;
 
     - Veja mais sobre o `JOIN` [nesta Seção específica](#tipos-de-join);
 
-- `count()` é uma função que conta as tuplas. No caso, estamos contando todas as ocorrências (`*`) para cada proprietário (a consulta está agrupada por `nome`).
+- `count()` é uma função que conta as linhas **não nulas**. No caso, como estamos usando `count(*)`, ele irá também contar as linhas nulas, se houver, para cada proprietário (a consulta está agrupada por `nome`).
 
 - `LIMIT` é a cláusula que usamos para limitar a quantidade de resultados vindos da consulta. Como queremos o "top 10", limitamos a consulta aos 10 primeiros resultados (que foram previamente ordenados de forma decrescente pelo total de hospedagens ativas).
 
@@ -352,7 +354,9 @@ ORDER BY total_reservas DESC;
 
 ## Tipos de JOIN
 
-- `INNER JOIN`: Retorna linhas quando há pelo menos uma correspondência em ambas as tabelas. No MySQL, você pode usar somente `JOIN` e será efetuado um `INNER JOIN`;
+As cláusulas `JOIN` combinam linhas de duas ou mais tabela, permitindo recuperar dados de todas essas tabelas envolvidas no `JOIN`. Com isso, seu `SELECT` pode **retornar colunas de tabelas diferentes em uma mesma consulta**.
+
+- `INNER JOIN`: Retorna linhas quando há pelo menos uma correspondência em **ambas** as tabelas. No MySQL, você pode usar somente `JOIN` e será efetuado um `INNER JOIN`;
 
 - `LEFT JOIN`: Retorna todas as linhas da tabela à esquerda (a primeira tabela da consulta) e as linhas correspondentes da tabela à direita (a segunda tabela, indicada após o comando de join). Inclui também os resultados em que **não houver correspondência** com a tabela à direita, marcados como NULL no lado direito;
 
@@ -361,3 +365,78 @@ ORDER BY total_reservas DESC;
 - `FULL JOIN`: Combina `LEFT JOIN` e `RIGHT JOIN`, retornando todas as linhas em que houve uma correspondência em uma das tabelas, marcando NULL para as colunas da tabela quando não há correspondência.
 
     - O **MySQL não tem suporte nativo ao `FULL JOIN`**. Nesse caso, você pode combinar `LEFT JOIN` e `RIGHT JOIN` por meio da cláusula `UNION`.
+
+    - A cláusula `UNION` faz a união dos resultados de dois ou mais `SELECT`s, exibindo somente os valores distintos (ou seja, caso haja linhas que se repitam nos `SELECT`s, somente uma é retornada). Se precisar que todas as linhas sejam retornadas, incluindo duplicatas, use `UNION ALL`. É necessário que as colunas em cada `SELECT` sejam as mesmas ou compatíveis (mesmo número de colunas e tipo de dados).
+
+        - Exemplo criado pela ChatGPT: 
+
+            ```SQL
+            (
+                -- LEFT JOIN: retorna todas as linhas de TabelaA e as correspondências em TabelaB
+                SELECT A.id, A.valor AS valor_A, B.valor AS valor_B
+                FROM TabelaA A
+                LEFT JOIN TabelaB B ON A.id = B.id
+            )
+            UNION
+            (
+                -- RIGHT JOIN: retorna todas as linhas de TabelaB e as correspondências em TabelaA
+                SELECT B.id, A.valor AS valor_A, B.valor AS valor_B
+                FROM TabelaB B
+                RIGHT JOIN TabelaA A ON B.id = A.id
+            );
+            ```
+
+## View
+
+View é uma forma de criar novas tabelas "virtuais", baseadas no retorno de consultas SQL feitas com as tabelas do banco. 
+
+
+- é uma tabela "virtual" pois ela não armazena dados, mas sim uma consulta SQL. Isso significa que, toda vez que a view é acessada, a consulta SQL definida para essa view é **executada novamente**, garantindo trazer os dados mais atualizados. Isso traz o trade-off com relação a **desempenho**, especialmente para views muito complexas.
+
+Uma de suas vantagens é criar uma ou mais tabelas que serão disponibilizadas para consulta. Por exemplo, por meio de uma view podemos decidir quais colunas serão "expostas" para consulta, bloqueando o acesso a consulta às tabelas originais. Assim, limitamos o acesso ao banco de dados a somente algumas views que queremos tornar públicas, protegendo dados sensíveis. 
+
+Refazer esse exemplo quando chegar nesse assunto no curso de MySQL:
+
+```sql
+create view viewValorTotalPedido as
+select c.nome, p.id as pedido_id, sum(i.precounitario) as valor_total_pedido, 
+  p.datahorapedido as data_hora_pedido
+from pedidos p
+join itenspedidos i on p.id = i.idpedido
+join clientes c on c.id = p.idcliente
+group by p.id, c.nome
+```
+
+## Trigger
+
+É um procedimento armazenado no banco de dados, que é executado a partir de alguma condição. Com isso, triggers podem ser utilizadas para automatizar tarefas.
+
+Por exemplo, uma trigger pode ser executada para atualizar uma coluna da tabela X quando um quando um novo item é adicionado a uma tabela Y.
+
+Refazer esse exemplo quando chegar nesse assunto no curso de MySQL:
+
+```sql
+-- uma trigger bem ineficiente
+create trigger calculaFaturamentoDiario
+after INSERT on itenspedidos
+for each row 
+BEGIN
+delete from faturamentodiario;
+INSERT into faturamentodiario 
+select 
+  date(p.datahorapedido) as dia, 
+  sum(i.precounitario) faturamento_diario
+from pedidos p
+join itenspedidos i
+on i.idpedido = p.id
+group by dia
+order by dia;
+end;
+```
+
+
+## Feedback
+
+As respostas às "demandas" do Serenatto de vez em quando foram feitas usando uma consulta SQL confusa e estranha.  Isso ficou mais evidente na explicação do HAVING e nas dos JOIN. Entendi que isso era feito para ser didática e exemplificar um conceito, mas achei que acabaram confundindo. Poderiam ter tentado buscar "demandas" mais apropriadas para cada conceito novo ensinado.
+
+A maioria das atividades "mão na massa" foram baseadas em banco de dados hipotéticos, o que não contribuiu para poder testar nossas respostas. Teria sido mais útil se os desafios fossem em cima do banco de dados usado no curso, ou se fornecessem o banco para cada desafio.
