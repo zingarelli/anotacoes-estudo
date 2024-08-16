@@ -96,84 +96,28 @@ Se precisar quebrar a linha no return, **use parênteses**. Isso é muito comum 
 
 O mesmo vale para as palavras reservadas `throw`, `yield`, `break` e `continue`.
 
-## Funções para manipular o DOM
+## Tipos
 
-`document.querySelector('texto_para_buscar')`: busca no HTML o texto informado (chamado de "seletor"). Pode ser **uma tag, uma classe (usando o .), um id (usando o #)**. Retorna o **PRIMEIRO** elemento que der match com o seletor;
+São divididos em duas categorias: primitivos e objetos.
 
-- no seletor, posso incluir **atributos** de uma tag, utilizando colchetes
+| tipo | mutabilidade | valores | 
+| - | - | - |
+| primitivo | imutável | números, string, boolean, null, undefined, symbol |
+| objeto | mutável | qualquer valor que não seja um dos primitivos |
 
-```js
-document.querySelector('input[type=tel]');
-```
+Variações especiais de objetos (possuem uma sintaxe especial ou operações visando melhor performance): array, Set, Map, *typed array*, RegExp, Date, Error, funções e classes.
 
-``document.querySelectorAll('texto_para_buscar')``: irá retornar **todos** os elementos que derem match com o seletor passado. O retorno é um `NodeList` (uma lista, um array).
+Imutabilidade: significa que o valor não muda. O número 2 vai ser sempre 2, o valor false será sempre false.
 
-- Os `querySelector` são *mais poderosos* do que os `getElementById` e `getElementsByTagName`, então **use** querySelector e querySelectorAll.
+- Observe que **string** é tipo primitivo, portanto, **imutável** em JavaScript.
 
-`<elemento>.addEventListener('nome do evento', função)`: adiciona o evento ao `<elemento>`, com a função passada.
+> **Não declaramos tipos** para as variáveis/constantes (no jargão de dev: "não tipamos"). A conversão é feita pelo JavaScript de acordo com o valor atribuído.
 
-- Só o nome do evento, não precisa começar com "on" (por exemplo: somente `click` ao invés de `onclick`)
+## Texto
 
-- pode ser uma função *definida em outra parte do código* (sem o parênteses) ou uma função anônima/arrow function (veja mais na [Seção sobre Funções](#funções)).
+Para declarar textos (strings), podemos utilizar aspas simples, duplas ou crase (backtick). O backtick foi adicionado pelo ES6 e permite interpolação de texto com expressões JS.
 
-### Eventos
-
-Começam com a palavra `on`+`nomeDoEvento` e permite executar uma função
-
-```js
-button.onclick = () => { 
-    // seu código... 
-}
-```
-
-Se atribuir uma função definida em **outra parte do código**, ela **NÃO** deve ser atribuída ao evento com **parênteses**, senão será invocada imediatamente. Caso a função **necessite de parâmetros**, precisa **criar uma função anônima ou arrow function** para chamar essa outra função com os parâmetros.
-
-- Uma explicação aprofundada sobre funções, funções anônimas e arrow function é vista na [Seção sobre Funções](#funções).
-
-Os eventos possuem um **parâmetro padrão** que geralmente chamamos de **`event`, ou `e`**, ou qualquer nome que você der. Esse `event` é um **objeto**, com propriedades e métodos que podem ser acessados e utilizados.
-
-- se der um `console.log` no evento, é possível ver o que tem dentro dele no console do navegador.
-
-- `e.target.parentNode`: acessa o **pai do elemento** que causou o evento.
-
-Lista de eventos: https://www.w3schools.com/jsref/dom_obj_event.asp
-
-Dentro do evento, temos a propriedade `target`, que retorna o elemento em que o evento ocorreu (por exemplo, no clique de um botão, o `event.target` retorna o `<button>`).
-
-## Data attributes
-
-Às vezes, por decisões de design, classes e ids de elementos HTML podem ser alterados. Por isso, **não é recomendável** que o código JavaScript **dependa do nome de uma classe ou id**. Uma alternativa para isso é **usar os data attributes**, conceito incluído no HTML5. 
-
-Os data attributes são atributos personalizados que podem ser dados aos elementos do HTML. Esses atributos começam com o prefixo `data-` e podem possuir ou não um valor associado
-
-```html
-<input id="cadastro" data-ativo data-tipo="cadastra-usuario" >
-```
-
-Elementos com data attribute podem ser selecionados utilizando o `querySelector` e `querySelectorAll`, passando o nome do data-atribute **entre colchetes**.
-
-```js
-const cadastro = document.querySelector("[data-tipo]");
-console.log(cadastro); 
-// retorna <input id="cadastro" ...>
-```
-
-Valores de data attributes podem ser **accessados e modificados** por meio do **objeto `dataset`**, presente no elemento que possui data attributes. 
-
-- Para **acessar** um atributo específico do dataset, basta informar o nome colocado após o prefixo `data-`.
-
-```js
-console.log(cadastro.dataset.tipo); 
-// retorna 'cadastra-usuario'
-```
-
-- também pode ser acessado dentro de um evento
-
-`e.target.dataset.tipo`
-
-O retorno do dataset é uma *string*. O valor pode ser **modificado**, bastando *atribuir* um novo valor.
-
-`cadastro.dataset.tipo = 'remove-usuario'`
+Caracteres de escape são adicionados por meio da barra invertida (`\`). Por exemplo, para incluir uma quebra de linha no texto, podemos utilizar o `\n`; para adicionar aspas simples em um texto declarado com aspas simples, utilizamos `\'`, etc.
 
 ## Variáveis e escopo
 
@@ -186,7 +130,7 @@ let 123variavel; // SyntaxError
 
 > Embora a linguagem aceite qualquer caracter Unicode como identificador, a convenção é se ater a caracteres ASCII (ou seja, sem acentos ou letras de outros alfabetos)
 
-`var nome`: escopo **global e local** (local quando declarada dentro de uma função, por exemplo);
+`var nome`: escopo **global e local** (local quando declarada dentro de uma função, por exemplo); é uma maneira antiga de declarar uma variável; 
 
 `let nome`: escopo **local de BLOCO** (não será vista pelo código após o bloco (bloco é qualquer coisa entre chaves `{}`)); 
 
@@ -756,13 +700,92 @@ p
 
 - padrões de API Web: RPC, Soap e REST. REST é o mais utilizado atualmente; verbos GET e POST no caso do Front End.
 
-## D.O.M.
+## DOM
 
-Document Object Model
+Document Object Model.
 
 Document representa a página HTML e por meio dele é possível acessar os diferentes elementos do HTML.
 
 B.O.M.: Browser Object Model: Os navegadores possuem um objeto window, que representa a janela do navegador. O Document (do DOM) é filho de window. Outros filhos: history, location, screen, navigator;
+
+## Funções para manipular o DOM
+
+`document.querySelector('texto_para_buscar')`: busca no HTML o texto informado (chamado de "seletor"). Pode ser **uma tag, uma classe (usando o .), um id (usando o #)**. Retorna o **PRIMEIRO** elemento que der match com o seletor;
+
+- no seletor, posso incluir **atributos** de uma tag, utilizando colchetes
+
+```js
+document.querySelector('input[type=tel]');
+```
+
+``document.querySelectorAll('texto_para_buscar')``: irá retornar **todos** os elementos que derem match com o seletor passado. O retorno é um `NodeList` (uma lista, um array).
+
+- Os `querySelector` são *mais poderosos* do que os `getElementById` e `getElementsByTagName`, então **use** querySelector e querySelectorAll.
+
+`<elemento>.addEventListener('nome do evento', função)`: adiciona o evento ao `<elemento>`, com a função passada.
+
+- Só o nome do evento, não precisa começar com "on" (por exemplo: somente `click` ao invés de `onclick`)
+
+- pode ser uma função *definida em outra parte do código* (sem o parênteses) ou uma função anônima/arrow function (veja mais na [Seção sobre Funções](#funções)).
+
+### Eventos
+
+Começam com a palavra `on`+`nomeDoEvento` e permite executar uma função
+
+```js
+button.onclick = () => { 
+    // seu código... 
+}
+```
+
+Se atribuir uma função definida em **outra parte do código**, ela **NÃO** deve ser atribuída ao evento com **parênteses**, senão será invocada imediatamente. Caso a função **necessite de parâmetros**, precisa **criar uma função anônima ou arrow function** para chamar essa outra função com os parâmetros.
+
+- Uma explicação aprofundada sobre funções, funções anônimas e arrow function é vista na [Seção sobre Funções](#funções).
+
+Os eventos possuem um **parâmetro padrão** que geralmente chamamos de **`event`, ou `e`**, ou qualquer nome que você der. Esse `event` é um **objeto**, com propriedades e métodos que podem ser acessados e utilizados.
+
+- se der um `console.log` no evento, é possível ver o que tem dentro dele no console do navegador.
+
+- `e.target.parentNode`: acessa o **pai do elemento** que causou o evento.
+
+Lista de eventos: https://www.w3schools.com/jsref/dom_obj_event.asp
+
+Dentro do evento, temos a propriedade `target`, que retorna o elemento em que o evento ocorreu (por exemplo, no clique de um botão, o `event.target` retorna o `<button>`).
+
+## Data attributes
+
+Às vezes, por decisões de design, classes e ids de elementos HTML podem ser alterados. Por isso, **não é recomendável** que o código JavaScript **dependa do nome de uma classe ou id**. Uma alternativa para isso é **usar os data attributes**, conceito incluído no HTML5. 
+
+Os data attributes são atributos personalizados que podem ser dados aos elementos do HTML. Esses atributos começam com o prefixo `data-` e podem possuir ou não um valor associado
+
+```html
+<input id="cadastro" data-ativo data-tipo="cadastra-usuario" >
+```
+
+Elementos com data attribute podem ser selecionados utilizando o `querySelector` e `querySelectorAll`, passando o nome do data-atribute **entre colchetes**.
+
+```js
+const cadastro = document.querySelector("[data-tipo]");
+console.log(cadastro); 
+// retorna <input id="cadastro" ...>
+```
+
+Valores de data attributes podem ser **accessados e modificados** por meio do **objeto `dataset`**, presente no elemento que possui data attributes. 
+
+- Para **acessar** um atributo específico do dataset, basta informar o nome colocado após o prefixo `data-`.
+
+```js
+console.log(cadastro.dataset.tipo); 
+// retorna 'cadastra-usuario'
+```
+
+- também pode ser acessado dentro de um evento
+
+`e.target.dataset.tipo`
+
+O retorno do dataset é uma *string*. O valor pode ser **modificado**, bastando *atribuir* um novo valor.
+
+`cadastro.dataset.tipo = 'remove-usuario'`
 
 ## Local Storage
 
@@ -809,3 +832,9 @@ Diferença entre Local Storage e Cookie:
 - já no caso de Local Storage, sua utilização é para **leitura/escrita** de dados **no browser**, **sem acesso pelo servidor**;
 
 - https://blog.shahednasser.com/localstorage-vs-cookies-whats-the-difference
+
+
+# Continuar em
+
+3.3.4 
+pag. 94
