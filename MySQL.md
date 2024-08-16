@@ -352,6 +352,10 @@ ORDER BY total_reservas DESC;
 
 - A cláusula `GROUP BY` aceita **agrupamento composto**, fazendo o agrupamento na ordem em que as colunas foram indicadas. No caso do exemplo, o resultado é agrupado por ano e depois por mês, e o `count()` faz a soma de cada um desses agrupamentos compostos.
 
+---
+
+Fazer um exemplo de consulta com select aninhado, em que um select, ao invés de consultar uma tabela, consulta o resultado de outro select.
+
 ## Tipos de JOIN
 
 As cláusulas `JOIN` combinam linhas de duas ou mais tabela, permitindo recuperar dados de todas essas tabelas envolvidas no `JOIN`. Com isso, seu `SELECT` pode **retornar colunas de tabelas diferentes em uma mesma consulta**.
@@ -390,7 +394,6 @@ As cláusulas `JOIN` combinam linhas de duas ou mais tabela, permitindo recupera
 
 View é uma forma de criar novas tabelas "virtuais", baseadas no retorno de consultas SQL feitas com as tabelas do banco. 
 
-
 - é uma tabela "virtual" pois ela não armazena dados, mas sim uma consulta SQL. Isso significa que, toda vez que a view é acessada, a consulta SQL definida para essa view é **executada novamente**, garantindo trazer os dados mais atualizados. Isso traz o trade-off com relação a **desempenho**, especialmente para views muito complexas.
 
 Uma de suas vantagens é criar uma ou mais tabelas que serão disponibilizadas para consulta. Por exemplo, por meio de uma view podemos decidir quais colunas serão "expostas" para consulta, bloqueando o acesso a consulta às tabelas originais. Assim, limitamos o acesso ao banco de dados a somente algumas views que queremos tornar públicas, protegendo dados sensíveis. 
@@ -405,6 +408,29 @@ from pedidos p
 join itenspedidos i on p.id = i.idpedido
 join clientes c on c.id = p.idcliente
 group by p.id, c.nome
+```
+
+### Diferença entre WITH e VIEW
+
+A cláusula `WITH` é outra forma de obter dados de uma ou mais tabelas e utilizar esses dados em outra consulta SQL. Diferente de uma View, a consulta criada com a cláusula `WITH` não fica armazenada no banco, ou seja, após a query ser executada, o resultado da consulta com `WITH` é apagado.
+
+- lembre-se: uma View fica salva no banco (a consulta, e não o resultado), podendo ser reutilizada em outras consultas.
+
+O resultado de uma cláusula `WITH` é chamado de **CTE (Common Table Expression)**. É uma maneira de criarmos uma ou mais **tabelas temporárias** que nos auxiliem em consultas mais complexas. Com isso, conseguimos simplificar a complexidade de uma query fazendo a quebra em consultas menores, que podem ser referenciadas.
+
+Exemplo da ChatGPT. Refazer esse exemplo quando chegar nesse assunto no curso de MySQL:
+
+```sql
+    -- CTE
+    WITH RecentSales AS (
+        SELECT sale_id, sale_date, amount
+        FROM sales
+        WHERE sale_date > '2024-01-01'
+    )
+    -- we can reference the CTE in a more simplified query
+    SELECT sale_id, amount
+    FROM RecentSales 
+    WHERE amount > 100;
 ```
 
 ## Trigger
@@ -434,9 +460,8 @@ order by dia;
 end;
 ```
 
+## Transações
 
-## Feedback
+São blocos de comandos SQL que queremos ter certeza de que foram executados corretamente para que as atualizações seja de fato salvas no banco de dados. Caso algum comando falhe por algum motivo, queremos garantir que nada seja salvo no banco. Ou seja, esse bloco de comandos funciona como se fosse uma coisa única. 
 
-As respostas às "demandas" do Serenatto de vez em quando foram feitas usando uma consulta SQL confusa e estranha.  Isso ficou mais evidente na explicação do HAVING e nas dos JOIN. Entendi que isso era feito para ser didática e exemplificar um conceito, mas achei que acabaram confundindo. Poderiam ter tentado buscar "demandas" mais apropriadas para cada conceito novo ensinado.
-
-A maioria das atividades "mão na massa" foram baseadas em banco de dados hipotéticos, o que não contribuiu para poder testar nossas respostas. Teria sido mais útil se os desafios fossem em cima do banco de dados usado no curso, ou se fornecessem o banco para cada desafio.
+Em uma transação, confirmamos a gravação de fato dos resultados dos comandos executados por meio de um `COMMIT`. Caso algo saia errado, podemos reverter o banco ao estado anterior à transação por meio de um `ROLLBACK`.
