@@ -32,6 +32,8 @@ Download da versão MySQL Community Edition: [link](https://dev.mysql.com/downlo
 
 - Baixamos o arquivo MySQL Installer for Windows e selecionamos a opção full, para instalar tanto o servidor quanto as ferramentas para desenvolvimento. Nessa opção, é instalado o **MySQL Workbench**, que é uma interface gráfica utilizada no curso para se trabalhar com o MySQL. Se você prefere uma ferramenta baseada em linha de comando, também é instalado o MySQL Shell.
 
+> Posteriormente, quando você abrir o MySLQ Workbench e se deparar com erros tipo "Target host is configured as windows, but seems to be a different OS." ou "Current profile has no WMI enabled.", abra os Serviços do Windows e verifique se o MySQL está em execução. Se não estiver, inicie o serviço e reabra o MySQL Workbench.
+
 ## Convenções do MySQL
 
 Seguem algumas convenções de nomes e definições que o MySQL usa (ou que os instrutores usam) e que podem ser diferentes das utilizadas por outros sistemas ou na literatura sobre banco de dados.
@@ -291,14 +293,16 @@ GROUP BY cliente_id;
 
 - `AS` é utilizado quando queremos dar um "apelido" (*alias*) a uma coluna/resultado. Esse apelido aparece somente no resultado da consulta, ou seja, a coluna na tabela não é renomeada.
 
-- `GROUP BY` pode ser utilizado em conjunto com algumas funções de agregação, como a `avg()`. Precisamos explicar qual tipo de agrupamento dos dados será feito para que a função seja corretamente aplicada.
+- `GROUP BY` costuma ser utilizado em conjunto com funções de agregação, como a `avg()`. Quando os dados são agrupados, as funções de agregação são aplicadas separadamente para o conjunto de dados **de cada agrupamento.**
 
     - após agrupado, você pode aplicar um filtro à consulta usando o `HAVING`. É semelhante ao `WHERE`, porém, específico para conjuntos agrupados.
 
 ---
 
 ```sql
-SELECT cliente_id, avg(datediff(data_fim, data_inicio)) AS media_dias_estadia 
+SELECT 
+  cliente_id, 
+  avg(datediff(data_fim, data_inicio)) AS media_dias_estadia 
 FROM alugueis
 GROUP BY cliente_id
 ORDER BY media_dias_estadia DESC
@@ -313,7 +317,9 @@ ORDER BY media_dias_estadia DESC
 ---
 
 ```sql
-SELECT p.nome AS nome_proprietario, count(*) AS total_hospedagens_ativas
+SELECT 
+  p.nome AS nome_proprietario, 
+  count(*) AS total_hospedagens_ativas
 FROM proprietarios p
 JOIN hospedagens h ON p.proprietario_id = h.proprietario_id
 WHERE h.ativo = 1
@@ -338,9 +344,9 @@ LIMIT 10;
 
 ```sql
 SELECT 
-	year(data_inicio) AS ano,
-    month(data_inicio) AS mes,
-    count(*) AS total_reservas
+  year(data_inicio) AS ano,
+  month(data_inicio) AS mes,
+  count(*) AS total_reservas
 FROM alugueis
 GROUP BY ano, mes
 ORDER BY total_reservas DESC;
@@ -350,15 +356,17 @@ ORDER BY total_reservas DESC;
 
 - As funções `year()` e `month()` extraem o ano e o mês de uma dada data.
 
-- A cláusula `GROUP BY` aceita **agrupamento composto**, fazendo o agrupamento na ordem em que as colunas foram indicadas. No caso do exemplo, o resultado é agrupado por ano e depois por mês, e o `count()` faz a soma de cada um desses agrupamentos compostos.
+- A cláusula `GROUP BY` aceita **agrupamento composto**, fazendo o agrupamento na ordem em que as colunas foram indicadas. No caso do exemplo, o resultado é agrupado por ano e depois, dentro de cada ano, é agrupado por mês, e o `count()` faz a soma de cada um desses agrupamentos compostos.
 
 ---
+
+### TODO
 
 Fazer um exemplo de consulta com select aninhado, em que um select, ao invés de consultar uma tabela, consulta o resultado de outro select.
 
 ## Tipos de JOIN
 
-As cláusulas `JOIN` combinam linhas de duas ou mais tabela, permitindo recuperar dados de todas essas tabelas envolvidas no `JOIN`. Com isso, seu `SELECT` pode **retornar colunas de tabelas diferentes em uma mesma consulta**.
+As cláusulas `JOIN` combinam linhas de duas ou mais tabelas, permitindo recuperar dados de todas essas tabelas envolvidas no `JOIN`. Com isso, seu `SELECT` pode **retornar colunas de tabelas diferentes em uma mesma consulta**.
 
 - `INNER JOIN`: Retorna linhas quando há pelo menos uma correspondência em **ambas** as tabelas. No MySQL, você pode usar somente `JOIN` e será efetuado um `INNER JOIN`;
 
@@ -398,6 +406,8 @@ View é uma forma de criar novas tabelas "virtuais", baseadas no retorno de cons
 
 Uma de suas vantagens é criar uma ou mais tabelas que serão disponibilizadas para consulta. Por exemplo, por meio de uma view podemos decidir quais colunas serão "expostas" para consulta, bloqueando o acesso a consulta às tabelas originais. Assim, limitamos o acesso ao banco de dados a somente algumas views que queremos tornar públicas, protegendo dados sensíveis. 
 
+### TODO
+
 Refazer esse exemplo quando chegar nesse assunto no curso de MySQL:
 
 ```sql
@@ -418,20 +428,20 @@ A cláusula `WITH` é outra forma de obter dados de uma ou mais tabelas e utiliz
 
 O resultado de uma cláusula `WITH` é chamado de **CTE (Common Table Expression)**. É uma maneira de criarmos uma ou mais **tabelas temporárias** que nos auxiliem em consultas mais complexas. Com isso, conseguimos simplificar a complexidade de uma query fazendo a quebra em consultas menores, que podem ser referenciadas.
 
-Exemplo da ChatGPT. Refazer esse exemplo quando chegar nesse assunto no curso de MySQL:
+- Exemplo criado pela ChatGPT, retornando a quantidade de vendas a partir de 1º de janeiro de 2024 (as vendas recentes, nomeada como RecentSales), filtradas a partir daquelas cuja quantidade ultrapassou 100:
 
-```sql
-    -- CTE
-    WITH RecentSales AS (
-        SELECT sale_id, sale_date, amount
-        FROM sales
-        WHERE sale_date > '2024-01-01'
-    )
-    -- we can reference the CTE in a more simplified query
-    SELECT sale_id, amount
-    FROM RecentSales 
-    WHERE amount > 100;
-```
+    ```sql
+        -- CTE
+        WITH RecentSales AS (
+            SELECT sale_id, sale_date, amount
+            FROM sales
+            WHERE sale_date > '2024-01-01'
+        )
+        -- we can reference the CTE in a more simplified query
+        SELECT sale_id, amount
+        FROM RecentSales 
+        WHERE amount > 100;
+    ```
 
 ## Trigger
 
@@ -439,29 +449,592 @@ Exemplo da ChatGPT. Refazer esse exemplo quando chegar nesse assunto no curso de
 
 Por exemplo, uma trigger pode ser executada para atualizar uma coluna da tabela X quando um quando um novo item é adicionado a uma tabela Y.
 
-Refazer esse exemplo quando chegar nesse assunto no curso de MySQL:
+- Exemplo da aula, adequado pela ChatGPT para o MySQL. Esta trigger refaz os dados da tabela faturamentodiario a cada nova inserção na tabela itenspedidos:
 
-```sql
--- uma trigger bem ineficiente
-create trigger calculaFaturamentoDiario
-after INSERT on itenspedidos
-for each row 
-BEGIN
-delete from faturamentodiario;
-INSERT into faturamentodiario 
-select 
-  date(p.datahorapedido) as dia, 
-  sum(i.precounitario) faturamento_diario
-from pedidos p
-join itenspedidos i
-on i.idpedido = p.id
-group by dia
-order by dia;
-end;
-```
+    ```sql
+    -- uma trigger bem ineficiente
+    DELIMITER //
+
+    CREATE TRIGGER calculaFaturamentoDiario
+    AFTER INSERT ON itenspedidos
+    FOR EACH ROW
+    BEGIN
+        -- apaga o que já tinha
+        DELETE FROM faturamentodiario;
+
+        -- refaz os cálculos de faturamento de cada dia
+        INSERT INTO faturamentodiario (dia, faturamento_diario)
+        SELECT 
+            DATE(p.datahorapedido) AS dia, 
+            SUM(i.precounitario) AS faturamento_diario
+        FROM pedidos p
+        JOIN itenspedidos i
+        ON i.idpedido = p.id
+        GROUP BY dia
+        ORDER BY dia;
+    END //
+
+    DELIMITER ;
+    ```
 
 ## Transações
 
-São blocos de comandos SQL que queremos ter certeza de que foram executados corretamente para que as atualizações seja de fato salvas no banco de dados. Caso algum comando falhe por algum motivo, queremos garantir que nada seja salvo no banco. Ou seja, esse bloco de comandos funciona como se fosse uma coisa única. 
+São blocos de comandos SQL que queremos ter certeza de que foram executados corretamente para que as atualizações seja de fato salvas no banco de dados. Caso algum comando falhe por algum motivo, queremos garantir que nada seja salvo no banco. Ou seja, esse bloco de comandos funciona como se fosse uma coisa única (princípio da atomicidade, veja mais sobre [ACID](#acid) abaixo). 
 
 Em uma transação, confirmamos a gravação de fato dos resultados dos comandos executados por meio de um `COMMIT`. Caso algo saia errado, podemos reverter o banco ao estado anterior à transação por meio de um `ROLLBACK`.
+
+### ACID
+
+Acrônimo para Atomicidade, Consistência, Isolamento e Durabilidade. São princípios a serem seguidos pelos SGBDs no que tange as transações.
+
+- Atomicidade: em uma transação, todas operações são concluídas com sucesso ou nenhuma é aplicada. Ocorrendo algum erro, o banco reverte as operações da transação que já tenham sido realizadas e volta ao estado original;
+
+- Consistência: após uma transação, o banco sai de um estado válido e entra em outro estado válido. Isso significa que todas as regras e restrições definidas no schema continuam valendo;
+
+- Isolamento: cada transação é executada de maneira isolada, evitando problemas de concorrência. Por exemplo, os efeitos de uma transação A não ficam visíveis às transações B, C e D enquanto A não for concluída. Cada banco decide como tratar transações que competem pelo mesmo recurso;
+
+- Durabilidade: após o COMMIT de uma transação, é garantido que os dados foram persistidos e as mudanças no banco foram permanentes, mesmo se houver alguma falha de conexão, falta de energia, etc.
+
+## Stored procedures
+
+A maioria dos SGBDs criam suas próprias "extensões" ao SQL, para prover novas funcionalidades como laços, condicionais, funções e procedures.
+
+Uma Stored Procedure é um bloco de comandos a serem executados, incluindo a possibilidade de definir variáveis, laços e condições. Elas são armazenadas no banco e podem ser reutilizadas. Com isso, você pode encapsular a lógica e regras de negócio relacionadas a alguma ação no banco, automatizando alguma tarefa repetitiva. 
+
+Você pode entendê-las como sendo pequenos programas.
+
+> Uma transação, apesar de ser também um bloco de comandos, não permite o uso de lógica estruturada nem de parâmetros. Sua finalidade é efetuar operações garantindo o cumprimento dos princípios ACID. Além disso, uma stored procedure pode ter uma ou mais transações, mas o inverso não se aplica.
+
+O exemplo a seguir cria uma procedure que lista todos os clientes:
+
+```sql
+DELIMITER $$
+CREATE PROCEDURE lista_clientes()
+BEGIN
+	SELECT * FROM clientes;
+END$$
+DELIMITER ;
+```
+
+O uso de delimitadores (`DELIMETER`) como `//` ou `$$` é para diferenciar o fim de comandos que são do bloco (que usam o `;` por padrão) e o fim de comandos que são da procedure em si. Após a declaração da procedure, é chamado o `DELIMITER ;` para voltar ao `;` padrão.
+
+Para usar uma procedure, usamos o comando `CALL`:
+
+```sql
+CALL lista_clientes;
+```
+
+- Podemos chamar procedures dentro de outras procedures, inclusive passando parâmetros como referência usando a a palavra reservada `INOUT`. Um [exemplo](#passagem-de-parâmetro-por-referência) é dado na próxima Seção. 
+
+Para apagar:
+
+```sql
+DROP PROCEDURE lista_clientes;
+```
+
+Para alterar uma stored procedure, apagamos ela e a criamos novamente, com as alterações (veja os [exemplos na próxima Seção](#exemplos-de-procedures)). Também podmeos alterar interativamente pelo MySQL Workbench, clicando com o botão direito na procedure e selecionando "Alter Stored Procedure...".
+
+### Exemplos de procedures
+
+Esses exemplos são evoluções de uma mesma procedure que insere um novo registro na tabela reservas. 
+
+---
+
+#### Uso de parâmetros e variáveis
+
+Calculando o valor total da reserva baseado no número de dias e valor da diária. 
+
+Observe que é possível **declarar parâmetros e variáveis** locais na procedure.
+
+```sql
+DROP PROCEDURE IF EXISTS nova_reserva;
+DELIMITER //
+-- procedure com parâmetros
+CREATE PROCEDURE nova_reserva(
+	vReserva VARCHAR(10),
+	vCliente VARCHAR(10),
+	vHospedagem VARCHAR(10),
+	vDataInicio DATE, 
+	vDataFim DATE,
+    vPrecoUnitario DECIMAL(10,2) -- valor da diária
+)
+BEGIN
+	-- variáveis para cálculo do preço total da reserva
+    DECLARE vDias INTEGER DEFAULT 0;
+    DECLARE vPrecoTotal DECIMAL(10,2);
+    
+    -- inicialização das variáveis
+    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vPrecoTotal = vDias * vPrecoUnitario;
+    
+    INSERT INTO reservas VALUES (
+		vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
+	);
+END//
+DELIMITER ;
+```
+
+Chamando a procedure com argumentos:
+
+```sql
+CALL nova_reserva('10004', '1004', '8635', '2024-02-15', '2024-02-17', 180);
+```
+
+---
+
+#### Tratamento de erros 
+
+**Tratamento de erros** baseado em um código de erro gerado pelo SGBD.
+
+- Para descobrir o código de erro, você pode tentar executar um comando para o erro que você quer tratar.
+
+**Importante:** você deve **declarar todas as variáveis** que sua procedure for utilizar **antes** de usar `DECLARE EXIT HANDLER`. 
+
+> Usar o `EXIT` diz para que o bloco de código seja encerrado caso o erro ocorra. Se quiser que o bloco de código continue, pode ser usado o `CONTINUE`.
+
+```sql
+DROP PROCEDURE IF EXISTS nova_reserva;
+DELIMITER //
+CREATE PROCEDURE nova_reserva(
+	vReserva VARCHAR(10),
+	vCliente VARCHAR(10),
+	vHospedagem VARCHAR(10),
+	vDataInicio DATE, 
+	vDataFim DATE,
+    vPrecoUnitario DECIMAL(10,2) -- valor da diária
+)
+BEGIN
+	-- variáveis para cálculo do preço total da reserva
+    DECLARE vDias INTEGER DEFAULT 0;
+    DECLARE vPrecoTotal DECIMAL(10,2);
+    
+    -- variável para exibir mensagem de erro
+    DECLARE vMensagem VARCHAR(100);
+    
+    -- tratamento de erro para chave estrangeira (erro 1452)
+    DECLARE EXIT HANDLER FOR 1452
+    BEGIN
+		SET vMensagem = 'Problema de chave estrangeira';
+        -- use o select para exibir a mensagem como resultado da consulta
+        SELECT vMensagem;
+    END;
+    
+    -- cálculo do valor total da reserva
+    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vPrecoTotal = vDias * vPrecoUnitario;
+    
+    INSERT INTO reservas VALUES (
+		vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
+	);
+    
+    SET vMensagem = 'Aluguel incluído na base com sucesso!';
+    SELECT vMensagem;
+END//
+DELIMITER ;
+```
+
+---
+
+#### Condicional IF
+
+No próximo exemplo, a inserção da reserva é feita passando o nome do cliente ao invés do ID. Procuramos o id do cliente pelo nome na tabela `clientes` e atribuímos este ID a uma variável. Também tratamos os casos de mais de um cliente possuir o mesmo nome, ou de o cliente não existir, usando um **condicional `IF`**.
+
+
+```sql
+DROP PROCEDURE IF EXISTS nova_reserva;
+DELIMITER //
+CREATE PROCEDURE nova_reserva(
+	vReserva VARCHAR(10),
+	vClienteNome VARCHAR(255),
+	vHospedagem VARCHAR(10),
+	vDataInicio DATE, 
+	vDataFim DATE,
+    vPrecoUnitario DECIMAL(10,2) -- valor da diária
+)
+BEGIN
+	-- a partir do nome, vamos encontrar o id consultando a tabela clientes
+    DECLARE vCliente VARCHAR(10);
+    
+    -- vamos verificar se há mais de um cliente com o mesmo nome
+    DECLARE vQtdCliente INTEGER;
+	
+	-- variáveis para cálculo do preço total da reserva
+    DECLARE vDias INTEGER DEFAULT 0;
+    DECLARE vPrecoTotal DECIMAL(10,2);
+    
+    -- variável para exibir mensagem de erro
+    DECLARE vMensagem VARCHAR(100);
+    
+    -- tratamento de erro para chave estrangeira (erro 1452)
+    DECLARE EXIT HANDLER FOR 1452
+    BEGIN
+		SET vMensagem = 'Problema de chave estrangeira';
+        -- use o select para exibir a mensagem como resultado da consulta
+        SELECT vMensagem;
+    END;
+    
+    -- verificando a quantidade de clientes com o nome informado
+    -- podemos usar o resultado do SELECT como valor da variável
+    SET vQtdCliente = (SELECT count(*) FROM clientes WHERE nome = vClienteNome);
+    
+    IF vQtdCliente > 1 THEN
+		SET vMensagem = 'Não é possível fazer a inclusão, pois há mais de um cliente com o mesmo nome.';
+        SELECT vMensagem;
+	ELSEIF vQtdCliente = 0 THEN
+		SET vMensagem = 'Não é possível fazer a inclusão, pois o cliente não existe.';
+        SELECT vMensagem;
+	ELSE
+		-- cálculo do valor total da reserva
+		SET vDias = datediff(vDataFim, vDataInicio);
+		SET vPrecoTotal = vDias * vPrecoUnitario;
+		
+		-- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
+        -- o valor a uma variável
+		SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
+		
+		INSERT INTO reservas VALUES (
+			vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
+		);
+		
+		SET vMensagem = 'Aluguel incluído na base com sucesso!';
+		SELECT vMensagem;
+    END IF;
+END//
+DELIMITER ;
+```
+
+---
+
+#### Condicional CASE
+
+Pedaço de código mostrando como seria o `IF` anterior utilizando **outra condicional, o `CASE`**:
+
+```sql
+CASE vQtdCliente
+WHEN 0 THEN
+    SET vMensagem = 'Não é possível fazer a inclusão, pois o cliente não existe.';
+    SELECT vMensagem;
+
+WHEN 1 THEN
+    -- cálculo do valor total da reserva
+    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vPrecoTotal = vDias * vPrecoUnitario;
+    
+    -- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
+    -- o valor a uma variável
+    SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
+    
+    INSERT INTO reservas VALUES (
+        vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
+    );
+    
+    SET vMensagem = 'Aluguel incluído na base com sucesso!';
+    SELECT vMensagem;
+
+ELSE
+    SET vMensagem = 'Não é possível fazer a inclusão, pois há mais de um cliente com o mesmo nome.';
+    SELECT vMensagem;
+END CASE;
+
+```
+
+---
+
+Outra versão do `CASE`, colocando a condição dentro de cada `WHEN`:
+
+```sql
+CASE 
+WHEN vQtdCliente > 1 THEN
+    SET vMensagem = 'Não é possível fazer a inclusão, pois há mais de um cliente com o mesmo nome.';
+    SELECT vMensagem;
+WHEN vQtdCliente = 0 THEN
+    SET vMensagem = 'Não é possível fazer a inclusão, pois o cliente não existe.';
+    SELECT vMensagem;
+WHEN vQtdCliente = 1 THEN
+    -- cálculo do valor total da reserva
+    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vPrecoTotal = vDias * vPrecoUnitario;
+    
+    -- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
+    -- o valor a uma variável
+    SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
+    
+    INSERT INTO reservas VALUES (
+        vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
+    );
+    
+    SET vMensagem = 'Aluguel incluído na base com sucesso!';
+    SELECT vMensagem;
+END CASE;
+```
+
+---
+
+#### Loop WHILE
+
+Exemplo utilizando o **loop `WHILE`**. Nesta procedure, incluímos uma reserva de aluguel baseado na data inicial e número de dias, excluindo finais de semana (finais de semana são adicionados à reserva, mas não são cobrados, então não entram na contagem de número de dias). Também é mostrado o uso de `INTERVAL` e a função `dayofweek` para se trabalhar com datas.
+
+```sql
+
+DROP PROCEDURE IF EXISTS nova_reserva;
+DELIMITER //
+CREATE PROCEDURE nova_reserva(
+	vReserva VARCHAR(10),
+	vClienteNome VARCHAR(255),
+	vHospedagem VARCHAR(10),
+	vDataInicio DATE, 
+	vDias INTEGER,
+    vPrecoUnitario DECIMAL(10,2) -- valor da diária
+)
+BEGIN
+	-- novas regras: 
+    -- 1. calcular a data final com base na inicial e número de dias
+    -- 2. finais de semana NÃO contam para o cálculo dos dias e são
+    -- incluídos de graça no total da reserva
+    DECLARE vDataFim DATE;
+    DECLARE vContador Integer;
+    DECLARE vDiaSemana Integer;
+
+	-- a partir do nome, vamos encontrar o id consultando a tabela clientes
+    DECLARE vCliente VARCHAR(10);
+    
+    -- vamos verificar se há mais de um cliente com o mesmo nome
+    DECLARE vQtdCliente INTEGER;
+	
+	-- variável para cálculo do preço total da reserva
+    DECLARE vPrecoTotal DECIMAL(10,2);
+    
+    -- variável para exibir mensagem de erro
+    DECLARE vMensagem VARCHAR(100);
+    
+    -- tratamento de erro para chave estrangeira (erro 1452)
+    DECLARE EXIT HANDLER FOR 1452
+    BEGIN
+		SET vMensagem = 'Problema de chave estrangeira';
+        -- use o select para exibir a mensagem como resultado da consulta
+        SELECT vMensagem;
+    END;
+    
+    -- verificando se há mais de um cliente com o mesmo nome
+    -- podemos usar o resultado do SELECT como valor da variável
+    SET vQtdCliente = (SELECT count(*) FROM clientes WHERE nome = vClienteNome);
+    
+    CASE 
+	WHEN vQtdCliente > 1 THEN
+		SET vMensagem = 'Não é possível fazer a inclusão, pois há mais de um cliente com o mesmo nome.';
+        SELECT vMensagem;
+    WHEN vQtdCliente = 0 THEN
+		SET vMensagem = 'Não é possível fazer a inclusão, pois o cliente não existe.';
+        SELECT vMensagem;
+	WHEN vQtdCliente = 1 THEN
+		-- cálculo dos dias, aplicando as novas regras
+        SET vContador = 0;
+        
+        -- a data de início será incluída como sendo o
+        -- primeiro dia das diárias. Isso é corrigido no loop
+        SET vDataFim = vDataInicio - INTERVAL 1 DAY; 
+        WHILE vContador < vDias DO
+			-- independente do dia, adicionamos à data final
+            SET vDataFim = vDataFim + INTERVAL 1 DAY;
+			SET vDiaSemana = dayofweek(vDataFim);
+             -- 1 é domingo e 7 é sábado
+            IF (vDiaSemana <> 1 AND vDiaSemana <> 7) THEN
+				SET vContador = vContador + 1;
+            END IF;
+        END WHILE;        
+		
+        -- cálculo do valor total da reserva
+        SET vPrecoTotal = vDias * vPrecoUnitario;
+		
+		-- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
+        -- o valor a uma variável
+		SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
+		
+		INSERT INTO reservas VALUES (
+			vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
+		);
+		
+		SET vMensagem = 'Aluguel incluído na base com sucesso!';
+		SELECT vMensagem;
+    END CASE;
+END//
+DELIMITER ;
+```
+
+---
+
+#### Passagem de parâmetro por referência
+
+Neste exemplo, separamos a lógica do `WHILE` do exemplo anterior em uma nova procedure, chamada `calcula_data_fim`, que faz o cálculo e retorna a data final do aluguel. Esse retorno é dentro do próprio parâmetro `vDataFim` passado à procedure, indicando com `INOUT` que este **parâmetro é passado como referência**, ou seja, modificações de valor feito nesse parâmetro serão mantidos ao retornar à procedure que chamou `calcula_data_fim`.
+
+```sql
+-- procedure que calcula a data final e utiliza passagem de 
+-- parâmetro por referência para retornar o resultado
+DROP PROCEDURE IF EXISTS calcula_data_fim;
+DELIMITER $$
+CREATE PROCEDURE calcula_data_fim(
+	vDataInicio DATE,
+    INOUT vDataFim DATE, -- passagem de parâmetro por referência
+    vDias INTEGER
+)
+BEGIN
+	DECLARE vContador INTEGER;
+    DECLARE vDiaSemana INTEGER;
+    
+	SET vContador = 0;
+	SET vDataFim = vDataInicio - INTERVAL 1 DAY; 
+    
+	WHILE vContador < vDias	DO
+		SET vDataFim = vDataFim + INTERVAL 1 DAY;
+		SET vDiaSemana = dayofweek(vDataFim);
+		IF (vDiaSemana <> 1 AND vDiaSemana <> 7) THEN
+			SET vContador = vContador + 1;
+		END IF;
+	END WHILE;   
+END$$
+DELIMITER ;
+
+DROP PROCEDURE IF EXISTS nova_reserva;
+DELIMITER //
+CREATE PROCEDURE nova_reserva(
+	vReserva VARCHAR(10),
+	vClienteNome VARCHAR(255),
+	vHospedagem VARCHAR(10),
+	vDataInicio DATE, 
+	vDias INTEGER,
+    vPrecoUnitario DECIMAL(10,2)
+)
+BEGIN
+    DECLARE vCliente VARCHAR(10);
+    DECLARE vQtdCliente INTEGER;
+    DECLARE vDataFim DATE;
+	DECLARE vPrecoTotal DECIMAL(10,2);
+    DECLARE vMensagem VARCHAR(100);
+    
+    -- tratamento de erro para chave estrangeira (erro 1452)
+    DECLARE EXIT HANDLER FOR 1452
+    BEGIN
+		SET vMensagem = 'Problema de chave estrangeira';
+        SELECT vMensagem;
+    END;
+    
+    -- verificando se há mais de um cliente com o mesmo nome
+    SET vQtdCliente = (SELECT count(*) FROM clientes WHERE nome = vClienteNome);
+    
+    CASE 
+	WHEN vQtdCliente > 1 THEN
+		SET vMensagem = 'Não é possível fazer a inclusão, pois há mais de um cliente com o mesmo nome.';
+        SELECT vMensagem;
+    WHEN vQtdCliente = 0 THEN
+		SET vMensagem = 'Não é possível fazer a inclusão, pois o cliente não existe.';
+        SELECT vMensagem;
+	WHEN vQtdCliente = 1 THEN
+        
+        -- executando outra procedure
+        CALL calcula_data_fim(vDataInicio, vDataFim, vDias);
+		
+        -- cálculo do valor total da reserva
+        SET vPrecoTotal = vDias * vPrecoUnitario;
+		
+		SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 		
+		INSERT INTO reservas VALUES (
+			vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
+		);
+		
+		SET vMensagem = 'Aluguel incluído na base com sucesso!';
+		SELECT vMensagem;
+    END CASE;
+END//
+DELIMITER ;
+```
+
+---
+
+#### Usando CURSOR e TEMPORARY TABLE
+
+Neste exemplo, criamos duas novas procedures e fazemos uso de tabela temporária e cursor para fazer a inclusão de uma reserva para um grupo. Assumimos que o grupo é uma string com nomes separados por vírgula. No caso, será feita a uma reserva para cada nome, utilizando os mesmos dados de hospedagem, dias e valores. Considere que a procedure `nova_reserva` agora calcula automaticamente o ID da reserva. É apenas um exemplo didático para entender tabela temporária e cursor, pois na prática seria muito mais fácil percorrer a string e adicionar cada nome diretamente da lista recebida.
+
+> Uma **tabela temporária** é outra forma de armazenarmos dados temporariamente no banco. Diferente de uma View ou CTE, a tabela temporária persiste **durante a sessão** do banco (enquanto a conexão ao banco estiver ativa) ou caso seja explicitamente excluída ("dropada"). Ela pode ser acessada por outras queries dentro da mesma sessão.
+
+> Um **cursor** é um mecanismo que permite que tenhamos **acesso linha a linha dos resultados de uma consulta**. Com ele, o resultado da consulta é armazenado em memória e podemos acessar cada linha de maneira interativa utilizando o `FETCH`. Veja no exemplos os passos para a declaração, abertura, iteração e fechamento do cursor.
+
+```sql
+-- percorre uma lista de nomes e adiciona cada um
+-- em uma tabela temporaria
+DROP PROCEDURE IF EXISTS inclui_novo_grupo;
+DELIMITER //
+CREATE PROCEDURE inclui_novo_grupo(
+	grupo VARCHAR(255) -- lista de nomes separados por vírgula    
+)
+BEGIN
+	DECLARE nome VARCHAR(255);
+    DECLARE proximo_nome VARCHAR(255);
+    DECLARE pos INTEGER;
+    
+    SET proximo_nome = grupo;
+    SET pos = INSTR(proximo_nome, ',');
+    
+    WHILE pos > 0 DO 
+		-- adiciona nome à tabela temporária
+        SET nome = LEFT(proximo_nome, pos - 1);
+        INSERT INTO temp_nomes VALUES (nome);
+        
+        -- remove nome do grupo
+        SET proximo_nome = SUBSTR(proximo_nome, pos + 1);
+        SET pos = INSTR(proximo_nome, ',');
+    END WHILE;
+    
+    IF TRIM(proximo_nome) <> '' THEN
+		INSERT INTO temp_nomes VALUES (TRIM(proximo_nome));
+    END IF;
+END//
+DELIMITER ;
+
+-- adiciona um grupo em uma tabela temporária e usa
+-- um cursor para percorrer esta tabela e adicionar
+-- uma reserva para cada nome do grupo
+DROP PROCEDURE IF EXISTS nova_reserva_grupo;
+DELIMITER //
+CREATE PROCEDURE nova_reserva_grupo(
+	grupo VARCHAR(255),
+	vHospedagem VARCHAR(10),
+	vDataInicio DATE,
+	vDias INTEGER,
+    vPrecoUnitario DECIMAL(10,2)
+)
+BEGIN
+	DECLARE vNome VARCHAR(255);
+    
+    -- sentinela para sair do loop quando não houver mais nomes
+    DECLARE fimLoop INTEGER DEFAULT 0; 
+
+    -- cursor que percorre linha a linha o resultado do select
+    DECLARE cursorNome CURSOR FOR SELECT nome FROM temp_nomes;
+    
+    -- tratando erro quando chega ao fim do cursor, atualizando
+    -- a sentinela e continuando a execução da procedure 
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET fimLoop = 1;
+    
+    -- criação da tabela temporária
+	DROP TEMPORARY TABLE IF EXISTS temp_nomes;
+    CREATE TEMPORARY TABLE temp_nomes(nome VARCHAR(255));
+    CALL inclui_novo_grupo(grupo);
+    
+    -- percorrendo a lista de nomes e adicionando a reserva
+    OPEN cursorNome; -- executa o select da declaração do cursor
+    FETCH cursorNome INTO vNome;
+    WHILE fimLoop = 0 DO 
+		CALL nova_reserva(vNome, vHospedagem, vDataInicio, vDias, vPrecoUnitario);
+		FETCH cursorNome INTO vNome;
+    END WHILE;
+    CLOSE cursorNome; -- libera a memória do cursor
+    
+    -- por precaução, vamos apagar a tabela temporária também ao final
+    DROP TEMPORARY TABLE IF EXISTS temp_nomes;
+END//
+DELIMITER ;
+
+-- exemplo de chamada
+CALL nova_reserva_grupo('Gabriel Carvalho,Erick Oliveira,Catarina Correia,Lorena Jesus', '8635', '2023-06-03', 7, 30);
+
+```
