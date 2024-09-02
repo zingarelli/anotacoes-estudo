@@ -1,11 +1,12 @@
 # Next.js
 
+Estas anotações estão baseadas na **versão 14** do Next, então alguns conceitos, códigos e estruturas podem mudar em versões anteriores. 
+
 ## Créditos
 
 Estas anotações são baseadas nos cursos da Alura para a formação [Next.js 14: desenvolvendo aplicações robustas com alta produtividade](https://www.alura.com.br/formacao-next-js-14-aplicacoes-robustas-alta-produtividade), ministrados pela [Patrícia Silva](https://github.com/gss-patricia) e pelo [Vinicios Neves](https://www.linkedin.com/in/vinny-neves/).
 
 Alguns complementos foram inseridos baseados na própria [documentação do Next](https://nextjs.org/docs) (em inglês).
-
 
 ## Introdução
 
@@ -47,11 +48,9 @@ Com isso, um projeto Next é criado já com alguns arquivos e pastas. Para rodá
 
 O projeto irá rodar em http://localhost:3000
 
-> Em projetos React, estamos acostumados a verificar erros na aplicação olhando o Dev Tools do navegador. Já no Next, como algumas coisas serão feitas pelo servidor, também precisamos ficar de olho no console onde rodamos o `npm run dev`, pois é nele que serão informado erros do servidor.
+> Em projetos React, estamos acostumados a verificar erros na aplicação olhando o Dev Tools do navegador. Já no Next, como algumas coisas serão feitas pelo servidor, também precisamos ficar de olho no console onde rodamos o `npm run dev`, pois é nele que serão informados erros do servidor.
 
 ## Estrutura de um projeto Next
-
-A formação baseia-se na **versão 14** do Next, então alguns conceitos, códigos e estruturas podem mudar em versões diferentes. 
 
 Exemplo da estrutura de pastas criada pelo `create-next-app`:
 
@@ -145,7 +144,7 @@ O Next também entrega uma solução para otimizar a importação de fontes, inc
 
 Existem fontes chamadas de "variantes". Este é um formato de fonte que consegue se adaptar automaticamente a diferentes "pesos" ou "estilos" de fonte. [Neste link](https://fonts.google.com/variablefonts) há a lista de fontes variantes no Google Fonts. Para fontes que **não** sejam variantes, será necessário adicionar a propriedade `weight` no import da fonte, indicando quais pesos queremos importar, por exemplo.
 
-Exemplo importando a fonte `Prompt` (não variante). Observe que a fonte importada é utilizada como uma função, que recebe as configurações como um objeto. Essa função retorna um objeto e utilizamos a propriedade `className` desse objeto para fazer o link entre a fonte e o HTML onde ela deve ser aplicada ─ no caso do exemplo, estamos aplicando a fonte à aplicação toda (atributo `className` da tag `<html>`). Observe que dessa forma não precisamos configurar o `font-family` no CSS global:
+Exemplo importando a fonte `Prompt` (não variante). Observe que a fonte importada é utilizada como uma função, que recebe as configurações via parâmetro, por meio de um objeto. Essa função, por sua vez, retorna um objeto e utilizamos a propriedade `className` desse objeto para fazer o link entre a fonte e o HTML onde ela deve ser aplicada ─ no caso do exemplo, estamos aplicando a fonte à aplicação toda (atributo `className` da tag `<html>`). Observe que dessa forma não precisamos configurar o `font-family` no CSS global:
 
 ```jsx
 import { Prompt } from 'next/font/google';
@@ -253,7 +252,7 @@ export default async function Home({ searchParams }) {
 
 Por padrão, os componentes no Next são renderizados pelo servidor (SSR). Por conta disso, requisições de fetch de dados são feitos pelo lado do servidor e você pode utilizar o resultado diretamente no componente, **sem a necessidade de um `useEffect` ou `useState`** gerenciando o estado dos dados. Isso ocorre porque o servidor irá obter os dados necessários para montar a tela e enviá-la ao cliente quando tudo estiver pronto.
 
-- Essa solução está disponível nas versões novas do Next, usando App Router.
+- Essa solução está disponível nas versões novas do Next, usando **App Router**.
 
 - Por ser feito pelo servidor, o erros e `console.log` que você fizer irão **aparecer no terminal**, e não no Dev Tools do navegador.
 
@@ -282,3 +281,268 @@ export default async function Home() {
   );
 }
 ```
+
+## Página de erro
+
+Quando acontece algum erro na aplicação que não tenha sido tratado, você pode gerar uma página para exibir alguma informação (*fallback UI*) ao invés daquela tela padrão de erro do React. Isso é feito criando um arquivo `error.js` para a definição de um componente que irá retornar o que deve ser renderizado na página de erro.
+
+Você pode criar um arquivo `error.js` em cada rota da aplicação, de modo a ter uma página de erro personalizada para cada rota. Quando um erro ocorre em uma rota que não tem esse arquivo, o Next irá procurar pelo arquivo de erro na rota pai e assim por diante.
+
+Exemplo de componente de erro. Note que neste caso deve ser criado um **client component** para lidar com comportamento de erros dinâmicos e possibilitar alguma interação com a pessoa usuária.
+
+```jsx
+'use client'; // error components MUST BE client components
+import { useEffect } from "react";
+
+export default function Error({ error }) {
+    useEffect(() => {
+        // this will be displayed in the browser dev tools
+        console.log(`Erro na página inicial: ${error}`);
+    }, [error]);
+
+    return (
+        <div><h2 style={{ color: '#FFF' }}>Ops, aconteceu um erro!</h2></div>
+    )
+}
+```
+
+## Prisma
+
+> Para um exemplo de uso do Prisma, incluindo os arquivos necessários, consulte o projeto do [Code Connect](https://github.com/zingarelli/code-connect/tree/postgres_prisma/prisma).
+
+O Prisma é um [ORM (Object Relational Mapper)](https://www.prisma.io/dataguide/types/relational/what-is-an-orm). Isso significa que ele atua, no caso do projeto, como um **intermediador entre as linguagens SQL e JavaScript** (ele também trabalha com outras linguagens). Assim, podemos focar nas estruturas e códigos no Next, criando tabelas e consultas utilizando objetos em JS, e deixar que o Prisma se responsabilize por se comunicar com o banco de dados e "traduzir" em SQL aquilo que queremos. 
+
+Para adicionar o Prisma a um projeto, usamos o comando 
+
+```shell
+npm i prisma
+```
+
+Para criar os arquivos iniciais para utilização do Prisma, o comando é 
+
+```shell
+npx prisma init
+```
+
+Caso ele ainda não esteja instalado na máquina, este comando também irá fazer a instalação. 
+
+Iniciado o Prisma, uma pasta `prisma` será criada na raiz do projeto com um arquivo **`schema.prisma`**. Neste arquivo definimos qual SGBD será utilizado e também criamos os objetos que representarão as tabelas e seus relacionamentos (daí o nome *Object Relational Mapper*). 
+
+Também será criado um arquivo `.env`, onde são definidas variáveis de ambiente. O Prisma irá consultar esse arquivo para obter as credenciais de conexão ao banco.
+
+> O arquivo `.env` contém dados sensíveis de acesso ao projeto, então **não o versione** nem o compartilhe em ambiente de produção.
+
+### Criação do banco de dados
+
+Supondo que vamos criar o banco do zero, definimos as tabelas e relacionamentos no arquivo `schema.prisma` e rodamos o comando abaixo para efetuar a chamada "migração" (*migration*). Esta é a ação que irá criar de fato o banco de dados e suas tabelas no Postgres.
+
+```shell
+npx prisma migrate dev --name init
+```
+
+- `dev` indica que estamos em um ambiente de desenvolvimento;
+
+- `--name init` é a forma de darmos um nome a essa migração, de modo a facilitar identificá-la quando houver outras migrações. Você pode escolher o nome que quiser;
+
+- a pasta `prisma/migrations` contém subpastas com os arquivos SQL criados pelo Prisma.
+
+Exemplo de criação de duas tabelas (models), Post e User, no `schema.prisma`, incluindo chaves primárias e estrangeira, e relacionamentos:
+
+```prisma
+// @id indicates this property as primary key
+// @default is a default value; in this case, it will use the autoincrement function to generate an integer
+// @unique indicates that the value cannot be repeated between records (rows)
+// Post Post[] indicates a 1:N relationship between User and Post
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  username String @unique
+  avatar String
+  Post Post[]
+}
+
+// @updatedAt automatically updates the time when a record is updated
+// @relation configures foreign keys to indicate a connection between tables
+model Post {
+  id Int @id @default(autoincrement())
+  cover String
+  title String
+  slug String @unique
+  body String
+  markdown String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId Int
+  author User @relation(fields: [authorId], references: [id])
+}
+```
+
+### Prisma Client
+
+É uma **classe** disponibilizada pelo Prisma para fazer consultas e as demais operações de CRUD na base de dados, sem usar SQL. 
+
+O client é criado pelo seguinte comando:
+
+```shell
+npx prisma generate
+```
+
+Esse comando deve ser **utilizado toda vez que houver alguma mudança no banco** (alguma alteração no `schema.prisma`), para garantir que o client esteja atualizado com qualquer alteração dos modelos, tipos e relacionamentos.
+
+Para disponibilizar o client para uso na aplicação, uma sugestão é criar um arquivo `db.js` na pasta prisma e exportar o client. 
+
+```js
+// --- prisma/db.js
+import { PrismaClient } from '@prisma/client';
+const db = new PrismaClient();
+export default db;
+```
+
+### Seed de dados
+
+> Link do Prisma sobre seeding, incluindo exemplos em JS e TS: https://www.prisma.io/docs/orm/prisma-migrate/workflows/seeding.
+
+Você pode usar o Prisma para popular (semear) o banco de dados. Para isso, criamos um comando `seed` no `package.json`, e usamos o comando `npx prisma db seed` para popular o banco.
+
+O exemplo a seguir mostra como seria o comando `seed` incluído no `package.json`. O arquivo `prisma/seed.js` será executado pelo Node e irá popular o banco de dados:
+
+```json
+{
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  }
+}
+```
+
+O próximo exemplo mostra a inserção de um novo dado à tabela "Author":
+
+```js
+// --- prisma/seed.js
+const { PrismaClient } = require('@prisma/client'); // neste caso, precisamos usar require
+const prisma = new PrismaClient();
+
+async function main() {
+    // --- criando autora "Ana Beatriz"
+    const author = {
+        name: "Ana Beatriz",
+        username: "anabeatriz_dev",
+        avatar: "https://raw.githubusercontent.com/viniciosneves/code-connect-assets/main/authors/anabeatriz_dev.png",
+    };
+
+    // upsert faz a criação ou atualização na base de dados
+    // baseado na condição passada em "where"
+    const ana = await prisma.user.upsert({
+        where: { username: author.username },
+        update: {}, // vazio indica que nenhum update será feito
+        create: author
+    });
+}
+
+main()
+    .then(async () => {
+        await prisma.$disconnect()
+    })
+    .catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+    })
+```
+
+### Fetch de dados
+
+Por meio do prisma client, podemos acessar as **tabelas** do banco (os models no `schema.prisma`) como se fossem **objetos do client**. Esses objetos possuem métodos para fazer consultas.
+
+No exemplo a seguir, usamos o método **`findMany`** para recuperar os dados da tabela Post. Essa tabela possui uma relação com a tabela Author (uma chave estrangeira para o id do autor), então podemos passar via parâmetro um objeto de configuração com a propriedade `include` para também recuperar dados da tabela Author (na prática, é como se estivéssemos fazendo um `SELECT` com `JOIN` no SQL). Além disso, também está implementada a lógica para paginação (utilizando as propriedades `take` e `skip`) e a ordenação pela data de criação do post (propriedade `orderBy`);
+
+```js
+import db from '../../prisma/db';
+
+const ITEMS_PER_PAGE = 6;
+
+// fetch no lado do servidor
+const getAllPosts = async (page) => {
+  try {
+    // lógica para a página anterior
+    const prev = page > 1 ? page - 1 : null;
+
+    // lógica para a próxima página, baseado no número
+    // de items salvos na base
+    const totalItems = await db.post.count(); // SELECT count(*) FROM post
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); 
+    const next = page < totalPages ? page + 1 : null;
+
+    // lógica para trazer os items da próxima página
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+
+    // SELECT * FROM post
+    const posts = await db.post.findMany({
+      // Uso do include para trazer dados de outra tabela.
+      // Possível porque há uma relacionamento entre as
+      // tabelas definido no schema.prisma
+      include: {
+        author: true
+      },
+      // paginação
+      take: ITEMS_PER_PAGE,
+      skip,
+      // ordenação
+      orderBy: { createdAt: 'desc' }
+    });
+    return { data: posts, prev, next };
+  }
+  catch (error) {
+    console.log(`[${new Date().toString()}] Função getAllPosts --> erro de conexão com a API: ${error}`);
+    return { data: [], prev: null, next: null };
+  }
+}
+```
+
+## Deploy FullStack na Vercel usando Prisma
+
+A Vercel possibilita criarmos um banco de dados e integrá-lo ao deploy da aplicação. Para isso, precisamos fazer alguns ajustes no projeto e também na Vercel.
+
+Para o uso do Prisma, a Vercel solicita duas variáveis de ambiente, então precisamos alterar o `schema.prisma`:
+
+```prisma
+datasource db {
+  provider  = "postgresql"
+  // Uses connection pooling
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+```
+
+Para manter o sincronismo com o projeto rodando localmente, adicionamos essas variáveis também ao `.env`:
+
+```
+POSTGRES_PRISMA_URL="postgresql://postgres@localhost:5432/codeconnect_dev"
+POSTGRES_URL_NON_POOLING="postgresql://postgres@localhost:5432/codeconnect_dev"
+```
+
+- Lembrando que, em **produção**, **não compartilhamos o `.env`**.
+
+Por fim, ajustamos o `package.json`, adicionando os passos do Prisma para o script de **`build`** (a Vercel irá chamar esse comando durante o deploy):
+
+```json
+{  
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && prisma migrate dev && prisma db seed && next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+}
+```
+
+Na Vercel, precisamos adicionar um banco Postgres, disponibilizado pela plataforma. Para o caso deste projeto, a versão free (hobby) está disponível. 
+
+- Acesse a página do projeto na Vercel;
+
+- Vá até a aba "Storage";
+
+- Clique no botão "Create" ao lado do item "Postgres";
+
+- Use todas as opções padrão nas próximas janelas.
+
+> A página do projeto na Vercel só aparece após o primeiro deploy. Então faça o primeiro deploy, que irá gerar um erro por não ter um banco de dados, e aí então crie um banco Postgres e faça um redeploy.
