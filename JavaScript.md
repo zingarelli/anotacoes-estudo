@@ -109,7 +109,7 @@ Variações especiais de objetos (possuem uma sintaxe especial ou operações vi
 
 Imutabilidade: significa que o valor não muda. O número 2 vai ser sempre 2, o valor false será sempre false.
 
-- Observe que **string** é tipo primitivo, portanto, **imutável** em JavaScript.
+- Observe que **string** é tipo primitivo, portanto, **imutável** em JavaScript. Métodos como `toUpperCase` retornam uma nova string ao invés de modificar a original.
 
 > **Não declaramos tipos** para as variáveis/constantes (no jargão de dev: "não tipamos"). A conversão é feita pelo JavaScript de acordo com o valor atribuído.
 
@@ -117,9 +117,118 @@ Imutabilidade: significa que o valor não muda. O número 2 vai ser sempre 2, o 
 
 Para declarar textos (strings), podemos utilizar aspas simples, duplas ou crase (backtick). O backtick foi adicionado pelo ES6 e permite interpolação de texto com expressões JS.
 
+> Quando usado o backtick, denominamos esse valor de *template literal*
+
 Caracteres de escape são adicionados por meio da barra invertida (`\`). Por exemplo, para incluir uma quebra de linha no texto, podemos utilizar o `\n`; para adicionar aspas simples em um texto declarado com aspas simples, utilizamos `\'`, etc.
 
+## Booleano
+
+Qualquer valor em JS pode ser convertido para booleano, o que pode ser chamado de valores *truthy* ou *falsy*. 
+
+**Seis valores** são considerados ***falsy***:
+
+- `undefined`;
+
+- `null`;
+
+- `0`;
+
+- `-0`;
+
+- `Nan`;
+
+- `""` (string vazia).
+
+Isso ajuda a simplificar expressões condicionais, por exemplo.
+
+## null e undefined
+
+São valores primitivos que representam **ausência de valor**. 
+
+O `undefined` é o "valor" retornado nos seguintes casos:
+
+- variáveis não inicializadas;
+
+- propriedade que não existe em um objeto;
+
+- elemento que não existe em um array;
+
+- retorno de função que não retorna nada;
+
+- valor de parâmetros de uma função quando o argumento não é passado.
+
+## Symbol
+
+É um tipo introduzido pelo ES6 para poder atribuir nomes a propriedades de objetos sem utilizar strings, de modo a garantir que uma propriedade não seja acidentamente sobrescrita. 
+
+Um valor de símbolo é gerado pela função `Symbol()`, que aceita uma string como parâmetro opcional. O valor retornado é garantido que seja único, mesmo se você passar o mesmo parâmetro em uma segunda chamada. Ou seja, **a função `Symbol()` nunca retorna o mesmo valor duas vezes**.
+
+No exemplo a seguir, criamos duas novas propriedades utilizando a função `Symbol('novaProp')`. Observe que elas não se sobrescrevem, mesmo tendo sido geradas da mesma forma:
+
+```js
+let obj1 = {};
+const propA = Symbol('novaProp');
+const propB = Symbol('novaProp');
+obj1[propA] = 162;
+obj1[propB] = null;
+
+obj1[propA]; // 162
+obj1[propB]; // null
+
+propA == propB; // false
+propA === propB; // false
+propA == propA; // true
+propA === propA; // true
+
+// mas o valor convertido para string é igual
+propA.toString(); // 'Symbol(novaProp)'
+propB.toString(); // 'Symbol(novaProp)'
+propA.toString() === propB.toString(); // true
+
+// o valor de símbolo não é uma string
+obj1['Symbol(novaProp)']; // undefined
+propA === 'Symbol(novaProp)'; // false
+propA.toString() === 'Symbol(novaProp)'; // true
+```
+
+Já a função `Symbol.for()` é o oposto. Ela garante que irá retornar o **mesmo valor** de símbolo quando chamada com a mesma string.
+
+```js
+const symA = Symbol.for('somosIguais');
+const symB = Symbol.for('somosIguais');
+symA === symB; // true
+```
+
+## global object
+
+O JS tem um objeto global que provê uma série de propriedades disponíveis para qualquer programa JS.
+
+No Node, esse objeto é acessado usando `global`. 
+
+No navegador, é acessado usando `window`.
+
+O **ES2020** define o `globalThis` como o nome padrão de acesso ao objeto global, em substituição ao `global` e ao `window`.
+
+## Conversões úteis
+
+Para fazermos conversões explícitas, podemos utilizar as funções (observe a inicial maiúscula) `Boolean()`, `Number()` e `String()`. 
+
+Podemos converter qualquer valor para string (exceto `null` e `undefined`) usando o método `toString()`.
+
+Para números, também temos as funções globais `parseInt()` e `parseFloat()`.
+
+Atalhos para conversão para número ou string:
+
+```js
++'2'; // a string será convertida para número
+3 + ''; // o valor número 3 será convertido para string '3'
+```
+
 ## Variáveis e escopo
+
+**Anterior** ao ES6: declara usando `var`.
+
+A partir do **ES6**: declara usando `let` e `const`. Ainda é possível usar `var` por questões de compatibilidade. O uso de **`const`** é para declaração de um **valor que não irá mudar**. Se não for o caso, use `let`.
 
 Podem começar com letra, underline (`_`) ou dólar (`$`). **Não** podem começar com **número**.
 
@@ -130,35 +239,35 @@ let 123variavel; // SyntaxError
 
 > Embora a linguagem aceite qualquer caracter Unicode como identificador, a convenção é se ater a caracteres ASCII (ou seja, sem acentos ou letras de outros alfabetos)
 
-`var nome`: escopo **global e local** (local quando declarada dentro de uma função, por exemplo); é uma maneira antiga de declarar uma variável; 
+`var`: escopo **global e local** (local quando declarada dentro de uma função, global nos outros casos); é uma maneira antiga de declarar uma variável. Quando global, se torna **propriedade do [global object](#global-object)**.
 
-`let nome`: escopo **local de BLOCO** (não será vista pelo código após o bloco (bloco é qualquer coisa entre chaves `{}`)); 
+`let`: escopo **local de BLOCO** (não será vista pelo código após o bloco)
 
-- por convenção, `let` é usada somente dentro de blocos; 
+- bloco é qualquer coisa entre chaves `{}` ou em loops; 
 
-- boa prática: dê preferência ao `let` ao invés de `var`, por questões de segurança, já que `var` tem um contexto global e pode ser manipulada via console. O `let` também pode ser manipulado via console, dependendo de onde for declarado. No entanto, devido a seu escopo local de **bloco**, oferece mais proteção do que var;
+- boa prática: dê preferência ao `let` ao invés de `var`, tanto para se adequar às versões modernas de JS quanto por questões de segurança, já que `var` é parte do global object e pode ser manipulada via console. O `let` também pode ser manipulado via console, dependendo de onde for declarado. No entanto, devido a seu escopo local de **bloco**, oferece mais proteção do que `var`;
 
 - dentro de uma função, `var` é vista por *todos* na função, *inclusive* se for declarada em *blocos internos* (dentro de um if, por exemplo). Já `let`, se declarada dentro de um bloco `if` dentro da função, será vista *somente pelo bloco* `if`, e não pela função inteira.
 
-`const nome`: boa prática é declarar constantes em SNAKE_UPPER_CASE.
+`const`: uma prática comum é declarar constantes em SNAKE_UPPER_CASE, para diferenciá-las de variáveis.
 
-- diferente das variáveis, `const` **precisa ser inicializada com algum valor**, senão irá subir uma exceção no console;
+- diferente das variáveis, `const` **precisa ser inicializada com algum valor**, senão irá subir uma exceção de `TypeError`;
 
 - também possui **escopo de BLOCO**.
 
+> Quando `let` ou `const` são declaradas **antes** de qualquer bloco de código, seu escopo é **global** (mas não são propriedades do global object). No Node, o escopo global é o arquivo em que a variável foi definida. No navegador, o escopo é o **documento HTML**, o que significa que **outros scripts têm acesso a ela**, caso sejam executados após o script que definiu a variável. 
+
 Boa prática para `var`, `let` e `const`: faça a declaração *no topo do bloco de código*, para auxiliar o "hoisting" do interpretador a elevá-las até o topo desde o início.
 
-- no caso de `let` e `const`, o interpretador faz o hoisting, mas não inicializa estas variáveis; 
+- no caso de `let` e `const`, o interpretador faz o hoisting, mas as variáveis não são acessíveis enquanto não forem declaradas; tentar utilizá-las antes da declaração, causará um erro;
 
-- no caso de var, ela é inicializada como undefined se nenhum valor tiver sido atribuído a ela.
+- no caso de `var`, ela é inicializada como `undefined` e **pode ser acessada antes da declaração**.
 
 ### Hoisting
 
 Hoisting é uma etapa em que o interpretador **coloca na memória** as declarações de funções, variáveis ou classes, *antes de executar o código*. É como se ele colocasse no topo do arquivo essas declarações. 
 
 Funciona bem para funções (é por isso que você pode usá-las antes de declará-las), mas pode causar erros com variáveis e classes (o hoisting eleva somente as **DECLARAÇÕES** e **não as inicializações**; em casos específicos elas são inicializadas com seu valor padrão, em outros casos não são nem inicializadas).
-
-Diferença para `var`: ela tem um escopo mais abrangente, então se possível é melhor considerar utilizar o `let` e o `const`. Diferente de `let` e `const`, durante o hoisting a `var` é elevada e *inicializada como undefined*, podendo, por essa causa, *ser utilizada antes mesmo de ser declarada no código*.
 
 ## Comparação
 
@@ -167,6 +276,41 @@ Diferença para `var`: ela tem um escopo mais abrangente, então se possível é
 `===` : comparação idêntica: tanto o **valor** quanto o **tipo** têm que ser iguais;
 
 Comparadores lógicos: `&&,` `||` e `!`
+
+### Comparação em objetos
+
+Objetos não são comparados por valor, mas sim **por referência**. Os objetos são uma referência a uma posição da memória e, por conta disso, quando comparamos dois objetos que possuem as **mesmas propriedades e os mesmos valores** nestas propriedades, eles serão **diferentes**, pois estão referenciando diferentes regiões de memória.
+
+```js
+let objA = { x: 10 };
+let objB = { x: 10 };
+objA == objB; // false
+objA === objB; // false
+
+// mas os VALORES nas propriedades são iguais, 
+// pois são primitivos
+objA.x == objB.x; // true
+objA.x === objB.x; // true
+```
+
+Desse modo, para comparar se dois objetos são iguais, devemos manualmente comparar se suas propriedades são iguais e se os valores delas são iguais. 
+
+> É por isso que, ao declararmos uma variável e atribuir a ela um objeto que está em outra variável, **não** estamos copiando aquele objeto, e sim **atribuindo a referência** ao mesmo objeto. Por conta disso, qualquer modificação em uma variável irá ser refletida na outra.
+
+```js
+let a = { x: 10 };
+let b = a; // estamos copiando a REFERÊNCIA
+b === a; // true, pois referenciam o mesmo obj
+
+a.x; // 10
+b.x; // 10
+b.x = 15;
+
+b.x; // 15
+a.x; // também 15, pois referenciam o mesmo obj
+```
+
+Essas mesmas observações se **aplicam para arrays** e seus elementos (lembrando que arrays são uma variação especial de objeto).
 
 ## Arrays
 
@@ -836,5 +980,5 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-3.3.4 
-pag. 94
+3.10.3
+pag. 129
