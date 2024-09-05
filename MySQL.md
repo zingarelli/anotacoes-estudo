@@ -282,18 +282,31 @@ WHERE hospedagem_id IN ('1', '10', '100');
 ---
 
 ```sql
-SELECT cliente_id, avg(preco_total) AS ticket_medio
+SELECT 
+	(SELECT COUNT(*) FROM proprietarios) AS qtd_proprietarios,	
+	(SELECT COUNT(*) FROM hospedagens) AS qtd_hospedagens,
+	(SELECT COUNT(*) FROM alugueis) AS qtd_alugueis;
+```
+
+- Uma consulta bem simples para mostrar que é possível usar `SELECT` de forma aninhada, ou seja, aproveitar o resultado de um (ou mais) `SELECT` em outro `SELECT`. Neste caso, estamos retornando de uma única vez a quantidade de registros nas tabelas proprietarios, hospedagens e alugueis.
+
+- `COUNT()` é uma função que conta as linhas **não nulas**. No caso, como estamos usando `COUNT(*)`, ele irá também contar as linhas nulas, se houver, para cada proprietário (a consulta está agrupada por `nome`).
+
+- `AS` é utilizado quando queremos dar um "apelido" (*alias*) a uma coluna/resultado. Esse apelido aparece somente no resultado da consulta, ou seja, a coluna na tabela não é renomeada.
+
+---
+
+```sql
+SELECT cliente_id, AVG(preco_total) AS ticket_medio
 FROM alugueis
 GROUP BY cliente_id;
 ```
 
 - Consulta que está agrupando os clientes pelo ID e calculando uma média que eles gastam dentre os vários alugueis que já pagaram. 
 
-- `avg()` é uma **função de agregação** que calcula a média.
+- `AVG()` é uma **função de agregação** que calcula a média.
 
-- `AS` é utilizado quando queremos dar um "apelido" (*alias*) a uma coluna/resultado. Esse apelido aparece somente no resultado da consulta, ou seja, a coluna na tabela não é renomeada.
-
-- `GROUP BY` costuma ser utilizado em conjunto com funções de agregação, como a `avg()`. Quando os dados são agrupados, as funções de agregação são aplicadas separadamente para o conjunto de dados **de cada agrupamento.**
+- `GROUP BY` costuma ser utilizado em conjunto com funções de agregação, como a `AVG()`. Quando os dados são agrupados, as funções de agregação são aplicadas separadamente para o conjunto de dados **de cada agrupamento.**
 
     - após agrupado, você pode aplicar um filtro à consulta usando o `HAVING`. É semelhante ao `WHERE`, porém, específico para conjuntos agrupados.
 
@@ -302,7 +315,7 @@ GROUP BY cliente_id;
 ```sql
 SELECT 
   cliente_id, 
-  avg(datediff(data_fim, data_inicio)) AS media_dias_estadia 
+  AVG(DATEDIFF(data_fim, data_inicio)) AS media_dias_estadia 
 FROM alugueis
 GROUP BY cliente_id
 ORDER BY media_dias_estadia DESC
@@ -310,7 +323,7 @@ ORDER BY media_dias_estadia DESC
 
 - Função que verifica a média de dias de cada cliente quando fica hospedado, ordenando a média de maneira decrescente.
 
-- `datediff()` é uma função para subtração entre valores do tipo `DATE`.
+- `DATEDIFF()` é uma função para subtração entre valores do tipo `DATE`.
 
 - `ORDER BY` é a cláusula para ordenação do resultado baseado em alguma coluna. `DESC` indica ordenação decrescente. Por padrão, a ordem é ascendente (`ASC`).
 
@@ -319,7 +332,7 @@ ORDER BY media_dias_estadia DESC
 ```sql
 SELECT 
   p.nome AS nome_proprietario, 
-  count(*) AS total_hospedagens_ativas
+  COUNT(*) AS total_hospedagens_ativas
 FROM proprietarios p
 JOIN hospedagens h ON p.proprietario_id = h.proprietario_id
 WHERE h.ativo = 1
@@ -336,17 +349,15 @@ LIMIT 10;
 
     - Veja mais sobre o `JOIN` [nesta Seção específica](#tipos-de-join);
 
-- `count()` é uma função que conta as linhas **não nulas**. No caso, como estamos usando `count(*)`, ele irá também contar as linhas nulas, se houver, para cada proprietário (a consulta está agrupada por `nome`).
-
 - `LIMIT` é a cláusula que usamos para limitar a quantidade de resultados vindos da consulta. Como queremos o "top 10", limitamos a consulta aos 10 primeiros resultados (que foram previamente ordenados de forma decrescente pelo total de hospedagens ativas).
 
 ---
 
 ```sql
 SELECT 
-  year(data_inicio) AS ano,
-  month(data_inicio) AS mes,
-  count(*) AS total_reservas
+  YEAR(data_inicio) AS ano,
+  MONTH(data_inicio) AS mes,
+  COUNT(*) AS total_reservas
 FROM alugueis
 GROUP BY ano, mes
 ORDER BY total_reservas DESC;
@@ -354,15 +365,56 @@ ORDER BY total_reservas DESC;
 
 - Consulta do total de reservas (aluguéis) feitas por ano e mês, de modo a verificar os meses de maior e menor demanda em cada ano. Uma consulta assim pode indicar a sazonalidade.
 
-- As funções `year()` e `month()` extraem o ano e o mês de uma dada data.
+- As funções `YEAR()` e `MONTH()` extraem o ano e o mês de uma dada data.
 
-- A cláusula `GROUP BY` aceita **agrupamento composto**, fazendo o agrupamento na ordem em que as colunas foram indicadas. No caso do exemplo, o resultado é agrupado por ano e depois, dentro de cada ano, é agrupado por mês, e o `count()` faz a soma de cada um desses agrupamentos compostos.
+- A cláusula `GROUP BY` aceita **agrupamento composto**, fazendo o agrupamento na ordem em que as colunas foram indicadas. No caso do exemplo, o resultado é agrupado por ano e depois, dentro de cada ano, é agrupado por mês, e o `COUNT()` faz a soma de cada um desses agrupamentos compostos.
 
 ---
 
-### TODO
+```sql
+-- Transformando o CPF, armazenado como uma string somente com números, 
+-- para um formato com pontos e traço (XXX.XXX.XXX-XX).
+-- A função UPPER passa todas as letras para maiúsculo.
+-- A função TRIM elimina espaços em branco no início e final da string.
+-- A função CONCAT concatena strings, separadas por vírgula.
+-- A função SUBSTR(campo, inicio, qtd) retorna parte de uma string de 
+-- "campo", a partir de "inicio" (o índice começa em 1) e extraindo 
+-- uma quantidade "qtd" de caracteres, incluindo o caracter de inicio
+SELECT 
+	UPPER(TRIM(nome)) as nome,
+	CONCAT(SUBSTR(cpf, 1, 3), '.',
+		SUBSTR(cpf, 4, 3), '.',
+		SUBSTR(cpf, 7, 3), '-',
+		SUBSTR(cpf, 10, 2)) as CPF,
+	contato as 'e-mail'
+FROM clientes;
+```
 
-Fazer um exemplo de consulta com select aninhado, em que um select, ao invés de consultar uma tabela, consulta o resultado de outro select.
+- Consulta para mostrar nome, CPF e e-mail dos clientes, utilizando algumas funções para manipular strings.
+
+---
+
+```sql
+SELECT 
+	h.tipo tipo, 
+    AVG(a.nota) media_avaliacao,
+    TRUNCATE(AVG(a.nota), 2) media_truncada,
+    ROUND(AVG(a.nota), 2) media_arredondada,
+    ROUND(AVG(a.nota), 3) media_arredondada_tres_casas,
+    CEIL(AVG(a.nota)) media_arredondada_pra_cima,
+    FLOOR(AVG(a.nota)) media_arredondada_pra_baixo
+FROM avaliacoes a
+JOIN hospedagens h ON h.hospedagem_id = a.hospedagem_id
+GROUP BY h.tipo;
+```
+
+- Média geral das avaliações, baseada no tipo da hospedagem, utilizando algumas funções para manipular números. Exemplo de retorno:
+
+| tipo | media_avaliacao | media_truncada | media_arredondada | media_arredondada_tres_casas | media_arredondada_pra_cima | media_arredondada_pra_baixo |
+| - | - | - | - | - | - | - |
+| 'apartamento' | '2.9565' | '2.95' | '2.96' | '2.957' | '3' | '2' |
+| 'casa' | '2.9756' | '2.97' | '2.98' | '2.976' | '3' | '2' |
+| 'hotel' | '3.0618' | '3.06' | '3.06' | '3.062' | '4' | '3' |
 
 ## Tipos de JOIN
 
@@ -406,18 +458,20 @@ View é uma forma de criar novas tabelas "virtuais", baseadas no retorno de cons
 
 Uma de suas vantagens é criar uma ou mais tabelas que serão disponibilizadas para consulta. Por exemplo, por meio de uma view podemos decidir quais colunas serão "expostas" para consulta, bloqueando o acesso a consulta às tabelas originais. Assim, limitamos o acesso ao banco de dados a somente algumas views que queremos tornar públicas, protegendo dados sensíveis. 
 
-### TODO
-
-Refazer esse exemplo quando chegar nesse assunto no curso de MySQL:
+Exemplo de view que cria uma tabela com os aluguéis e um desconto promocional baseado na quantidade de dias de estadia. O cálculo do desconto e o valor promoocional estão sendo feitos por duas funções customizadas cujo código não está no exemplo. Veja mais sobre [funções nesta Seção](#funções).
 
 ```sql
-create view viewValorTotalPedido as
-select c.nome, p.id as pedido_id, sum(i.precounitario) as valor_total_pedido, 
-  p.datahorapedido as data_hora_pedido
-from pedidos p
-join itenspedidos i on p.id = i.idpedido
-join clientes c on c.id = p.idcliente
-group by p.id, c.nome
+CREATE OR REPLACE VIEW viewAluguelPromocional AS
+SELECT 
+	aluguel_id, 
+    cliente_id, 
+    preco_total,
+    getDesconto(aluguel_id) AS desconto,
+    calculaDesconto(aluguel_id) AS preco_promocional
+FROM alugueis;
+
+-- usando a view
+SELECT * FROM viewaluguelpromocional;
 ```
 
 ### Diferença entre WITH e VIEW
@@ -564,7 +618,7 @@ BEGIN
     DECLARE vPrecoTotal DECIMAL(10,2);
     
     -- inicialização das variáveis
-    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vDias = DATEDIFF(vDataFim, vDataInicio);
     SET vPrecoTotal = vDias * vPrecoUnitario;
     
     INSERT INTO reservas VALUES (
@@ -620,7 +674,7 @@ BEGIN
     END;
     
     -- cálculo do valor total da reserva
-    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vDias = DATEDIFF(vDataFim, vDataInicio);
     SET vPrecoTotal = vDias * vPrecoUnitario;
     
     INSERT INTO reservas VALUES (
@@ -675,7 +729,7 @@ BEGIN
     
     -- verificando a quantidade de clientes com o nome informado
     -- podemos usar o resultado do SELECT como valor da variável
-    SET vQtdCliente = (SELECT count(*) FROM clientes WHERE nome = vClienteNome);
+    SET vQtdCliente = (SELECT COUNT(*) FROM clientes WHERE nome = vClienteNome);
     
     IF vQtdCliente > 1 THEN
 		SET vMensagem = 'Não é possível fazer a inclusão, pois há mais de um cliente com o mesmo nome.';
@@ -685,7 +739,7 @@ BEGIN
         SELECT vMensagem;
 	ELSE
 		-- cálculo do valor total da reserva
-		SET vDias = datediff(vDataFim, vDataInicio);
+		SET vDias = DATEDIFF(vDataFim, vDataInicio);
 		SET vPrecoTotal = vDias * vPrecoUnitario;
 		
 		-- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
@@ -717,7 +771,7 @@ WHEN 0 THEN
 
 WHEN 1 THEN
     -- cálculo do valor total da reserva
-    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vDias = DATEDIFF(vDataFim, vDataInicio);
     SET vPrecoTotal = vDias * vPrecoUnitario;
     
     -- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
@@ -752,7 +806,7 @@ WHEN vQtdCliente = 0 THEN
     SELECT vMensagem;
 WHEN vQtdCliente = 1 THEN
     -- cálculo do valor total da reserva
-    SET vDias = datediff(vDataFim, vDataInicio);
+    SET vDias = DATEDIFF(vDataFim, vDataInicio);
     SET vPrecoTotal = vDias * vPrecoUnitario;
     
     -- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
@@ -817,7 +871,7 @@ BEGIN
     
     -- verificando se há mais de um cliente com o mesmo nome
     -- podemos usar o resultado do SELECT como valor da variável
-    SET vQtdCliente = (SELECT count(*) FROM clientes WHERE nome = vClienteNome);
+    SET vQtdCliente = (SELECT COUNT(*) FROM clientes WHERE nome = vClienteNome);
     
     CASE 
 	WHEN vQtdCliente > 1 THEN
@@ -919,7 +973,7 @@ BEGIN
     END;
     
     -- verificando se há mais de um cliente com o mesmo nome
-    SET vQtdCliente = (SELECT count(*) FROM clientes WHERE nome = vClienteNome);
+    SET vQtdCliente = (SELECT COUNT(*) FROM clientes WHERE nome = vClienteNome);
     
     CASE 
 	WHEN vQtdCliente > 1 THEN
@@ -1037,4 +1091,99 @@ DELIMITER ;
 -- exemplo de chamada
 CALL nova_reserva_grupo('Gabriel Carvalho,Erick Oliveira,Catarina Correia,Lorena Jesus', '8635', '2023-06-03', 7, 30);
 
+```
+
+## Funções
+
+Assim como Stored Procedures, funções encapsulam códigos e são armazenadas no banco, podendo ser reutilizadas em outras consultas SQL, inclusive podendo ser chamadas dentro de outras funções, procedures e triggers. 
+
+Diferente de Stored Procedures, elas **obrigatoriamente retornam algum valor**. Além disso, elas costumam ser utilizadas em consultas SQL como **parte de uma expressão** (por exemplo, fazer alguma conversão e retornar o valor para uma variável), por isso são mais "simples". Por fim, as funções **não fazem modificações no banco de dados**, ou seja, elas não são utilizadas para operações de inserção, atualização, remoção, etc.
+
+> Funções **não** trabalham com transações nem com tratamento de erros com `DECLARE ... HANDLER`. Você pode, no entanto, usar `IF` ou `CASE` para fazer alguma validação da entrada ou resultado esperado e retornar algum valor que simbolize um erro.
+
+Exemplo simples que retorna somente uma frase:
+
+```sql
+DELIMITER $$
+CREATE FUNCTION helloWorld()
+RETURNS VARCHAR(50) -- tipo que será retornado
+DETERMINISTIC -- resultado do retorno é sempre o mesmo
+BEGIN
+	RETURN 'Hello world!'; -- retorno de fato da função
+END$$
+DELIMITER ;
+```
+
+- quando a função retorna **sempre o mesmo resultado** para **os mesmos valores de entrada**, adicionamos o modificador **`DETERMINISTIC`** para auxiliar o MySQL na otimização. Dependendo das regras configuradas no SGBD, pode ser obrigatória a declaração explícita do modificador.
+
+Para ver a saída da função, podemos fazer um `SELECT`:
+
+```sql
+SELECT helloWorld();
+```
+
+### Exemplos de funções
+
+---
+
+Neste exemplo, temos o uso de **parâmetros e variáveis locais**. A função recebe o id de um cliente e retorna o seu CPF, no formato (XXX.XXX.XXX-XX):
+
+```sql
+DROP FUNCTION IF EXISTS formata_cpf;
+DELIMITER //
+CREATE FUNCTION formata_cpf(id VARCHAR(255))
+RETURNS VARCHAR(50) DETERMINISTIC
+BEGIN
+	DECLARE cpf_formatado VARCHAR(50);
+    -- podemos usar SET ou fazer um SELECT..INTO    
+    SET cpf_formatado = (
+		SELECT CONCAT(SUBSTR(cpf, 1, 3), '.',
+			SUBSTR(cpf, 4, 3), '.',
+			SUBSTR(cpf, 7, 3), '-',
+			SUBSTR(cpf, 10, 2)) 
+		FROM clientes
+        WHERE cliente_id = id
+	);
+	RETURN cpf_formatado;
+END//
+DELIMITER ;
+```
+
+Podemos chamar as funções criadas no meio de uma consulta SQL:
+
+```sql
+SELECT TRIM(nome), formata_cpf(cliente_id) FROM clientes LIMIT 10;
+```
+
+---
+
+No próximo exemplo, mostramos como é possível utilizar o `SELECT INTO` para inicializar mais de uma variável. A função retorna uma string com o nome e o valor da diária de um aluguel, baseado no id do aluguel passado como argumento.
+
+```sql
+DROP FUNCTION IF EXISTS infoAluguel;
+DELIMITER //
+CREATE FUNCTION infoAluguel(id VARCHAR(255))
+RETURNS VARCHAR(255) DETERMINISTIC
+BEGIN
+	DECLARE nome VARCHAR(255);
+	DECLARE total_aluguel DECIMAL(10, 2);
+	DECLARE total_dias INT;
+    DECLARE valor_diaria DECIMAL(10, 2);
+    
+    -- podemos usar SELECT INTO para atribuir valores
+    -- a mais de uma variável
+    SELECT 
+		c.nome, 
+		a.preco_total, 
+        datediff(a.data_fim, a.data_inicio)
+	INTO nome, total_aluguel, total_dias
+    FROM alugueis a
+    JOIN clientes c ON c.cliente_id = a.cliente_id
+    WHERE a.aluguel_id = id;
+    
+    SET valor_diaria = ROUND(total_aluguel / total_dias, 2);
+    
+    RETURN CONCAT('Cliente: ', nome, '. Valor Diária: R$', valor_diaria);
+END//
+DELIMITER ;
 ```
