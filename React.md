@@ -580,7 +580,7 @@ O `useEffect()` recebe **dois argumentos**, com o segundo sendo opcional: uma fu
 Segue um código de exemplo para os três casos:
 
 ```js
-useEffect( () => {
+useEffect(() => {
     // faça alguma coisa TODA VEZ que a variável "data" for alterada
 } , [data]);
 
@@ -658,7 +658,7 @@ O exemplo abaixo mostra como usar `dispatch()` passando um objeto de ação como
 </button>
 ```
 
-A função `dispatch()` pode ser passada a outros componentes via props. Assim, outros componentes podem solicitar uma alteração no estado. Dessa forma, o `useReducer` pode ser uma alternativa para o Redux, que é uma biblioteca para gerenciamento de estados. O Redux é um assunto a parte e eu ainda não aprendi muito sobre ele. Outras alternativas para gerenciamento de estado são  a [ContextAPI](#gerenciando-estados-com-a-context-api) e o [Recoil](#gerenciando-estados-com-recoil), que possuem seções específica aqui neste arquivo..
+A função `dispatch()` pode ser passada a outros componentes via props. Assim, outros componentes podem solicitar uma alteração no estado. Dessa forma, o `useReducer` pode ser uma alternativa para o Redux, que é uma biblioteca para gerenciamento de estados. O Redux é um assunto a parte e eu ainda não aprendi muito sobre ele. Outras alternativas para gerenciamento de estado são  a [ContextAPI](#gerenciando-estados-com-a-context-api) e o [Recoil](#gerenciando-estados-com-recoil), que possuem seções específica aqui neste arquivo.
 
 ### `useRef()`
 
