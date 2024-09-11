@@ -248,6 +248,37 @@ export default async function Home({ searchParams }) {
 }
 ```
 
+### Criando endpoints
+
+Além de exibir páginas com o arquivo `pages.js`, você também pode usar a App Router para criar **endpoints no servidor para retornar ou receber dados**, ou seja, usar o Next como uma API para tratar requests e responses. O Next define isso como [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers).
+
+Para isso, você cria um **arquivo `route.js`**. Dentro deste arquivo, você pode criar funções para os verbos HTTP, como GET, POST, etc. Estas funções possuem dois parâmetros opcionais: o `request`, um [objeto representando a Request](https://nextjs.org/docs/app/api-reference/functions/next-request), e o `context`, um objeto cuja única propriedade atualmente é a `params`, que por sua vez é o objeto que o Next disponibiliza para acessar as rotas dinâmicas.
+
+Um exemplo de organização de projeto é, dentro da pasta `app`, criar uma pasta `api` e nela definir as rotas (endpoints) para lidar com requisições.
+
+O exemplo abaixo cria uma função que irá retornar as respostas a um comentário usando o endpoint `api/comment/[id]/replies`, cujo id é acessado por uma rota dinâmica (`[id]`). A consulta no banco está sendo feita com [Prisma](#prisma).
+
+```js
+// -- api/comment/[id]/replies/route.js
+import db from "../../../../../../prisma/db"
+
+// we add underline to indicate that the 
+// request parameter will not be used
+export const GET = async (_request, { params }) => {
+    const replies = await db.comment.findMany({
+        where: {
+            parentId: parseInt(params.id)
+        },
+        include: {
+            author: true
+        }
+    });
+
+    // Response is an interface of the Fetch API
+    return Response.json(replies);
+}
+```
+
 ## Fetch de dados pelo servidor
 
 Por padrão, os componentes no Next são renderizados pelo servidor (SSR). Por conta disso, requisições de fetch de dados são feitos pelo lado do servidor e você pode utilizar o resultado diretamente no componente, **sem a necessidade de um `useEffect` ou `useState`** gerenciando o estado dos dados. Isso ocorre porque o servidor irá obter os dados necessários para montar a tela e enviá-la ao cliente quando tudo estiver pronto.
@@ -306,6 +337,137 @@ export default function Error({ error }) {
 }
 ```
 
+## Server Actions
+
+Server Actions são **funções assíncronas** que você pode criar em seu projeto Next, e que podem ser invocadas tanto por client components quanto por server components. Essas funções são **executadas no lado do servidor**. 
+
+Um exemplo comum é invocá-las na submissão de um formulário, usando o atributo `action` do elemento `form`. Um aspecto interessante do Next é que essa submissão **não** irá causar um recarregamento da página.
+
+- Podemos passar argumentos para uma Server Action usando a função `bind`. Isso é necessário, pois a função está rodando no servidor, então temos que "emprestá-la" do servidor para o componente que vai invocá-la;
+
+- Caso uma Server Action resulte em uma ação que atualiza algum campo da página, você pode usar a função `revalidatePath` para que o Next faça as alterações necessárias na UI (sem recarregar a página inteira).
+
+- Server Actions também podem ser invocadas da maneira tradicional, por meio de eventos ou hooks como `useEffect`.
+
+- Podemos utilizar o hook `useFormStatus` do React para verificar se uma ação está pendente. Isso é útil para exibirmos um ícone de carregamento enquanto a ação não termina, por exemplo.
+
+  - até 2024, este hook se encontra [disponível de forma experimental](https://react.dev/reference/react-dom/hooks/useFormStatus) no React;
+
+  - o hook só funciona se o componente for renderizado dentro de um elemento `form`;
+
+  - o componente que utiliza o hook deve ser um client component. Você pode, por exemplo, abstrair o pedaço de código que usa o hook em um componente separado e aí informar que será um client component.
+
+Ao criar uma server action, é uma **boa prática deixar explícito** no arquivo que a função deve ser executada no servidor, utilizando a diretiva `'use server'`. 
+
+Outra boa prática é colocar as actions em uma pasta separada. Por exemplo, criar um arquivo `src/actions/index.js` e dentro dele exportar as actions.
+
+Exemplo de Server Action para incrementar o número de curtidas em uma postagem. Observe que usamos o método `update` do [Prisma](#prisma): 
+
+```js
+// explicit tell Next that this file is to run in the server
+'use server';
+
+import { revalidatePath } from "next/cache";
+import db from "../../prisma/db";
+
+// server action to increment the number of likes for a post
+export async function incrementThumbsUp(post){
+    await db.post.update({
+        where: { 
+            id: post.id 
+        },
+        data: {
+            // we can pass an object with an "increment" property
+            // to let Prisma increment the current value of a field 
+            // by a value of X (increment likes by 1 in this case)
+            likes: {
+                increment: 1
+            }
+        }
+    });
+
+    // clear cache to update the UI of pages affected by this action
+    revalidatePath('/');
+    revalidatePath(`/${post.slug}`);
+}
+```
+
+Exemplo de chamada utilizando a `action` de um elemento `form`. Parte não relevante do código foi omitida para economizar espaço. 
+
+```jsx
+import { incrementThumbsUp } from '@/actions';
+
+export const CardPost = ({ post }) => {
+    // using bind to pass additional arguments to the Server Action
+    const submitThumbsUp = incrementThumbsUp.bind(null, post);
+    
+    return (
+        <form action={submitThumbsUp}>
+              <ThumbsUpButton />
+              <p>{post.likes}</p>
+        </form>
+    );
+}
+```
+
+Mesmo exemplo, dessa vez utilizando o evento de submit do `form`. Neste caso, é necessário transformar o componente em um client component e, por conta disso, impedir o recarregamento da página com `preventDefault`:
+
+```jsx
+'use client'
+
+import { incrementThumbsUp } from '@/actions';
+
+export const CardPost = ({ post }) => {
+    // using bind to pass additional arguments to the Server Action
+    const submitThumbsUp = incrementThumbsUp.bind(null, post);
+
+    const handleSubmit = e => {
+        e.preventDefault();
+        submitThumbsUp();
+    }
+    
+    return (
+        <form onSubmit={handleSubmit}>
+            <ThumbsUpButton />
+            <p>{post.likes}</p>
+        </form>
+    );
+}
+```
+
+O `ThumbsUpButton` é um client component que vai renderizar um botão ou um spinner, baseado no estado da ação (por meio do `useFormStatus`). Parte não relevante do código foi omitida para economizar espaço. :
+
+```jsx
+'use client';
+
+import { useFormStatus } from "react-dom"
+
+export const ThumbsUpButton = () => {
+    const { pending } = useFormStatus();
+    return <IconButton disabled={pending}>
+        {pending ? <Spinner /> : <ThumbsUp />}
+    </IconButton>
+}
+```
+
+#### Valores de formulário
+
+Quando uma Server Action é chamada via **`action` de um elemento `form`**, o Next automaticamente **injeta um objeto [`formData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData/FormData)** como último argumento da função. Este objeto contém os valores de cada elemento dentro do formulário, que podem ser acessados por um método `get` passando o atributo `name` desses elementos.
+
+O exemplo abaixo é parte de um código de uma Server Action que faz a inserção de comentários em um post. Observe que `formData` aparece como último parâmetro da função. Esse parâmetro **não** é passado pelo componente que chama a função, e sim injetado automaticamente pelo Next. Também observe que usamos o **método `create`** do Prisma para fazer a **inserção no banco de dados**:
+
+```js
+export async function postComment(post, formData) {
+    await db.comment.create({
+        data: {
+            text: formData.get('text'),
+            authorId: author.id,
+            postId: post.id
+        }
+    });
+}
+```
+
 ## Prisma
 
 > Para um exemplo de uso do Prisma, incluindo os arquivos necessários, consulte o projeto do [Code Connect](https://github.com/zingarelli/code-connect/tree/postgres_prisma/prisma).
@@ -340,7 +502,7 @@ Supondo que vamos criar o banco do zero, definimos as tabelas e relacionamentos 
 npx prisma migrate dev --name init
 ```
 
-- `dev` indica que estamos em um ambiente de desenvolvimento;
+- `dev` indica que estamos em um ambiente de desenvolvimento. A outra opção, `prod` é para ambientes de produção e possui diferenças (não mencionadas aqui);
 
 - `--name init` é a forma de darmos um nome a essa migração, de modo a facilitar identificá-la quando houver outras migrações. Você pode escolher o nome que quiser;
 
