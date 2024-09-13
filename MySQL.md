@@ -46,9 +46,9 @@ Seguem algumas convenções de nomes e definições que o MySQL usa (ou que os i
 
 - Modelo físico do banco de dados: conceito parecido com o DER (Diagrama Entidade-Relacionamento), só que mais detalhado. No MySQL Workbench, podemos ter uma versão "enhanced" do DER na opção Database -> Reverse Engineer...;
 
-- tupla: linha de uma tabela. Às vezes também escrevo nas anotações como sendo "registro" ou "entrada". Entenda todas como sinônimos.
+- tupla: linha de uma tabela. Às vezes também escrevo nas anotações como sendo "registro" ou "entrada". Entenda todas como sinônimos neste caso.
 
-- Uso do ponto e vírgula (`;`): indica o fim de um comando. Embora não seja obrigatório em todas as consultas, a ausência dele pode dar dores de cabeça ou efeitos indesejados, por exemplo, quando você quer executrar múltiplos comandos de uma vez. Então é considerada boa prática adicioná-lo ao final de cada comando SQL;
+- Uso do ponto e vírgula (`;`): indica o fim de um comando. Embora não seja obrigatório em todas as consultas, a ausência dele pode dar dores de cabeça ou efeitos indesejados, por exemplo, quando você quer executar múltiplos comandos de uma vez. Então é considerada boa prática adicioná-lo ao final de cada comando SQL;
 
 - Uso de aspas simples: quando tratar de strings, opte pelo uso de aspas simples. O MySQL também aceita aspas duplas, mas [há exceções](https://dev.mysql.com/doc/refman/8.4/en/string-literals.html).
 
@@ -268,7 +268,11 @@ A cláusula `DISTINCT` elimina os valores repetidos para a coluna (ou colunas) q
 
 ### Exemplos de consultas
 
-Para estes exemplos, suponha que a base de dados é de uma plataforma de aluguel de imóveis por temporadas curtas, tipo Airbnb.
+Para estes exemplos, suponha que a base de dados é de uma plataforma de aluguel de imóveis por temporadas curtas, tipo Airbnb. Abaixo segue uma imagem com o diagrama do banco utilizado (em algumas consultas a tabela "reservas" vai ser chamada de "aluguel").
+
+![diagrama com as tabelas da empresa Insight Places](https://github.com/user-attachments/assets/76e4bacb-81b4-4b24-8334-fd551bacab8d)
+
+---
 
 ```sql
 SELECT * FROM hospedagens
@@ -288,11 +292,13 @@ SELECT
 	(SELECT COUNT(*) FROM alugueis) AS qtd_alugueis;
 ```
 
-- Uma consulta bem simples para mostrar que é possível usar `SELECT` de forma aninhada, ou seja, aproveitar o resultado de um (ou mais) `SELECT` em outro `SELECT`. Neste caso, estamos retornando de uma única vez a quantidade de registros nas tabelas proprietarios, hospedagens e alugueis.
+- Uma consulta bem simples para mostrar que é possível usar `SELECT` de forma aninhada, ou seja, aproveitar o resultado de um ou mais `SELECT` (denominados subconsultas) em outro `SELECT`. Neste caso, estamos retornando de uma única vez a quantidade de registros nas tabelas proprietarios, hospedagens e alugueis.
 
 - `COUNT()` é uma função que conta as linhas **não nulas**. No caso, como estamos usando `COUNT(*)`, ele irá também contar as linhas nulas, se houver, para cada proprietário (a consulta está agrupada por `nome`).
 
 - `AS` é utilizado quando queremos dar um "apelido" (*alias*) a uma coluna/resultado. Esse apelido aparece somente no resultado da consulta, ou seja, a coluna na tabela não é renomeada.
+
+- Subconsultas que retornam um único valor podem ser chamadas de subconsultas escalares.
 
 ---
 
@@ -318,14 +324,14 @@ SELECT
   AVG(DATEDIFF(data_fim, data_inicio)) AS media_dias_estadia 
 FROM alugueis
 GROUP BY cliente_id
-ORDER BY media_dias_estadia DESC
+ORDER BY media_dias_estadia DESC;
 ```
 
 - Função que verifica a média de dias de cada cliente quando fica hospedado, ordenando a média de maneira decrescente.
 
 - `DATEDIFF()` é uma função para subtração entre valores do tipo `DATE`.
 
-- `ORDER BY` é a cláusula para ordenação do resultado baseado em alguma coluna. `DESC` indica ordenação decrescente. Por padrão, a ordem é ascendente (`ASC`).
+- `ORDER BY` é a cláusula para ordenação do resultado baseado em alguma coluna (ou mais colunas, separadas por vírgula). `DESC` indica ordenação decrescente. Por padrão, a ordem é ascendente (`ASC`).
 
 ---
 
@@ -372,14 +378,17 @@ ORDER BY total_reservas DESC;
 ---
 
 ```sql
--- Transformando o CPF, armazenado como uma string somente com números, 
--- para um formato com pontos e traço (XXX.XXX.XXX-XX).
+-- Transformando o CPF, armazenado como uma string somente
+-- com números, para um formato com pontos e traço 
+-- (XXX.XXX.XXX-XX).
 -- A função UPPER passa todas as letras para maiúsculo.
--- A função TRIM elimina espaços em branco no início e final da string.
+-- A função TRIM elimina espaços em branco no início e 
+-- final da string.
 -- A função CONCAT concatena strings, separadas por vírgula.
--- A função SUBSTR(campo, inicio, qtd) retorna parte de uma string de 
--- "campo", a partir de "inicio" (o índice começa em 1) e extraindo 
--- uma quantidade "qtd" de caracteres, incluindo o caracter de inicio
+-- A função SUBSTR(campo, inicio, qtd) retorna parte de 
+-- uma string de "campo", a partir de "inicio" (o índice 
+-- começa em 1) e vai extraindo uma quantidade "qtd" de 
+-- caracteres, incluindo o caracter de inicio.
 SELECT 
 	UPPER(TRIM(nome)) as nome,
 	CONCAT(SUBSTR(cpf, 1, 3), '.',
@@ -437,14 +446,20 @@ As cláusulas `JOIN` combinam linhas de duas ou mais tabelas, permitindo recuper
             ```SQL
             (
                 -- LEFT JOIN: retorna todas as linhas de TabelaA e as correspondências em TabelaB
-                SELECT A.id, A.valor AS valor_A, B.valor AS valor_B
+                SELECT 
+                    A.id, 
+                    A.valor AS valor_A, 
+                    B.valor AS valor_B
                 FROM TabelaA A
                 LEFT JOIN TabelaB B ON A.id = B.id
             )
             UNION
             (
                 -- RIGHT JOIN: retorna todas as linhas de TabelaB e as correspondências em TabelaA
-                SELECT B.id, A.valor AS valor_A, B.valor AS valor_B
+                SELECT 
+                    B.id, 
+                    A.valor AS valor_A, 
+                    B.valor AS valor_B
                 FROM TabelaB B
                 RIGHT JOIN TabelaA A ON B.id = A.id
             );
@@ -454,11 +469,11 @@ As cláusulas `JOIN` combinam linhas de duas ou mais tabelas, permitindo recuper
 
 View é uma forma de criar novas tabelas "virtuais", baseadas no retorno de consultas SQL feitas com as tabelas do banco. 
 
-- é uma tabela "virtual" pois ela não armazena dados, mas sim uma consulta SQL. Isso significa que, toda vez que a view é acessada, a consulta SQL definida para essa view é **executada novamente**, garantindo trazer os dados mais atualizados. Isso traz o trade-off com relação a **desempenho**, especialmente para views muito complexas.
+- é uma tabela "virtual" pois ela não armazena dados, mas sim uma consulta SQL. Isso significa que, toda vez que a view é acessada, a **consulta SQL** definida para essa view é **executada novamente**, garantindo trazer os dados mais atualizados. Com isso, temos que considerar o trade-off com relação a **desempenho**, especialmente para views muito complexas.
 
 Uma de suas vantagens é criar uma ou mais tabelas que serão disponibilizadas para consulta. Por exemplo, por meio de uma view podemos decidir quais colunas serão "expostas" para consulta, bloqueando o acesso a consulta às tabelas originais. Assim, limitamos o acesso ao banco de dados a somente algumas views que queremos tornar públicas, protegendo dados sensíveis. 
 
-Exemplo de view que cria uma tabela com os aluguéis e um desconto promocional baseado na quantidade de dias de estadia. O cálculo do desconto e o valor promoocional estão sendo feitos por duas funções customizadas cujo código não está no exemplo. Veja mais sobre [funções nesta Seção](#funções).
+Exemplo de view que cria uma tabela com os aluguéis e um desconto promocional baseado na quantidade de dias de estadia. O cálculo do desconto e o valor promocional estão sendo feitos por duas funções customizadas cujo código não está no exemplo. Veja mais sobre [funções nesta Seção](#funções).
 
 ```sql
 CREATE OR REPLACE VIEW viewAluguelPromocional AS
@@ -476,7 +491,7 @@ SELECT * FROM viewaluguelpromocional;
 
 ### Diferença entre WITH e VIEW
 
-A cláusula `WITH` é outra forma de obter dados de uma ou mais tabelas e utilizar esses dados em outra consulta SQL. Diferente de uma View, a consulta criada com a cláusula `WITH` não fica armazenada no banco, ou seja, após a query ser executada, o resultado da consulta com `WITH` é apagado.
+A cláusula `WITH` é outra forma de obter dados de uma ou mais tabelas e utilizar esses dados em outra consulta SQL. Diferente de uma View, **a consulta criada com a cláusula `WITH` não fica armazenada no banco**, ou seja, após a query ser executada, o resultado da consulta com `WITH` é apagado.
 
 - lembre-se: uma View fica salva no banco (a consulta, e não o resultado), podendo ser reutilizada em outras consultas.
 
@@ -485,13 +500,13 @@ O resultado de uma cláusula `WITH` é chamado de **CTE (Common Table Expression
 - Exemplo criado pela ChatGPT, retornando a quantidade de vendas a partir de 1º de janeiro de 2024 (as vendas recentes, nomeada como RecentSales), filtradas a partir daquelas cuja quantidade ultrapassou 100:
 
     ```sql
-        -- CTE
+        -- CTE de nome RecentSales
         WITH RecentSales AS (
             SELECT sale_id, sale_date, amount
             FROM sales
             WHERE sale_date > '2024-01-01'
         )
-        -- we can reference the CTE in a more simplified query
+        -- referenciando a CTE em outra consulta
         SELECT sale_id, amount
         FROM RecentSales 
         WHERE amount > 100;
@@ -499,11 +514,11 @@ O resultado de uma cláusula `WITH` é chamado de **CTE (Common Table Expression
 
 ## Trigger
 
-É um procedimento armazenado no banco de dados, que é executado a partir de alguma condição. Com isso, triggers podem ser utilizadas para automatizar tarefas.
+É um procedimento armazenado no banco de dados, que é **executado a partir de alguma condição**. Com isso, triggers podem ser utilizadas para automatizar tarefas.
 
 Por exemplo, uma trigger pode ser executada para atualizar uma coluna da tabela X quando um quando um novo item é adicionado a uma tabela Y.
 
-- Exemplo da aula, adequado pela ChatGPT para o MySQL. Esta trigger refaz os dados da tabela faturamentodiario a cada nova inserção na tabela itenspedidos:
+- Exemplo da aula, adequado pela ChatGPT para o MySQL. Esta trigger refaz os dados da tabela `faturamentodiario` a cada nova inserção na tabela `itenspedidos`:
 
     ```sql
     -- uma trigger bem ineficiente
@@ -526,20 +541,20 @@ Por exemplo, uma trigger pode ser executada para atualizar uma coluna da tabela 
         ON i.idpedido = p.id
         GROUP BY dia
         ORDER BY dia;
-    END //
+    END//
 
     DELIMITER ;
     ```
 
 ## Transações
 
-São blocos de comandos SQL que queremos ter certeza de que foram executados corretamente para que as atualizações seja de fato salvas no banco de dados. Caso algum comando falhe por algum motivo, queremos garantir que nada seja salvo no banco. Ou seja, esse bloco de comandos funciona como se fosse uma coisa única (princípio da atomicidade, veja mais sobre [ACID](#acid) abaixo). 
+São blocos de comandos SQL que queremos ter certeza de que foram executados corretamente para que as atualizações seja de fato salvas no banco de dados. Caso algum comando falhe por algum motivo, queremos garantir que nada seja salvo no banco. Ou seja, esse **bloco de comandos funciona como se fosse uma coisa única** (princípio da atomicidade, veja mais sobre [ACID](#acid) abaixo). 
 
-Em uma transação, confirmamos a gravação de fato dos resultados dos comandos executados por meio de um `COMMIT`. Caso algo saia errado, podemos reverter o banco ao estado anterior à transação por meio de um `ROLLBACK`.
+Em uma transação, confirmamos a gravação de fato dos resultados dos comandos executados por meio de um **`COMMIT`**. Caso algo saia errado, podemos reverter o banco ao estado anterior à transação por meio de um **`ROLLBACK`**.
 
 ### ACID
 
-Acrônimo para Atomicidade, Consistência, Isolamento e Durabilidade. São princípios a serem seguidos pelos SGBDs no que tange as transações.
+Acrônimo para **Atomicidade, Consistência, Isolamento e Durabilidade**. São princípios a serem seguidos pelos SGBDs no que tange as transações.
 
 - Atomicidade: em uma transação, todas operações são concluídas com sucesso ou nenhuma é aplicada. Ocorrendo algum erro, o banco reverte as operações da transação que já tenham sido realizadas e volta ao estado original;
 
@@ -586,17 +601,17 @@ Para apagar:
 DROP PROCEDURE lista_clientes;
 ```
 
-Para alterar uma stored procedure, apagamos ela e a criamos novamente, com as alterações (veja os [exemplos na próxima Seção](#exemplos-de-procedures)). Também podmeos alterar interativamente pelo MySQL Workbench, clicando com o botão direito na procedure e selecionando "Alter Stored Procedure...".
+Para alterar uma stored procedure, apagamos ela e a criamos novamente, com as alterações (veja os [exemplos na próxima Seção](#exemplos-de-procedures)). Também podemos alterar interativamente pelo MySQL Workbench, clicando com o botão direito na procedure e selecionando "Alter Stored Procedure...".
 
 ### Exemplos de procedures
 
-Esses exemplos são evoluções de uma mesma procedure que insere um novo registro na tabela reservas. 
+Esses exemplos são evoluções de uma mesma procedure que insere um novo registro na tabela `reservas` (ou `alugueis`). 
 
 ---
 
 #### Uso de parâmetros e variáveis
 
-Calculando o valor total da reserva baseado no número de dias e valor da diária. 
+Calculando o valor total da reserva baseado no número de dias e valor da diária.
 
 Observe que é possível **declarar parâmetros e variáveis** locais na procedure.
 
@@ -640,7 +655,7 @@ CALL nova_reserva('10004', '1004', '8635', '2024-02-15', '2024-02-17', 180);
 
 **Tratamento de erros** baseado em um código de erro gerado pelo SGBD.
 
-- Para descobrir o código de erro, você pode tentar executar um comando para o erro que você quer tratar.
+- Para descobrir o código de erro, você pode tentar executar um comando para o erro que você quer tratar, ou consultar a [documentação do MySQL](https://dev.mysql.com/doc/mysql-errors/8.0/en/).
 
 **Importante:** você deve **declarar todas as variáveis** que sua procedure for utilizar **antes** de usar `DECLARE EXIT HANDLER`. 
 
@@ -666,6 +681,7 @@ BEGIN
     DECLARE vMensagem VARCHAR(100);
     
     -- tratamento de erro para chave estrangeira (erro 1452)
+    -- a procedure irá parar a execução (EXIT)
     DECLARE EXIT HANDLER FOR 1452
     BEGIN
 		SET vMensagem = 'Problema de chave estrangeira';
@@ -742,8 +758,8 @@ BEGIN
 		SET vDias = DATEDIFF(vDataFim, vDataInicio);
 		SET vPrecoTotal = vDias * vPrecoUnitario;
 		
-		-- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
-        -- o valor a uma variável
+		-- ao invés de um SET, podemos usar o SELECT INTO 
+        -- para atribuir o valor a uma variável
 		SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
 		
 		INSERT INTO reservas VALUES (
@@ -770,18 +786,12 @@ WHEN 0 THEN
     SELECT vMensagem;
 
 WHEN 1 THEN
-    -- cálculo do valor total da reserva
     SET vDias = DATEDIFF(vDataFim, vDataInicio);
     SET vPrecoTotal = vDias * vPrecoUnitario;
-    
-    -- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
-    -- o valor a uma variável
-    SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
-    
+    SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome;     
     INSERT INTO reservas VALUES (
         vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
-    );
-    
+    );    
     SET vMensagem = 'Aluguel incluído na base com sucesso!';
     SELECT vMensagem;
 
@@ -801,22 +811,18 @@ CASE
 WHEN vQtdCliente > 1 THEN
     SET vMensagem = 'Não é possível fazer a inclusão, pois há mais de um cliente com o mesmo nome.';
     SELECT vMensagem;
+
 WHEN vQtdCliente = 0 THEN
     SET vMensagem = 'Não é possível fazer a inclusão, pois o cliente não existe.';
     SELECT vMensagem;
+
 WHEN vQtdCliente = 1 THEN
-    -- cálculo do valor total da reserva
     SET vDias = DATEDIFF(vDataFim, vDataInicio);
     SET vPrecoTotal = vDias * vPrecoUnitario;
-    
-    -- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
-    -- o valor a uma variável
-    SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
-    
+    SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome;     
     INSERT INTO reservas VALUES (
         vReserva, vCliente, vHospedagem, vDataInicio, vDataFim, vPrecoTotal
-    );
-    
+    );    
     SET vMensagem = 'Aluguel incluído na base com sucesso!';
     SELECT vMensagem;
 END CASE;
@@ -826,7 +832,7 @@ END CASE;
 
 #### Loop WHILE
 
-Exemplo utilizando o **loop `WHILE`**. Nesta procedure, incluímos uma reserva de aluguel baseado na data inicial e número de dias, excluindo finais de semana (finais de semana são adicionados à reserva, mas não são cobrados, então não entram na contagem de número de dias). Também é mostrado o uso de `INTERVAL` e a função `dayofweek` para se trabalhar com datas.
+Exemplo utilizando o **loop `WHILE`**. Nesta procedure, incluímos uma reserva de aluguel baseado na data inicial e número de dias, excluindo finais de semana (finais de semana são adicionados à reserva, mas não são cobrados, então não entram na contagem de número de dias). Também é mostrado o uso de `INTERVAL` e a função `DAYOFWEEK` para se trabalhar com datas.
 
 ```sql
 
@@ -890,7 +896,7 @@ BEGIN
         WHILE vContador < vDias DO
 			-- independente do dia, adicionamos à data final
             SET vDataFim = vDataFim + INTERVAL 1 DAY;
-			SET vDiaSemana = dayofweek(vDataFim);
+			SET vDiaSemana = DAYOFWEEK(vDataFim);
              -- 1 é domingo e 7 é sábado
             IF (vDiaSemana <> 1 AND vDiaSemana <> 7) THEN
 				SET vContador = vContador + 1;
@@ -900,8 +906,8 @@ BEGIN
         -- cálculo do valor total da reserva
         SET vPrecoTotal = vDias * vPrecoUnitario;
 		
-		-- ao invés de um SET, podemos usar o SELECT INTO para atribuir 
-        -- o valor a uma variável
+		-- ao invés de um SET, podemos usar o SELECT INTO
+        -- para atribuir o valor a uma variável
 		SELECT cliente_id INTO vCliente FROM clientes WHERE nome = vClienteNome; 
 		
 		INSERT INTO reservas VALUES (
@@ -940,7 +946,7 @@ BEGIN
     
 	WHILE vContador < vDias	DO
 		SET vDataFim = vDataFim + INTERVAL 1 DAY;
-		SET vDiaSemana = dayofweek(vDataFim);
+		SET vDiaSemana = DAYOFWEEK(vDataFim);
 		IF (vDiaSemana <> 1 AND vDiaSemana <> 7) THEN
 			SET vContador = vContador + 1;
 		END IF;
