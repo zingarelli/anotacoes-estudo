@@ -39,6 +39,8 @@ A partir de abril/23 eu comecei a utilizar a [ChatGPT](https://chat.openai.com) 
 
 ## Lista de anotações
 
+Lista em ordem alfabética:
+
 - [Acessibilidade Web](./Acessibilidade.md)
 - [Cloud Computing](./Cloud.md)
 - [Desenvolvimento de Carreira](./Desenvolvimento-Carreira.md)
@@ -47,11 +49,12 @@ A partir de abril/23 eu comecei a utilizar a [ChatGPT](https://chat.openai.com) 
 - [HTML & CSS](./HTML_CSS.md)
 - [JavaScript](./JavaScript.md)
 - [Machine Learning - Classificação](https://github.com/zingarelli/Python_ML_Alura)
+- [MySQL](./MySQL.md)
+- [Next.js](./Next.md)
 - [Protocolo HTTP](./Protocolo-HTTP.md)
 - [React](./React.md)
+- [Tailwind CSS](./Tailwind.md)
 - [TypeScript](./TypeScript.md)
-- [Next.js](./Next.md)
-- [MySQL](./MySQL.md)
 
 ## Motivação
 
