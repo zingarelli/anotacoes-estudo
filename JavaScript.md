@@ -96,9 +96,9 @@ Se precisar quebrar a linha no return, **use parênteses**. Isso é muito comum 
 
 O mesmo vale para as palavras reservadas `throw`, `yield`, `break` e `continue`.
 
-## Tipos
+## Tipos e valores
 
-São divididos em duas categorias: primitivos e objetos.
+Tipos são divididos em duas categorias: primitivos e objetos.
 
 | tipo | mutabilidade | valores | 
 | - | - | - |
@@ -113,7 +113,7 @@ Imutabilidade: significa que o valor não muda. O número 2 vai ser sempre 2, o 
 
 > **Não declaramos tipos** para as variáveis/constantes (no jargão de dev: "não tipamos"). A conversão é feita pelo JavaScript de acordo com o valor atribuído.
 
-## Texto
+### Texto
 
 Para declarar textos (strings), podemos utilizar aspas simples, duplas ou crase (backtick). O backtick foi adicionado pelo ES6 e permite interpolação de texto com expressões JS.
 
@@ -121,7 +121,7 @@ Para declarar textos (strings), podemos utilizar aspas simples, duplas ou crase 
 
 Caracteres de escape são adicionados por meio da barra invertida (`\`). Por exemplo, para incluir uma quebra de linha no texto, podemos utilizar o `\n`; para adicionar aspas simples em um texto declarado com aspas simples, utilizamos `\'`, etc.
 
-## Booleano
+### Booleano
 
 Qualquer valor em JS pode ser convertido para booleano, o que pode ser chamado de valores *truthy* ou *falsy*. 
 
@@ -135,13 +135,13 @@ Qualquer valor em JS pode ser convertido para booleano, o que pode ser chamado d
 
 - `-0`;
 
-- `Nan`;
+- `NaN`;
 
 - `""` (string vazia).
 
 Isso ajuda a simplificar expressões condicionais, por exemplo.
 
-## null e undefined
+### null e undefined
 
 São valores primitivos que representam **ausência de valor**. 
 
@@ -157,7 +157,7 @@ O `undefined` é o "valor" retornado nos seguintes casos:
 
 - valor de parâmetros de uma função quando o argumento não é passado.
 
-## Symbol
+### Symbol
 
 É um tipo introduzido pelo ES6 para poder atribuir nomes a propriedades de objetos sem utilizar strings, de modo a garantir que uma propriedade não seja acidentamente sobrescrita. 
 
@@ -197,6 +197,25 @@ Já a função `Symbol.for()` é o oposto. Ela garante que irá retornar o **mes
 const symA = Symbol.for('somosIguais');
 const symB = Symbol.for('somosIguais');
 symA === symB; // true
+```
+
+### Operadores de incremento/decremento
+
+Os operadores para incrementar (`++`) ou diminuir (`--`) um valor tem um comportamento diferente dependendo da posição relativa ao operando. 
+
+- Se vier do **lado esquerdo** do operando (`++i`, por exemplo), o valor é incrementado e **retorna o valor incrementado**;
+
+- Se vier do **lado direito** do operando (`i++`), o valor é incrementado, mas **retorna o valor *não* incrementado**.
+
+As mesmas regras se aplicam para decremento.
+
+Exemplo:
+
+```js
+let i, j;
+i = 1;
+j = i++; // i=2, mas j=1
+j = ++i; // i=3 e j=3 também
 ```
 
 ## global object
@@ -253,7 +272,7 @@ let 123variavel; // SyntaxError
 
 - diferente das variáveis, `const` **precisa ser inicializada com algum valor**, senão irá subir uma exceção de `TypeError`;
 
-- também possui **escopo de BLOCO**.
+- também possui **escopo local de BLOCO**.
 
 > Quando `let` ou `const` são declaradas **antes** de qualquer bloco de código, seu escopo é **global** (mas não são propriedades do global object). No Node, o escopo global é o arquivo em que a variável foi definida. No navegador, o escopo é o **documento HTML**, o que significa que **outros scripts têm acesso a ela**, caso sejam executados após o script que definiu a variável. 
 
@@ -269,13 +288,53 @@ Hoisting é uma etapa em que o interpretador **coloca na memória** as declaraç
 
 Funciona bem para funções (é por isso que você pode usá-las antes de declará-las), mas pode causar erros com variáveis e classes (o hoisting eleva somente as **DECLARAÇÕES** e **não as inicializações**; em casos específicos elas são inicializadas com seu valor padrão, em outros casos não são nem inicializadas).
 
+### Destructuring assignment
+
+O ES6 possibilita inicializar uma ou mais variáveis baseada em valores vindos de um **array ou objeto**. Isso é chamado de `destructuring assignment`, pois é como se você estivesse abrindo/desestruturando aquele array ou objeto e colocando seus valores nas variáveis. Exemplos:
+
+```js
+// -- Arrays
+let [x, y] = [1, 7]; // x=1 e y=7
+[x, y] = [1, 7, 11]; // x=1, y=7 e o valor 11 é ignorado
+[x, y] = [1]; // x=1 e y=undefined
+[x, , y] = [1, 7, 11]; // x=1 e y=11; adicionamos uma vírgula para ignorar o valor 7
+
+// use ... para indicar que o resto dos valores 
+// devem ir para a próxima variável
+[x, ...y] = [1, 7, 11, 3, 14]; // x=1 e y=[7, 11, 3, 14],
+
+// se tivéssemos uma função que retorna um array 
+// com dois números, poderíamos também utilizar 
+// o destructuring assigment
+let [x1, y1] = getCoordinates(); 
+
+// -- Objetos
+let transparent = {
+    r: 0.0, 
+    g: 0.0, 
+    b: 0.0, 
+    a: 1.0
+};
+// use o mesmo nome das propriedades que deseja extrair
+let {r, b} = transparent; // r=0.0 e b=0.0
+
+// pode também atribuir um nome diferente
+{r: red, b: blue} = transparent; // red=0.0 e blue=0.0,
+```
+
 ## Comparação
 
-`==` : irá comparar os *valores*. O interpretador irá tentar descobrir o "valor primitivo" entre os dois valores/variáveis que estão sendo comparados, por isso às vezes o retorno pode trazer alguma surpresa (`"0" == 0` resulta em `true`, por exemplo);
+O operador `==` irá comparar os *valores*. O interpretador irá tentar descobrir o "valor primitivo" entre os dois valores/variáveis que estão sendo comparados, por isso às vezes o retorno pode trazer alguma surpresa (`"0" == 0` resulta em `true`, por exemplo, pois é feita uma conversão de string para number e então a comparação).
 
-`===` : comparação idêntica: tanto o **valor** quanto o **tipo** têm que ser iguais;
+Já o operador `===` efetua uma comparação idêntica (*strictly equality operator*): tanto o **valor** quanto o **tipo** têm que ser iguais. Esse é o operador recomendado para casos de comparação de valores.
 
-Comparadores lógicos: `&&,` `||` e `!`
+Comparadores lógicos: `&&,` `||` e `!`.
+
+Pontos de atenção:
+
+- `Infinity` será sempre maior do que qualquer número e `-Infinity` será sempre menor do que qualquer outro número;
+
+- Comparação de strings é `case-sensitive` (`A` é diferente de `a`) e a comparação é feita pela ordem númerica do valor Unicode de 16-bits de cada caracter. Caracteres minúsculos, neste caso, têm um valor **maior** que os maiúsculos (`'a' > 'Z'` retorna `true`). 
 
 ### Comparação em objetos
 
@@ -312,9 +371,67 @@ a.x; // também 15, pois referenciam o mesmo obj
 
 Essas mesmas observações se **aplicam para arrays** e seus elementos (lembrando que arrays são uma variação especial de objeto).
 
+### Curto circuito
+
+O **operador `&&`** pode ser utilizado para "avaliações de curto-circuito" (*short-circuit*) em expressões contendo valores truthy ou falsy (relembre sobre isso na [Seção sobre booleanos](#booleano)) 
+
+- caso o valor da **esquerda** seja falsy, `&&` **retorna esse valor e não avalia o que vier depois**;
+
+- Caso o valor da esquerda seja truthy, o que vier **à direita será avaliado e este valor será retornado pelo `&&`**.
+
+Isso é interessante, por exemplo, quando você quer condicionar a execução de uma função baseado em uma expressão:
+
+```js
+// se a === b for falso, minhaFunc 
+// NÃO será executada
+(a === b) && minhaFunc(); 
+
+// é o mesmo que if (a === b) minhaFunc(); 
+```
+
+> React utiliza isso para renderizar dinamicamente partes do componente baseado em algum estado.
+
+---
+
+A avaliação de curto-circuito também acontece para o **operador `||`**:
+
+- se o valor à esquerda é **truthy**, **retorna este valor** e não avalia o restante;
+
+- se o valor à esquerda é **falsy**, **avalia o valor à direita e retorna este valor**;
+
+- caso seja uma expressão que contenha mais de um operador `||`, vai aplicando esta regra até chegar ao último operando.
+
+Isso é útil, por exemplo, para definir um valor padrão a uma variável, caso um valor atribuído a ela possa ser falsy (chamado de *fallback value*, ou valor reserva). 
+
+No exemplo abaixo, se a função `getWidth()` retornar um valor truthy, esse será o valor de `num`; caso seja falsy (`undefined`, por exemplo), `getHeight()` será executado e, se truthy, irá atribuir esse valor a `num`; se falsy, será atribuído o valor `50`, que é truthy.
+
+```js
+let num = getWidth() || getHeight() || 50;
+```
+
+---
+
+Por fim, também temos o **operador `??`** para avaliações curto-circuito. Ele foi incluído pelo ES2020 e é chamado de *nullish coalescing operator*. Seu funcionamento é parecido com o do `||`, porém restrito a **valores "nullish", ou seja, `null` ou `undefined`**. Por exemplo, `0` e `""` (string vazia) são falsy, mas não nullish, então são considerados como válidos quando usados com `??`.
+
+```js
+let valido = null || 10 // valido é 10
+valido = null ?? 10     // valido é 10
+valido = 0 || 10;       // valido é 10
+valido = 0 ?? 10;       // valido é 0!!
+```
+
+
 ## Arrays
 
 Em JavaScript, dentro de um mesmo array pode haver elementos de tipos **diferentes**, inclusive objetos e outros arrays.
+
+- para acessar elementos: coloque o índice entre colchetes: `arr[2]` irá acessar o **terceiro** (o índice começa em zero) elemento do array `arr`.
+
+    - caso o array **não exista**, o acesso ao elemento irá resultar em um `ReferenceError`; caso seja atribuído `null` ou `undefined` (por exemplo, quando recebe o resultado de uma função), o acesso irá resultar em um `TypeError`;
+
+        - o ES2020 adicionou a possibilidade de acesso com `?.[]` (sim, com o ponto no meio) para evitar o erro quando a variável é `null` ou `undefined`. Será retornado `undefined`.
+
+    - caso acesse um índice que não tem valor, o resultado será `undefined`.
 
 - para adicionar itens: `push(novo_item)` (adiciona ao **final**) e `unshift(novo_item)` (adiciona ao **início**);
 
@@ -334,10 +451,10 @@ Em JavaScript, dentro de um mesmo array pode haver elementos de tipos **diferent
     - Spread operator: acontece quando você quer "desempacotar" ou desmembrar os elementos de um array. Você pode usar para copiar os elementos de um array para outro array, sem precisar passar os valores um por um.
     - Rest parameter: é o oposto do spread, ajuntando elementos em um array. Pode ser usado na **definição de uma função**, quando você não sabe a quantidade de parâmetros que ela vai ter (*rest* vem de "resto"). Você aplica o rest parameter como o **último** parâmetro da função, *agrupando* em um array todos os argumentos que vierem a mais quando a função é invocaada. 
 
-```js
-function foo(paramA, paramB, ...otherParams); 
-// tudo que vier a partir do 3º parâmetro será agrupado em um array aqui definido como otherParams, que pode ser usado dentro da função
-```
+        ```js
+        function foo(paramA, paramB, ...otherParams); 
+        // tudo que vier a partir do 3º parâmetro será agrupado em um array aqui definido como otherParams, que pode ser usado dentro da função
+        ```
 
 ## Condicionais e loops
 
@@ -396,6 +513,8 @@ function nome(param_a, param_b, ...) {
     - parâmetros podem ter valor padrão (estilo Python); isso foi implementado a partir do ES6;
 
     - o objeto `arguments` pode ser acessado dentro da função e traz, dentro de um array, todos os argumentos que a função recebeu;
+
+    - se a função não tiver um `return`, ao ser chamada ela irá retornar `undefined`.
 
 Quando a função é **atribuída a uma variável** (chamado de "função de expressão"), o nome da função é opcional, e torna-se o que se chama no JavaScript de "função anônima":
 
@@ -480,6 +599,16 @@ let objeto = {
 
 - propriedades são acessadas pelo ponto (`objeto.numero`) ou colchetes (`objeto['numero']`);
 
+    - o acesso pelo `.` não funciona se a propriedade tiver espaços, pontuação, ou se for um número ou uma expressão. Nestes casos, opte pelo `[]`;
+
+    - se a propriedade não existir, será retornado `undefined`;
+
+    - você também pode acessar subpropriedadades. Exemplo: `objeto.objetoInterno.textoInterno`;
+
+    - assim como em arrays, caso o objeto **não exista**, o acesso a uma propriedade resulta em um `ReferenceError`; caso seja atribuído `null` ou `undefined` ao objeto (por exemplo, quando recebe o resultado de uma função), o acesso irá resultar em um `TypeError`. Se quiser evitar isso, utilize o `?.` ou `?.[]` para acessar; neste caso, será retornado `undefined` se o objeto for `null` ou `undefined`. O mesmo vale para acesso a subpropriedades.
+
+    - caso acesse um índice que não tem valor, o resultado será `undefined`.
+
 - métodos também são acessados pelo ponto + parênteses, para a função ser executada: `objeto.ola()`;
 
 - posso selecionar mais de uma propriedade de uma vez: `var { texto, valido } = objeto`;
@@ -494,7 +623,9 @@ let objeto = {
 
 - `Object.keys(objeto)`: retorna um array todas as **chaves** (nome das propriedades);
 
-- `Object.entries(objeto)`): retorna um array de arrays bidimensionais, sendo que cada cada elemento é uma [chave, valor]
+- `Object.entries(objeto)`): retorna um array de arrays bidimensionais, sendo que cada cada elemento é uma [chave, valor];
+
+- O operador `in` pode ser usado para verificar se um objeto possui uma propriedade (`'numero' in objeto` retornaria `true`).
 
 ### JSON
 
@@ -553,6 +684,8 @@ Surgiram a partir do ES6.
 Não existem nativamente no JS, mas podem ser criadas como forma de facilitar a escrita/entendimento (o tal do *syntax sugar*). Por trás dos panos, o que há são objetos, que herdam métodos e propriedades de protótipos.
 
 É possível declarar e inicializar propriedades dentro do constructor, sem a necessidade de declará-las fora. As propriedades declaradas e inicializadas no constructor ficam visíveis para o restante da classe.
+
+- Se o construtor da classe não recebe argumentos, você pode chamá-la sem o parênteses (`new SuaClasse` ou `new SuaClasse()`). Isso, no entanto, não é recomendado;
 
 - boa prática: propriedades que terão **getters e setters** costumam ter o nome **começando com underline**, para diferenciar do nome no get e set (que são palavras-chave: `get saldo = return this._saldo;`)
 
@@ -980,5 +1113,5 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-3.10.3
-pag. 129
+5
+pag. 198
