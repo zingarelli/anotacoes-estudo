@@ -49,6 +49,7 @@ Lista em ordem alfabética:
 - [HTML & CSS](./HTML_CSS.md)
 - [JavaScript](./JavaScript.md)
 - [Machine Learning - Classificação](https://github.com/zingarelli/Python_ML_Alura)
+- [MongoDB e NoSQL](./NoSQL_MongoDB.md)
 - [MySQL](./MySQL.md)
 - [Next.js](./Next.md)
 - [Protocolo HTTP](./Protocolo-HTTP.md)
