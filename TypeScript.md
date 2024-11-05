@@ -1146,6 +1146,21 @@ type Props = typeof menu[0];
 export default function Item(item: Props) {...}
 ```
 
+Você pode utilizar `&` para combinar tipagens e assim extender de outros tipos: 
+
+```tsx
+import React, { ButtonHTMLAttributes, HtmlHTMLAttributes } from "react";
+
+// custom properties and also native HTML button properties
+type buttonProps = {
+    children: React.ReactNode;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>
+
+export const Button = ({ children, className }: buttonProps) => {
+    return <button className={className}>{children}</button>
+}
+```
+
 ## Tipagem de eventos
 
 Eventos passados como argumentos para uma função também precisam ser tipados. 

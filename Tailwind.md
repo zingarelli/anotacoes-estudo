@@ -2,7 +2,6 @@
 
 Anotações sobre o framework [Tailwind CSS](https://tailwindcss.com/).
 
-
 ## Créditos
 
 Essas anotações são baseadas no curso [Tailwind CSS: estilizando a sua página com classes utilitárias](https://cursos.alura.com.br/course/tailwind-css-estilizando-pagina-classes-utilitarias), oferecido pela [Alura](https://www.alura.com.br) e ministrado pela [Beatriz Moura](https://www.linkedin.com/in/beatrizmouradev/). 
@@ -108,7 +107,9 @@ Fica fácil mapear o tamanho definido pelo Tailwind e sua representação no CSS
 
 O inverso também é válido: se você quer uma margem de 24px, utilize a classe utilitária `m-6` ($24 \div 4$); se quer um margin-bottom de 2rem, utilize `mb-8` ($2 \times 4$).
 
-> Existem outras numerações, como **frações** (para representar porcentagem), expressões como **`sm`** e **`xl`** (representando padrões para small e extra-large), palavras como **`light`** e **`bold`** (representando peso de fonte), etc. Nesses casos, consulte a documentação para saber suas representações em CSS.
+> Existem outras numerações, como **frações** (para representar porcentagem), expressões como **`sm`** e **`xl`** (representando padrões para small e extra-large, o que também é conhecido como "T-shirt sizes" - tamanhos de camisetas), palavras como **`light`** e **`bold`** (representando peso de fonte), etc. Nesses casos, consulte a documentação para saber suas representações em CSS.
+
+Você também pode indicar um **valor arbitrário** para a classe utilitária, passando esse valor entre colchetes. Por exemplo: `bg-[#2D5BFF] rounded-[8px]`.
 
 ## Customização
 
@@ -126,14 +127,16 @@ Exemplo adicionando novas cores e família de fontes:
 <script>
     tailwind.config = {
         theme: {
-            // o extends preserva os valores default
+            // o extend preserva os valores default
             // do Tailwind e permite criar novos 
             extend: {
                 // adicionando novas cores
                 colors: {
                     azul: {
                         claro: '#C5DFFF',
-                        escuro: '#061E3C',
+                        // posso também usar variáveis, 
+                        // configuradas em algum outro CSS
+                        escuro: 'var(--foreground)',
                     }
                 },
                 // adicionando nova font-family
@@ -150,7 +153,7 @@ Exemplo adicionando novas cores e família de fontes:
 <body class="bg-azul-claro font-inter">
 ```
 
-> Em projetos maiores, podemos adicionar essas customizações em um arquivo separado `tailwind.config.js`.
+> Em projetos maiores, podemos adicionar essas customizações em um arquivo separado `tailwind.config.js`. Projetos Next criados com o `create-next-app`, por exemplo, já trazem esse arquivo pré-preenchido.
 
 Um guia sobre customização e opções que podem ser configuradas podem ser vistas na [documentação do Tailwind](https://tailwindcss.com/docs/configuration).
 

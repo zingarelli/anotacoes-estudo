@@ -458,26 +458,43 @@ Em JavaScript, dentro de um mesmo array pode haver elementos de tipos **diferent
 
 ## Condicionais e loops
 
-JavaScript possui o if ternário: `[condicao] ? [instrução se true] : [instrução se false];`
+JavaScript possui o **if ternário**: `[condicao] ? [instrução se true] : [instrução se false];`
 
-Laço de repetição: **três tipos de for**:
+Laço de repetição: **três tipos de for**: `for`, `for/in` e `for/of` (o `for/of` foi introduzido pelo ES6). Veja a diferença no exemplo:
 
 ```js
-var valores = [0, 1, 2, 'três'];
+const valores = [0, 1, 2, 'três'];
 
 // i como índice; é o for clássico
 for(let i = 0; i < valores.length; i++){
     console.log(valores[i]); // 0, 1, 2, 'três'
 }
 
-// i como ÍNDICE, percorrendo array e objeto
-for(i in valores){
-    console.log(i); // índices 0, 1, 2, 3
+// idx como nome de uma PROPRIEDADE de objeto
+// - índices são propriedades de um array
+// - array é "objeto especializado"
+let idx;
+for(idx in valores){ // poderia fazer o let idx aqui
+    console.log(idx); // índices 0, 1, 2, 3
 }
 
-// i como VALOR, somente para array e outras estruturas iteráveis (como strings)
-for(i of valores){
-    console.log(i); // valores 0, 1, 2, 'três'
+// val como VALOR, percorrendo objetos ITERÁVEIS,
+// como array, strings, set, etc
+let val;
+for(val of valores){ // poderia fazer o let val aqui
+    console.log(val); // valores 0, 1, 2, 'três'
+}
+```
+
+Há também uma variante do `for/of`: a `for/await`, introduzida pelo ES2018 para iteradores assíncronos. Exemplo retirado do livro ["JavaScript: The Definitive Guide"](https://www.oreilly.com/library/view/javascript-the-definitive/9781491952016/):
+
+```js
+// Read chunks from an asynchronously iterable stream
+// and print them out
+async function printStream(stream) {
+    for await (let chunk of stream) {
+        console.log(chunk);
+    }
 }
 ```
 
@@ -838,11 +855,11 @@ No JS pode haver **somente sobrescrita** de métodos (overriding), ou seja, os m
  
 ## Erros
 
-- `throw`: usado para **criar seu próprio erro**; pode substituir um return na função, jogando um erro que pode ser capturado e tratado.
+- `throw`: usado para **criar seu próprio erro**; pode substituir um return na função, jogando um erro que pode ser capturado e tratado. Se não for tratado na função, o erro "propaga" pela stack até encontrar um bloco que trata erros. Se nenhum for encontrado, o programa retorna um erro ao usuário. O erro dado pelo `throw` pode ser uma string, um número, ou uma instância da classe `Error`.
 
-- `try...catch`: captura e manipulação de um erro; coloca o código dentro do try e captura/manipula o erro com o catch;
+- `try...catch`: captura e manipulação de um erro; coloca o código dentro do try e captura/manipula o erro com o catch; O `catch` também pode jogar um erro com `throw`, para ser tratado por quem chamou a função, propagando o erro para cima.
 
-- `finally`: bloco de código que **será executado**, independente de existir ou não um erro pego no try...catch; é opcional.
+- `finally`: bloco de código que **será executado**, independente de existir ou não um erro pego no try...catch, ou até se houver um return ou um break no try. É opcional. Pode ser usado, por exemplo, para fazer alguma "limpeza" no código.
 
 ```js
 try {
@@ -1113,5 +1130,5 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-5
-pag. 198
+5.6
+pag. 237

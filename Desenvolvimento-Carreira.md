@@ -6,6 +6,7 @@
 - [Renata Tedesco](https://www.linkedin.com/in/renatatedesco/)
 - [Marianne Henriques](https://www.linkedin.com/in/mariannehenriques/)
 - [Priscila Stuani](https://www.linkedin.com/in/priscilastuani/)
+- [Amandha Moreira](https://cursos.alura.com.br/user/amandha-smoreira)
 
 ## Introdução
 
@@ -324,9 +325,11 @@ Seu Ikigai (razão de vida) está no centro de quatro questionamentos:
 
 ## Comunicação assertiva
 
+> "Comunicação não é o que você fala, é o que o outro compreende."
+
 O mercado de trabalho precisa cada vez mais de pessoas que sabem trabalhar em equipe, se comunicar e resolver conflitos.
 
-Habilidades técnicas são "facilmente" desenvolvidas por meio de treinamento. Habilidades comportamentais levam mais tempo e envolve interesses pessoais.
+Habilidades técnicas são "facilmente" desenvolvidas por meio de treinamento. **Habilidades comportamentais levam mais tempo e envolve interesses pessoais**.
 
 Comunicação:
 
@@ -340,7 +343,7 @@ Cada tipo possui vantagens e estratégias diferentes para se comunicar (quem é 
 
 Quando você **fala baixo**, pode demonstrar **falta de segurança** para a outra pessoa; ela pode não confiar no que você está falando.
 
-Cuidado com a aparência: enquanto as pessoas não te conhecerem, elas irão te julgar pelo veem e sentem. Em menos de 90 segundos, as pessoas irão te julgar e construir uma primeira impressão.
+Cuidado com a aparência: enquanto as pessoas não te conhecerem, elas irão te julgar pelo veem e sentem. Em menos de **90 segundos**, as pessoas irão te julgar e construir uma **primeira impressão**.
 
 - roupa, cabelo, barba, higiene (quando presencial);
 
@@ -424,7 +427,7 @@ Emoções e sentimentos direcionam nossos comportamentos: precisamos nos treinar
 
 A agressividade é anular o ponto de vista do outro, supervalorizando seu ponto de vista. A passividade é o contrário. 
 
-A assertividade é não anular nenhum ponto de vista: expor o seu ponto de vista e dar espaço para o ponto de vista do outro.
+A **assertividade** é não anular nenhum ponto de vista: **expor o seu ponto de vista** e **dar espaço para o ponto de vista do outro**.
 
 - não é somente aceitar o ponto de vista do outro, mas sim entendê-lo, de modo a não causar constrangimento ao outro.
 
@@ -434,7 +437,7 @@ Sinais passivos: fala mais baixa, postura reservada, gestos discretos, tenta sem
 
 **Sinais assertivos**: tom de voz equilibrado, fala tranquila e confiante, mensagem clara e objetiva.
 
-- características não-verbais: expressão sincera, contato visual demonstrando interesse, gestos equilibrados, **escuta ativa** (entender os interesses do outro, o que ele está querendo transmitir);
+- características não-verbais: expressão sincera, contato visual demonstrando interesse, gestos equilibrados, **escuta ativa** (entender os interesses do outro, o que ele está querendo transmitir, escolher escutar);
 
 - Problemas que afetam a escuta ativa: tentar ler os pensamentos do outro, achar que há um interesse diferente do que está sendo dito; já tentar ensaiar a resposta sem ao menos o outro terminar de falar; pré-julgar o outro e durante sua fala tentar encontrar provas que confirmem seu pré-julgamento; devanear durante a fala do outro, perder o foco; pensar numa solução sobre o que o outro está falando (síndrome do especialista);
 
