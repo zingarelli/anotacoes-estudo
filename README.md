@@ -54,6 +54,7 @@ Lista em ordem alfabética:
 - [Next.js](./Next.md)
 - [Protocolo HTTP](./Protocolo-HTTP.md)
 - [React](./React.md)
+- [Scrum](./Scrum.md)
 - [Tailwind CSS](./Tailwind.md)
 - [TypeScript](./TypeScript.md)
 
