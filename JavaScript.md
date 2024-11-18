@@ -278,13 +278,13 @@ let 123variavel; // SyntaxError
 
 Boa prática para `var`, `let` e `const`: faça a declaração *no topo do bloco de código*, para auxiliar o "hoisting" do interpretador a elevá-las até o topo desde o início.
 
-- no caso de `let` e `const`, o interpretador faz o hoisting, mas as variáveis não são acessíveis enquanto não forem declaradas; tentar utilizá-las antes da declaração, causará um erro;
+- no caso de `let` e `const`, o interpretador faz o hoisting, mas as variáveis **não** são acessíveis enquanto não forem declaradas; tentar utilizá-las antes da declaração, causará um erro;
 
 - no caso de `var`, ela é inicializada como `undefined` e **pode ser acessada antes da declaração**.
 
 ### Hoisting
 
-Hoisting é uma etapa em que o interpretador **coloca na memória** as declarações de funções, variáveis ou classes, *antes de executar o código*. É como se ele colocasse no topo do arquivo essas declarações. 
+Hoisting é uma etapa em que o interpretador **coloca na memória** as declarações de funções e variáveis, *antes de executar o código*. É como se ele colocasse no topo do arquivo essas declarações. 
 
 Funciona bem para funções (é por isso que você pode usá-las antes de declará-las), mas pode causar erros com variáveis e classes (o hoisting eleva somente as **DECLARAÇÕES** e **não as inicializações**; em casos específicos elas são inicializadas com seu valor padrão, em outros casos não são nem inicializadas).
 
@@ -599,20 +599,30 @@ var soma = () => {
 
 ## Objetos 
 
-Declarados entre `{}` possuem **propriedades** e **métodos**.
+Declarados entre `{}`. É uma coleção de **propriedades**, cada uma sendo um par de `chave: valor`, separados por vírgula. Quando uma propriedade é uma função, ela também pode ser chamada de **método** do objeto.
 
 ```js
 let objeto = {
-    texto: 'texto', // não precisa usar var nem let, e cada propriedade é separada por vírgula
-    numero: 1, // é como se fosse um conjunto de propriedades chave : valor
+    texto: 'texto', // não precisa usar var nem let
+    numero: 1, 
     valido: true,
     itens: ['item 1'],
+    // propriedades também podem ser outros objetos
     objetoInterno: {
         textoInterno: 'texto interno'
     },
-    ola: function(){return 'Olá, sou um objeto!'}
+    // métodos (funções) podem ser declarados assim...
+    ola: function(){
+        console.log('Olá, sou um objeto!');
+    }
+    // ... ou assim (ES6)
+    tchau() {
+        console.log('Até mais!');
+    }
 };
 ```
+
+> Também é possível criar objetos utilizando o operador `new` ou o método `Object.create()` (este último é uma maneira poderosa de criar um objeto e selecionar o seu prototype). Veja mais na [Seção de funções construtoras](#funções-construtoras).
 
 - propriedades são acessadas pelo ponto (`objeto.numero`) ou colchetes (`objeto['numero']`);
 
@@ -620,29 +630,87 @@ let objeto = {
 
     - se a propriedade não existir, será retornado `undefined`;
 
+        - indo mais fundo: o JS irá procurar por essa propriedade no prototype do objeto e, caso não encontre, irá procurar no prototype do prototype do objeto, e assim por diante, até não haver mais prototypes nessa cadeia de prototypes. Caso não encontre, aí sim é retornado o `undefined`.
+
     - você também pode acessar subpropriedadades. Exemplo: `objeto.objetoInterno.textoInterno`;
 
-    - assim como em arrays, caso o objeto **não exista**, o acesso a uma propriedade resulta em um `ReferenceError`; caso seja atribuído `null` ou `undefined` ao objeto (por exemplo, quando recebe o resultado de uma função), o acesso irá resultar em um `TypeError`. Se quiser evitar isso, utilize o `?.` ou `?.[]` para acessar; neste caso, será retornado `undefined` se o objeto for `null` ou `undefined`. O mesmo vale para acesso a subpropriedades.
+    - assim como em arrays (que são um tipo especial de objeto), caso o objeto **não exista**, o acesso a uma propriedade resulta em um `ReferenceError`; caso seja atribuído `null` ou `undefined` ao objeto (por exemplo, quando recebe o resultado de uma função), o acesso irá resultar em um `TypeError`. Se quiser evitar isso, utilize o `?.` ou `?.[]` para acessar (ES2020); neste caso, será retornado `undefined` se o objeto for `null` ou `undefined`. O mesmo vale para acesso a subpropriedades;
 
-    - caso acesse um índice que não tem valor, o resultado será `undefined`.
+        - outro jeito de evitar é usando o curto-circuito com &&:
 
-- métodos também são acessados pelo ponto + parênteses, para a função ser executada: `objeto.ola()`;
+            `const texto = objeto && objeto.objetoInterno && objeto.objetoInterno.textoInterno`;
 
-- posso selecionar mais de uma propriedade de uma vez: `var { texto, valido } = objeto`;
+    - caso acesse um índice que não tem valor, o resultado será `undefined`;
 
-- posso adicionar novas propriedades: `objeto.novaPropriedade = 'sou uma nova propriedade'`;
+- métodos são invocados pelo ponto + parênteses: `objeto.ola()`;
 
-- posso deletar propriedades com o comando `delete`; ao tentar acessá-las após remoção, irá retornar `undefined`: `delete objeto.novaPropriedade`
+- posso selecionar mais de uma propriedade de uma vez: `const { texto, valido } = objeto`;
+
+- posso adicionar novas propriedades: `objeto.novaPropriedade = 'sou uma nova propriedade'`. O mesmo é utilizado para sobrescrever o valor de uma propriedade que já existe.
+
+- posso deletar propriedades com o comando `delete`; ao tentar acessá-las após remoção, irá retornar `undefined`. Exemplo: `delete objeto.novaPropriedade`;
+
+    - propriedades herdadas **não** são deletadas com `delete`.
 
 - posso também inicializar um objeto vazio: `let novoObj = {}`;
 
-- `Object.values(objeto)`: retorna um array com todos os **valores**;
+- `Object.values(objeto)`: retorna um **array** com os **valores** de todas as propriedades do objeto;
 
-- `Object.keys(objeto)`: retorna um array todas as **chaves** (nome das propriedades);
+- `Object.keys(objeto)`: retorna um **array** com o nome de todas as **propriedades** (menos as não herdadas);
 
-- `Object.entries(objeto)`): retorna um array de arrays bidimensionais, sendo que cada cada elemento é uma [chave, valor];
+- `Object.entries(objeto)`): retorna um **array de arrays bidimensionais**, sendo que cada cada elemento é uma `[chave, valor]`;
 
 - O operador `in` pode ser usado para verificar se um objeto possui uma propriedade (`'numero' in objeto` retornaria `true`).
+
+    - você também pode usar os métodos `hasOwnProperty()` e `propertyIsEnumerable()`. Por exemplo: `objeto.hasOwnProperty('numero')` retornaria `true`.
+
+- `Object.assign(target, source1)`: copia as propriedades **próprias** (não herdadas) e enumeráveis de `source1` para `target`. Se `target` já tiver a propriedade, ela é sobrescrita com o valor de `source1`. Você pode passar outros objetos como argumento (`source2, ..., sourceN `) que também serão copiados para `target`, sendo que cada source novo irá sobrescrever as propriedades já existentes.
+
+    - você também pode fazer isso com o **spread operator** (ES2018): `target = {...source1, ...target}`. Ele também copia somente as propriedades próprias.
+
+### Acessando propriedades com get e set
+
+Você também pode definir métodos para acessar ou modificar uma propriedade (os chamados "getters" e "setters"). Isso foi introduzido no ES5.
+
+Exemplo: 
+
+```js
+const ponto = {
+    x: 3,
+    y: 4,
+
+    // coloque o mesmo nome para o getter e o setter
+    get r() {
+        return Math.hypot(this.x, this.y)
+    },
+    set r(newVal) {
+        // posso acessar outro getter do próprio objeto
+        const theta = this.theta;
+        this.x = newVal * Math.cos(theta);
+        this.y = newVal * Math.sin(theta);
+    },
+
+    // posso definir somente o getter
+    // criando uma propriedade read-only
+    get theta() {
+        return Math.atan2(this.y, this.x);
+    }
+}
+
+// para acessar/modificar, NÃO uso o parênteses
+ponto.r; // 5
+ponto.theta; // 0.9272952180016122
+
+// theta é read-only
+ponto.theta = 10;
+ponto.theta; // 0.9272952180016122
+```
+
+Como pode ser visto no exemplo, quando crio somente um getter, a propriedade é read-only. Se eu atribuir um valor a essa propriedade, este valor será **ignorado**. 
+
+Também é possível criar uma propriedade write-only definindo somente um setter. Propriedades write-only retornam undefined quando são acessadas.
+
+> Observe que, dentro do objeto, quando quero acessar alguma de suas propriedades, utilizamos o `this`.
 
 ### JSON
 
@@ -650,25 +718,25 @@ Formato `chave: valor`. Muito utilizado para comunicação entre back-end e fron
 
 `JSON.parse(dadosJSON)`: converte JSON para um objeto JavaScript. Comumente usado quando **recebemos** um JSON da API;
 
-`JSON.stringify(objetoJS)`: converte um objeto JavaScript para o formato JSON. Comumente usado quando **enviamos** dados para uma API.
+`JSON.stringify(objetoJS)`: converte um objeto JavaScript para o formato JSON. Comumente usado quando **enviamos** dados para uma API. Esse processo também é conhecido como **serialização**.
+
+- propriedades cujo valor seja `undefined`, assim como funções, **não** são serializáveis, ou seja, são **omitidos** no resultado da conversão. 
+
+- O valor `null`, no entanto, **é** serializável;
+
+- existem outras particularidades, como a serialização de um objeto do tipo Date. Consulte a [documentação](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description).
 
 ### Prototype
 
-`Object.prototype`: é o objeto no *topo* da cadeia de objetos do JS. No JS, **todos** os objetos herdam **propriedades e métodos de um prototype**. Se eu chamo um método de um `obj`, será primeiro procurado se o `obj` possui este método; se não possuir, vai subindo na cadeia procurando o método nos pais e assim por diante.
+No JS, **todos** os objetos herdam **propriedades e métodos de um prototype**. Se eu acesso a propriedade de um `obj`, será primeiro procurado se ele possui esta propriedade; se não possuir, vai subindo na cadeia procurando por ela nos pais e assim por diante.
 
-`objeto.__proto__`: propriedade que lista os métodos de protótipo do objeto instanciado, herdados do "objeto oculto", que seria o pai desse objeto. Funciona melhor no console do navegador (o Node não mostra todas as propriedades).
+`Object.prototype`: é o objeto no **topo** da cadeia de objetos do JS. Todos os objetos herdam propriedades dele. A única exceção é quando você cria um objeto sem prototype usando `Object.create(null)`.
 
-- a propriedade `__proto__` serve mais para exemplificar e está sendo descontinuada;
-
-- dados primitivos (numeros, textos, etc): não herdam necessariamente (já que são primitivos), mas possuem um objeto pai que os engloba.
-
-```js
-[1, 2, 3].__proto__; // mostra todas as propriedades de Array
-```
+`objeto.__proto__`: propriedade que expõe o protótipo do objeto instanciado, exibindo suas propriedades. Ela está sendo descontinuada e no seu lugar podemos usar `Object.getPrototypeOf(<nome_do_objeto>)`.
 
 ### Funções construtoras
 
-É possível **criar objetos a partir de um modelo**, por meio de funções construtoras. Esta era a maneira que o JS oferecia para se trabalhar antes de possibilitar o uso de classes na linguagem, que é a maneira moderna de criar objeto 
+É possível **criar objetos a partir de um modelo**, por meio de funções construtoras. Esta era a maneira que o JS oferecia para se trabalhar antes de possibilitar o uso de classes na linguagem. A maneira moderna de criar objetos é por meio de classes.
 
 - A criação antes era feita por meio de protótipos e cadeia de protótipos. Internamente, continua sendo assim - a maneira moderna é somente um "syntax sugar", ou seja, uma sintaxe mais fácil de ler por um humano. 
 
@@ -692,7 +760,7 @@ console.log(novoUsuario.exibirInfos());
 
 Objetos criados por meio de funções construtoras têm esta função como sendo seu protótipo.
 
-Existem outras formas de criar objetos a partir de um modelo, como o uso de `Object.create()`, sem a necessidade de uma função construtora.
+Outras forma de criar objetos a partir de um modelo é com o  [`Object.create()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create). Esse método estático permite passar o prototype desejado como primeiro argumento.
 
 ## Classes 
 
@@ -857,21 +925,23 @@ No JS pode haver **somente sobrescrita** de métodos (overriding), ou seja, os m
 
 - `throw`: usado para **criar seu próprio erro**; pode substituir um return na função, jogando um erro que pode ser capturado e tratado. Se não for tratado na função, o erro "propaga" pela stack até encontrar um bloco que trata erros. Se nenhum for encontrado, o programa retorna um erro ao usuário. O erro dado pelo `throw` pode ser uma string, um número, ou uma instância da classe `Error`.
 
-- `try...catch`: captura e manipulação de um erro; coloca o código dentro do try e captura/manipula o erro com o catch; O `catch` também pode jogar um erro com `throw`, para ser tratado por quem chamou a função, propagando o erro para cima.
+- `try...catch`: captura e manipulação de um erro; coloca o código dentro do try e captura/manipula o erro com o catch. O `catch` também pode jogar um erro com `throw`, para ser tratado por quem chamou a função, propagando o erro para cima.
 
 - `finally`: bloco de código que **será executado**, independente de existir ou não um erro pego no try...catch, ou até se houver um return ou um break no try. É opcional. Pode ser usado, por exemplo, para fazer alguma "limpeza" no código.
 
 ```js
 try {
-    //bloco a ser executado
+    // bloco a ser executado
 }
 catch(e) {
-    //se um erro "e" for jogado, será manipulado aqui
+    // se um erro "e" for jogado, será manipulado aqui
 }
 finally {
-    //será executado, mesmo se acontecer um erro no bloco do try
+    // será executado, mesmo se acontecer um erro no bloco do try
 }
 ```
+
+> O `catch` e o `finally` são opcionais, mas pelo menos um deve estar presente se você usar um bloco `try`.
 
 - `Error`: é um objeto que pode ser criado para personalizar o erro com uma mensagem, o nome do arquivo e a linha onde o erro ocorreu; os três parâmetros são opcionais
     - também pode dar um nome ao erro com a propriedade `name`;
@@ -1130,5 +1200,6 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-5.6
-pag. 237
+7
+
+pag. 293
