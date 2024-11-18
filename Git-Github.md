@@ -356,7 +356,7 @@ Cria nova branch, porém, **não** a ativa como principal; você continuará na 
 git checkout -b nome_da_nova_branch
 ```
 
-- Atualmente, também temos o comando `git switch` para trabalhar com branches, substituindo o `git checkout``. O comando para criar a branch e ativá-la como principal fica:
+- Atualmente, também temos o comando `git switch` para trabalhar com branches, substituindo o `git checkout`. O comando para criar a branch e ativá-la como principal fica:
    
 ```bash
 git switch -c nome_da_nova_branch
