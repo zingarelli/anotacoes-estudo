@@ -369,7 +369,7 @@ b.x; // 15
 a.x; // também 15, pois referenciam o mesmo obj
 ```
 
-Essas mesmas observações se **aplicam para arrays** e seus elementos (lembrando que arrays são uma variação especial de objeto).
+Essas mesmas observações se **aplicam para arrays** e seus elementos (lembrando que arrays são uma forma especializada de objeto, otimizado para o acesso a índices numéricos).
 
 ### Curto circuito
 
@@ -419,42 +419,6 @@ valido = null ?? 10     // valido é 10
 valido = 0 || 10;       // valido é 10
 valido = 0 ?? 10;       // valido é 0!!
 ```
-
-
-## Arrays
-
-Em JavaScript, dentro de um mesmo array pode haver elementos de tipos **diferentes**, inclusive objetos e outros arrays.
-
-- para acessar elementos: coloque o índice entre colchetes: `arr[2]` irá acessar o **terceiro** (o índice começa em zero) elemento do array `arr`.
-
-    - caso o array **não exista**, o acesso ao elemento irá resultar em um `ReferenceError`; caso seja atribuído `null` ou `undefined` (por exemplo, quando recebe o resultado de uma função), o acesso irá resultar em um `TypeError`;
-
-        - o ES2020 adicionou a possibilidade de acesso com `?.[]` (sim, com o ponto no meio) para evitar o erro quando a variável é `null` ou `undefined`. Será retornado `undefined`.
-
-    - caso acesse um índice que não tem valor, o resultado será `undefined`.
-
-- para adicionar itens: `push(novo_item)` (adiciona ao **final**) e `unshift(novo_item)` (adiciona ao **início**);
-
-- remoção: `pop()` (**último** item), `shift()` (**primeiro** item);
-
-- `splice(indice, quantos, item_1...item_n)`: remove a partir do `indice`, `quantos` itens você informar (`quantos` é opcional). Se informar outros itens (também opcional), splice irá *ADICIONAR* os itens a partir do `indice` e, caso `quantos` for informado, irá antes remover os itens a partir de `indice` para depois adicionar os novos itens. O método retorna um **novo array**;
-
-- `slice(inicial, final)`: faz um recorte; cria um novo array com os itens do array em que o método foi invocado, começando a partir do índice `inicial` (inclusivo) até o índice `final` (exclusivo, ou seja, não será incluído no novo array). 
-    - o segundo parâmetro é opcional; caso não seja utilizado, o recorte é feito até o último elemento do array (inclusivo, neste caso);
-    - necessário tomar cuidado quando o array possui objetos, pois o `slice()` faz uma ["shallow copy"](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy) do array.
-
-- `foreach(function(element, index, arr), thisValue)`: método que executa uma função; `function` e `element` são obrigatórios, os outros são opcionais. A função pode ser definida dentro ou fora do método (se fora do método, somente faz a chamada da função, sem argumentos);
-
-    - também pode ser mais direto com uma arrow function: `forEach((element, index, arr) => {...})`, `index` e `arr` são opcionais
-
-- reticências (`...`) antes de um array (`...arr`) pode indicar um **spread** ou um **rest**:
-    - Spread operator: acontece quando você quer "desempacotar" ou desmembrar os elementos de um array. Você pode usar para copiar os elementos de um array para outro array, sem precisar passar os valores um por um.
-    - Rest parameter: é o oposto do spread, ajuntando elementos em um array. Pode ser usado na **definição de uma função**, quando você não sabe a quantidade de parâmetros que ela vai ter (*rest* vem de "resto"). Você aplica o rest parameter como o **último** parâmetro da função, *agrupando* em um array todos os argumentos que vierem a mais quando a função é invocaada. 
-
-        ```js
-        function foo(paramA, paramB, ...otherParams); 
-        // tudo que vier a partir do 3º parâmetro será agrupado em um array aqui definido como otherParams, que pode ser usado dentro da função
-        ```
 
 ## Condicionais e loops
 
@@ -596,6 +560,261 @@ var soma = () => {
 - arrow function e funções anônimas não são "hoisted", ou seja, são interpretadas no momento da sua execução, não podendo ser utilizadas antes de serem declaradas;
 
 - é **melhor usar const** ao atribuir uma arrow function a uma variável, já que o retorno dessa função é um valor constante;
+
+## Arrays
+
+São formas especializadas de objetos (veja mais sobre objetos na [próxima Seção](#objetos)), em que as propriedades são índices numéricos. Isso possibilita implementar uma maneira otimizada de acesso aos elementos por meio do índice. Além disso, a classe Array disponibiliza vários métodos úteis e poderosos para se manipular arrays.
+
+> Por serem objetos, você pode adicionar propriedades com um nome qualquer ao array. No entanto, somente aquelas propriedades cujo nome seja um **valor inteiro não negativo (>=0)** serão consideradas índices do array e **contarão para o tamanho** do array.
+
+```js
+const mistura = [10, 20, 30];
+mistura[3] = 40;
+mistura['quatro'] = 50; // NÃO será índice
+mistura; // => [10, 20, 30, 40, quatro: 50]
+mistura.length; // => 4. Somente índices contam.
+
+// ... PORÉM, os abaixo serão considerados índices:
+mistura['4'] = 50; // converte para o inteiro 4
+mistura[5.0000] = 60; // converte para o inteiro 5
+mistura; // => [10, 20, 30, 40, 50, 60, quatro: 50]
+mistura.length; // => 6
+```
+
+Em JS, dentro de um mesmo array pode haver elementos de **tipos diferentes**, inclusive objetos e outros arrays.
+
+- O ES6, no entanto, introduz classes de arrays denominadas "typed arrays", que possuem tamanho fixo e aceitam somente um tipo númerico para seus elementos.
+
+Arrays podem ser **esparsos**, isto é, pode haver índices sem elemento (vazios), definido por vírgulas sem valor entre elas. O índice não existe (o operador `in` retorna falso para esses índices), mas o acesso retorna `undefined`. 
+
+```js
+// Observe que se houver somente UMA vírgula no final, 
+// NÃO adiciona um elemento vazio no final - precisaria
+// ter duas vírgulas para isso. Ou seja, `'palavra'` 
+// é o último elemento desse array.
+const sparse = [1,,, false,, 'palavra',];
+
+sparse.length; // => 6 (elementos vazios também contam)
+sparse[1]; // => undefined
+1 in sparse; // => false, índice vazio não é uma propriedade
+```
+
+### Acesso e gerenciamento
+
+Para **acessar** elementos: coloque o índice entre colchetes: `arr[2]` irá acessar o **terceiro** elemento do array `arr`, pois o índice começa em zero.
+
+- caso o array **não exista**, o acesso ao elemento irá resultar em um `ReferenceError`; caso seja atribuído `null` ou `undefined` (por exemplo, quando recebe o resultado de uma função), o acesso irá resultar em um `TypeError`;
+
+    - o ES2020 adicionou a possibilidade de acesso com `?.[]` (sim, com o ponto no meio) para evitar o erro quando a variável é `null` ou `undefined`. Será retornado `undefined`.
+
+- caso acesse um **índice** que não tem valor, o resultado será `undefined`.
+
+Para saber o **tamanho** do array, use a propriedade `length`.
+
+- por ser uma propriedade, `length` pode ser manualmente alterado. No entanto, se for colocado um **valor menor** do que o tamanho atual, os elementos após o tamanho atribuído a `length` serão **removidos** e não podem ser recuperados. Se for atribuído um **valor maior**, uma **área esparsa** (índices vazios) será colocada ao final do array até o tamanho atribuído. Isso, no entanto, não é uma prática comum.
+
+Para **adicionar** elementos: 
+
+- atribua um valor a um índice que ainda não existe (atenção: pode tornar o array esparso se os índices anteriores também não existirem);
+
+- `push(novo_elemento)`: adiciona ao **final**;
+
+- `unshift(novo_elemento)`: adiciona ao **início** e reorganiza os índices.
+
+Para **remoção**: 
+
+- `pop()`: remove **último** elemento;
+
+- `shift()`: remove **primeiro** elemento e reorganiza os índices;
+
+- além de removerem, esses métodos também retornam o elemento que foi removido.
+
+Para **modificar**: simplesmente acesse o elemento e atribua um novo valor a ele.
+
+Para **deletar**: use o operador `delete` (exemplo: `delete arr[2]`). Diferente da remoção, o delete torna o índice vazio, ou seja, o `length` continua **igual**, mas o array se torna **esparso**.
+
+### Alguns métodos úteis
+
+- `splice(indice, quantos, item_1...item_n)`: remove a partir do `indice`, `quantos` itens você informar (`quantos` é opcional). Se informar outros itens (também opcional), splice irá *ADICIONAR* os itens a partir do `indice` e, caso `quantos` for informado, irá antes remover os itens a partir de `indice` para depois adicionar os novos itens. O método retorna um **novo array**;
+
+- `slice(inicial, final)`: faz um recorte; cria um **novo array** com os itens do array em que o método foi invocado, começando a partir do índice `inicial` (inclusivo) até o índice `final` (exclusivo, ou seja, não será incluído no novo array). 
+
+    - o segundo parâmetro é opcional; caso não seja utilizado, o recorte é feito até o último elemento do array (inclusivo, neste caso);
+
+    - necessário tomar cuidado quando o array possui objetos, pois o `slice()` faz uma ["shallow copy"](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy) do array.
+
+- reticências (`...`) antes de um array (`...arr`) pode indicar um **spread** ou um **rest**:
+
+    - Spread operator: acontece quando você quer "desempacotar" ou desmembrar os elementos de um array. Você pode usar para copiar os elementos de um array para outro array, sem precisar passar os valores um por um. Essa é uma shallow copy e modificações feitas nos valores **não** mudam o array original no qual foi feito o spread.
+
+        ```js
+        const original = [1, 2, 3];
+        const expanded = [0, ...original, 4];
+
+        expanded[0] = 99;
+        original[0]; // => 1
+        ```
+
+    - Rest parameter: é o oposto do spread, ajuntando elementos em um array. Pode ser usado na **definição de uma função**, quando você não sabe a quantidade de parâmetros que ela vai ter (*rest* vem de "resto"). Você aplica o rest parameter como o **último** parâmetro da função, *agrupando* em um array todos os argumentos que vierem a mais quando a função é invocada. 
+
+        ```js
+        function foo(paramA, paramB, ...otherParams); 
+        // tudo que vier a partir do 3º parâmetro será agrupado em um array aqui definido como otherParams, que pode ser usado dentro da função
+        ```
+
+### Criação (ES6)
+
+O ES6 adicionou dois métodos estáticos para criação de arrays:
+
+`Array.of()`: retorna um array com base nos valores passados por argumento;
+
+`Array.from()`: recebe como primeiro argumento um iterable ou um objeto array-like e retorna um array com os elementos desse objeto. Possui um segundo argumento, opcional, em que você pode passar uma função a ser aplicada em cada elemento para retornar um valor diferente (parecido com um map interno) para aquele elemento.
+
+> Objetos array-like são objetos que possuem uma propriedade de nome `length` e propriedades cujos nomes sejam inteiros - outros nomes são ignorados pelo `Array.from()`.
+
+```js
+Array.from({ length: 4, 0: "foo", 1: 'yummy', 3: true })
+// => ['foo', 'yummy', undefined, true]
+
+Array.from({ length: 4, 0: "foo", banana: 'yummy', 3: true })
+// =>['foo', undefined, undefined, true]
+```
+
+### Iteração
+
+#### `forEach()`
+
+Você pode usar o `for` clássico ou o `for/of` para iterar sobre os elementos do array. No entanto, uma maneira mais completa e funcional é por meio do método `forEach()`.
+
+O `forEach(callbackFn(elemento, indice, arr), thisValue)` espera uma função como primeiro argumento (callback). Essa função será executada para cada elemento do array e, por sua vez, pode receber três argumentos, providenciados pelo forEach: o primeiro é o elemento de cada iteração, o segundo é o índice desse elemento, e o terceiro é o array como um todo. 
+
+O callback pode ser definido dentro ou fora do loop, mas é uma prática comum fazer dentro, com uma arrow function. Em muitos casos você só está interessado no elemento, então o segundo e terceiro argumentos podem ser ignorados e você escreve sua função com somente um parâmetro.
+
+O `forEach` the um segundo argumento opcional, aqui representado pelo `thisValue`. Ele pode ser utilizado para passar um outro contexto de `this` que a função vai acessar ao ser executada. É mais avançado e não tão comum, e a [MDN tem um exemplo](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach#using_thisarg) de utilização. 
+
+> Diferente dos loops `for` tradicionais, o `forEach` não termina antecipadamente usando o `break`, ou seja, o `forEach` **obrigatoriamente itera sobre todos os elementos**. Se você precisa de um loop que possa terminar antes de chegar ao final, utilize um dos `for` clássicos.
+
+O `forEach()` **ignora (pula) índices inexistentes**, no caso de array esparso. Já o `for/of` **não ignora**, e o acesso a índices inexistentes retorna `undefined`.
+
+```js
+let soma = 0;
+
+// array esparso de tamanho 7
+const numeros = [2, 4,,,, 10, -3];
+
+// forEach ignora índices vazios
+numeros.forEach((valor, indice) => {
+    soma += valor;
+    console.log('índice: ', indice);
+    // => índice:  0
+    // => índice:  1
+    // => índice:  5
+    // => índice:  6
+})
+soma; // => 13
+
+// forOf acessa índices vazios e retorna undefined
+soma = 0;
+// numeros.entries() retorna um array de arrays
+// [ [idx0, val0], ..., [idxN, valN] ]
+for (let [indice, valor] of numeros.entries()) {
+    soma += valor?? 0; // evitar undefined na soma
+    console.log('indice: ', indice);
+    // => índice:  0
+    // => índice:  1
+    // => índice:  2
+    // => índice:  3
+    // => índice:  4
+    // => índice:  5
+    // => índice:  6
+}
+soma; // => 13
+```
+
+#### `map()`
+
+O método `map()` é parecido com o `forEach()` com algumas diferenças, listadas abaixo. Ele espera uma função como argumento, que é executada para cada elemento do array, com exceção daqueles inexistentes caso seja esparso. Essa função também pode receber os três argumentos `(elemento, indice, arr)`.
+
+- o método **retorna** um novo array com os valores retornados pela função que você criou. Ou seja, sua função deve retornar um valor;
+
+- apesar de a função não ser executada em índices inexistentes, o array retornado **também será esparso** do mesmo jeito que o array original.
+
+```js
+const numeros = [1, 2, 3];
+// versão simplificada de arrow function, em que
+// estamos passando somente um parâmetro e 
+// retornando um valor em uma mesma linha, por
+// isso não precisamos dos parênteses no lado
+// esquerdo, nem da palavra return no direito
+const quadrados = numeros.map(val => val * val)
+quadrados; // => [1, 4, 9]
+```
+
+O `map()` é um método muito utilizado quando você trabalha com React e precisa fazer um loop dentro de um JSX, por exemplo.
+
+#### `reduce()`
+
+`reduce(callbackFn(acc, elemento, indice, arr), valorInicial);`
+
+Esse é outro método de iteração, cujo objetivo é **reduzir o array para um único valor**. Em outras palavras, ele combina os elementos do array para produzir um único valor a ser retornado, resultante de uma função que você passa como callback, também chamada de função redutora. O segundo argumento (`valorInicial`) é opcional e passa um valor inicial para o callback.
+
+Diferente dos métodos anteriores, a função redutora vai receber **quatro** argumentos: `(acc, elemento, indice, arr)`. O primeiro argumento é o resultado obtido até o momento pela função, geralmente chamado de acumulador. Os outros três são os mesmos mencionados anteriormente.
+
+Na primeira iteração, os passos serão os seguintes: 
+
+- é atribuído a `acc` o `valorInicial`; se esse valor não foi passado, o primeiro elemento do array (`arr[0]`) é atribuído a `acc`. 
+
+- o callback então é executado para o `elemento` da iteração. Se `valorInicial` foi passado, o `elemento` será  `arr[0]`; senão, será `arr[1]`;
+
+- o retorno do callback é atribuído a `acc`;
+
+Nas iterações seguintes, a função é passada para os próximos elementos e o retorno vai sendo atribuído em `acc`, por isso `acc` seria um "acumulador".
+
+```js
+let totalVendas = 100;
+const novasVendas = [25, 13, 9.99, 7];
+totalVendas = novasVendas.reduce(
+    // 1º argumento, callbackFn
+    (total, venda) => {
+        console.log(`acumulador: ${total}, elemento: ${venda}`);
+        // acumulador: 100, elemento: 25
+        // acumulador: 125, elemento: 13
+        // acumulador: 138, elemento: 9.99
+        // acumulador: 147.99, elemento: 7
+        return total + venda;
+    },
+    // 2º argumento, valorInicial
+    totalVendas
+);
+totalVendas; // => 154.99
+```
+
+Existe também o método `reduceRight()`, que é o mesmo procedimento, porém fazendo a iteração partindo do último índice até o primeiro.
+
+#### Outros métodos
+
+Existem vários outros métodos e listá-los aqui seria exaustivo. Vale a pena consultar a documentação da MDN ou o livro mencionando no início dessas anotações.
+
+- [`filter()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter);
+- [`find()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find);
+- [`findIndex()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex);
+- [`every()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every);
+- [`some()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some);
+- [Veja mais](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array#instance_methods).
+
+### Matriz
+
+JS não oferece suporte a matrizes (ou arrays multidimensionais em geral). O que pode ser feito nesse caso é criar um **array de arrays** (um array cujos elementos também são arrays) e assim por diante. Fique ciente, no entanto, que o tamanho do array é definido pela sua quantidade de elementos diretos, ou seja, se um elemento também é um array, o seu tamanho não é adicionado ao tamanho do array-pai. Veja no exemplo:
+
+```js
+// criando as linhas: array esparso de 10 posições
+let matriz = new Array(10); 
+for(let i = 0; i < matriz.length; i++){
+    matriz[i] = new Array(5); // criando as colunas
+}
+matriz.length; // => 10
+matriz[0].length; // => 5
+```
 
 ## Objetos 
 
@@ -1200,6 +1419,6 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-7
+7.8.2
 
-pag. 293
+pag. 318
