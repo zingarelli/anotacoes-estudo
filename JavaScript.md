@@ -611,7 +611,7 @@ Para **acessar** elementos: coloque o índice entre colchetes: `arr[2]` irá ace
 
 Para saber o **tamanho** do array, use a propriedade `length`.
 
-- por ser uma propriedade, `length` pode ser manualmente alterado. No entanto, se for colocado um **valor menor** do que o tamanho atual, os elementos após o tamanho atribuído a `length` serão **removidos** e não podem ser recuperados. Se for atribuído um **valor maior**, uma **área esparsa** (índices vazios) será colocada ao final do array até o tamanho atribuído. Isso, no entanto, não é uma prática comum.
+- por ser uma propriedade, `length` pode ser manualmente alterado. No entanto, se for colocado um **valor menor** do que o tamanho atual, os elementos após o tamanho atribuído a `length` serão **removidos** e não podem ser recuperados (o array é "truncado"). Se for atribuído um **valor maior**, uma **área esparsa** (índices vazios) será colocada ao final do array até o tamanho atribuído. Isso, no entanto, não é uma prática comum.
 
 Para **adicionar** elementos: 
 
@@ -620,6 +620,8 @@ Para **adicionar** elementos:
 - `push(novo_elemento)`: adiciona ao **final**;
 
 - `unshift(novo_elemento)`: adiciona ao **início** e reorganiza os índices.
+
+    - Atenção: se você passar mais de um elemento para o unshift (`arr.unshift(val1, val2, ..., valN)`), eles serão inseridos **em ordem** (`[val1, val2, ... valN, ...]`), diferente do que aconteceria se fossem passados individualmente.
 
 Para **remoção**: 
 
@@ -635,13 +637,20 @@ Para **deletar**: use o operador `delete` (exemplo: `delete arr[2]`). Diferente 
 
 ### Alguns métodos úteis
 
-- `splice(indice, quantos, item_1...item_n)`: remove a partir do `indice`, `quantos` itens você informar (`quantos` é opcional). Se informar outros itens (também opcional), splice irá *ADICIONAR* os itens a partir do `indice` e, caso `quantos` for informado, irá antes remover os itens a partir de `indice` para depois adicionar os novos itens. O método retorna um **novo array**;
-
-- `slice(inicial, final)`: faz um recorte; cria um **novo array** com os itens do array em que o método foi invocado, começando a partir do índice `inicial` (inclusivo) até o índice `final` (exclusivo, ou seja, não será incluído no novo array). 
+- `slice(inicial, final)`: faz um recorte; cria um **novo array** com os itens do array em que o método foi invocado, começando a partir do índice `inicial` (inclusivo) até o índice `final` (**exclusivo**, ou seja, não será incluído no novo array). 
 
     - o segundo parâmetro é opcional; caso não seja utilizado, o recorte é feito até o último elemento do array (inclusivo, neste caso);
 
+    - um valor negativo para os argumentos faz com que o recorte comece a partir do **final** do array;
+
     - necessário tomar cuidado quando o array possui objetos, pois o `slice()` faz uma ["shallow copy"](https://developer.mozilla.org/en-US/docs/Glossary/Shallow_copy) do array.
+
+
+- `splice(indice, quantos, item_1...item_n)`: remove a partir do `indice`, `quantos` itens você informar (`quantos` é opcional). O terceiro argumento em diante, também opcional, indica elementos a serem **adicionados** a partir do `indice`, após a remoção. O método **modifica o array** e **também** retorna um **novo array**.
+
+    - observe que `quantos` é diferente do `final` visto em `slice()`: `quantos` especifica o tamanho, a quantidade de elementos a serem removidos.
+
+- `includes(elemento)`: introduzido pelo ES2016, verifica se um elemento se encontra no array e retorna true/false. Se o que você precisa é saber o índice da primeira ocorrência de um elemento, use o método `indexOf(elemento)`;
 
 - reticências (`...`) antes de um array (`...arr`) pode indicar um **spread** ou um **rest**:
 
@@ -670,7 +679,7 @@ O ES6 adicionou dois métodos estáticos para criação de arrays:
 
 `Array.from()`: recebe como primeiro argumento um iterable ou um objeto array-like e retorna um array com os elementos desse objeto. Possui um segundo argumento, opcional, em que você pode passar uma função a ser aplicada em cada elemento para retornar um valor diferente (parecido com um map interno) para aquele elemento.
 
-> Objetos array-like são objetos que possuem uma propriedade de nome `length` e propriedades cujos nomes sejam inteiros - outros nomes são ignorados pelo `Array.from()`.
+> Objetos array-like são objetos que possuem uma propriedade de nome `length` e propriedades cujos nomes sejam inteiros - outros nomes são ignorados pelo `Array.from()`. Apesar de poderem ser usados em funções que aceitam objetos array-like, eles não herdam métodos do `Array.prototype`.
 
 ```js
 Array.from({ length: 4, 0: "foo", 1: 'yummy', 3: true })
@@ -692,7 +701,7 @@ O callback pode ser definido dentro ou fora do loop, mas é uma prática comum f
 
 O `forEach` the um segundo argumento opcional, aqui representado pelo `thisValue`. Ele pode ser utilizado para passar um outro contexto de `this` que a função vai acessar ao ser executada. É mais avançado e não tão comum, e a [MDN tem um exemplo](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach#using_thisarg) de utilização. 
 
-> Diferente dos loops `for` tradicionais, o `forEach` não termina antecipadamente usando o `break`, ou seja, o `forEach` **obrigatoriamente itera sobre todos os elementos**. Se você precisa de um loop que possa terminar antes de chegar ao final, utilize um dos `for` clássicos.
+> Diferente dos loops `for` tradicionais, o `forEach` **não termina antecipadamente** usando o `break`, ou seja, o `forEach` **obrigatoriamente itera sobre todos os elementos**. Se você precisa de um loop que possa terminar antes de chegar ao final, utilize um dos `for` clássicos.
 
 O `forEach()` **ignora (pula) índices inexistentes**, no caso de array esparso. Já o `for/of` **não ignora**, e o acesso a índices inexistentes retorna `undefined`.
 
@@ -735,7 +744,7 @@ soma; // => 13
 
 O método `map()` é parecido com o `forEach()` com algumas diferenças, listadas abaixo. Ele espera uma função como argumento, que é executada para cada elemento do array, com exceção daqueles inexistentes caso seja esparso. Essa função também pode receber os três argumentos `(elemento, indice, arr)`.
 
-- o método **retorna** um novo array com os valores retornados pela função que você criou. Ou seja, sua função deve retornar um valor;
+- o método **retorna um novo array** com os valores retornados pela função que você criou. Ou seja, sua função deve retornar um valor;
 
 - apesar de a função não ser executada em índices inexistentes, o array retornado **também será esparso** do mesmo jeito que o array original.
 
@@ -814,6 +823,22 @@ for(let i = 0; i < matriz.length; i++){
 }
 matriz.length; // => 10
 matriz[0].length; // => 5
+```
+
+Você pode usar o método `flat()` para "achatar" um array de arrays, isto é, para transformá-lo em um único array. O método recebe como argumento o `depth`, ou seja, a profundidade com que o método deve achatar o array, levando em conta que subelementos do array podem conter outros arrays, e assim por diante. Por padrão, o valor é 1. Entenda melhor no exemplo:
+
+```js
+let arr = [1, [2, [3, [4]]]];
+// flat() e flat(1) são a mesma coisa
+arr.flat() // => [1, 2, [3, [4]]]
+arr.flat(1) // => [1, 2, [3, [4]]]
+
+// acessando novos níveis de aninhamento
+arr.flat(2) // => [1, 2, 3, [4]]
+arr.flat(3) // => [1, 2, 3, 4]
+
+// isso não causa erro
+arr.flat(4) // => [1, 2, 3, 4]
 ```
 
 ## Objetos 
@@ -1419,6 +1444,6 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-7.8.2
+8
 
-pag. 318
+pag. 338
