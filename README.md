@@ -2,7 +2,7 @@
 
 Neste repositório eu disponibilizo minhas notas de estudo, separadas por tecnologia. Aqui você encontra informações principalmente em tópicos de Front End, mas também há assuntos mais gerais, como desenvolvimento de carreira e computação em nuvem. 
 
-[Clique aqui](#lista-de-anotações) para ver a lista de tópicos e o link para suas anotações.
+**[Clique aqui](#lista-de-anotações) para ver a lista de tópicos e o link para suas anotações.**
 
 | :placard: Vitrine.Dev |     |
 | -------------  | --- |
@@ -39,9 +39,8 @@ A partir de abril/23 eu comecei a utilizar a [ChatGPT](https://chat.openai.com) 
 
 ## Lista de anotações
 
-Lista em ordem alfabética:
-
 - [Acessibilidade Web](./Acessibilidade.md)
+- [CI/CD](./CI_CD)
 - [Cloud Computing](./Cloud.md)
 - [Desenvolvimento de Carreira](./Desenvolvimento-Carreira.md)
 - [Docker](./Docker.md)

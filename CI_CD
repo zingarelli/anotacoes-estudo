@@ -1,0 +1,98 @@
+# CI/CD e GitHub Actions
+
+Anotações bem breves sobre CI/CD e aplicação de GitHUb Actions para automatização com a Vercel. 
+
+Para algo mais detalhado, veja os dois últimos links listados abaixo.
+
+🎓 Curso Alura: [NextJS: CI e CD para Front-end com o Github Actions](https://cursos.alura.com.br/course/nextjs-ci-cd-front-end-github-actions)
+
+🙏 [Créditos da imagem](https://www.blackduck.com/glossary/what-is-cicd.html)
+
+🗒️ [GitHub Actions Quickstart (em inglês)](https://docs.github.com/en/actions/writing-workflows/quickstart)
+
+🗒️ [Guia Vercel com GitHub Actions (em inglês)](https://vercel.com/guides/how-can-i-use-github-actions-with-vercel)
+
+## Definição
+
+- CI (Continuous Integration): está relacionado às etapas de commit, build e testes da aplicação, ou seja, **tarefas do dia a dia do dev**. Garante que mudanças no código estão de acordo para serem incorporadas ao repositório;
+
+- CD (Continuous Delivery): está relacionado às etapas de release e deploy, ou seja, às **entregas do projeto**. As entregas são feitas de maneira automatizada para diferentes ambientes, seja produção, staging, etc.
+
+São processos de automatização de um projeto. O CI acontece enquanto o código está sendo escrito; o CD acontece após o código estar "completo".
+
+![SVG ilustrando os passos envolvidos em um processo de CI/CD em um ciclo infinito: planejamento, codificação, build, testes contínuos, release, deploy, operação, monitoramento.](https://www.blackduck.com/glossary/what-is-cicd/_jcr_content/root/synopsyscontainer/column_1946395452_co/colRight/image_copy.coreimg.svg/1727199377195/cicd.svg)
+
+## GitHub Actions
+
+O GitHub Actions é uma plataforma criada pelo GitHub para agregar processos de CI/CD ao seu projeto quando hospedado no GitHub.
+
+Você automatiza seus processos por meio dos chamados "workflows". São arquivos YAML em que você define o momento em que o workflow é executado (chamados eventos), as variáveis de ambiente a serem utilizadas, as tarefas a serem realizadas (chamados de jobs), podendo também utilizar tarefas automatizadas pelo próprio GitHub (as actions), etc.
+
+Em seu projeto, os workflows devem ser armazenados na pasta: `.github/workflows`.
+
+🗒️ [Eventos que ativam workflows (em inglês)](https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows)
+
+### Usando GitHub Actions para deploy na Vercel
+
+É possível adicionar tarefas da Vercel ao workflow, personalizando o deploy. Para isso, são necessários alguns passos. O curso mostrou detalhadamente uma forma, mas já é antiga e algumas coisas mudaram. 
+
+Deixo abaixo os links para referência (em inglês) de como é feito hoje em dia, e mais abaixo exemplo de parte de script criado no `package.json` e um arquivo YAML utilizado para o workflow de deploy.
+
+- [Criação do arquivo YAML para o workflow](https://vercel.com/guides/how-can-i-use-github-actions-with-vercel)
+
+- [Criação do VERCEL_TOKEN](https://vercel.com/guides/how-do-i-use-a-vercel-api-access-token)
+
+- [Instalação da Vercel CLI](https://vercel.com/docs/cli): necessária para criar os tokens VERCEL_ORG_ID e VERCEL_PROJECT_ID.
+
+  - uma alternativa é usar o comando `npx vercel link` na pasta do projeto. Quando rodar a primeira vez, dois passos adicionais irão ocorrer: 1. Irá instalar o pacote da Vercel e 2. Irá logar na sua conta Vercel. Após isso, o comando irá rodar e fazer algumas perguntas para configuração do link (é como seu projeto local é linkado com o projeto hospedado na Vercel). Finalizado, será criada a pasta `.vercel` e dentro dela você encontrará o `projectId` e `orgId` no arquivo `project.json`. Essa pasta é automaticamente adicionada ao gitignore. **NÃO compartilhe essa pasta nem os valores dos tokens** para evitar acesso indevido ao seu projeto.
+
+- [Criação de secrets no GitHub](https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions#creating-secrets-for-a-repository): é aqui que você vai guardar os tokens gerados, evitando expô-los nos seus arquivos.
+
+#### Scripts package.json
+
+```json
+"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "lint:fix": "next lint --fix",
+  "deploy:prod": "npm run build && vercel --yes --prod --token=$VERCEL_TOKEN"
+}
+```
+
+#### Arquivo yml
+
+```yml
+# nome para o workflow
+name: 'CD: Main Workflow'
+
+# variáveis de ambiente 
+# (salvas no GitHub Secrets)
+env:
+  VERCEL_TOKEN: '${{ secrets.VERCEL_TOKEN }}'
+  VERCEL_ORG_ID: '${{ secrets.VERCEL_ORG_ID }}'
+  VERCEL_PROJECT_ID: '${{ secrets.VERCEL_PROJECT_ID }}'
+
+# workflow acionado em eventos de push
+# nas branches main e cd-vercel
+on:
+  push:
+    branches: [main, cd-vercel]
+
+# o que deve ser executado
+jobs:
+  deploy: # nome deste job
+    runs-on: ubuntu-latest # máquina virtual
+    
+    # adicione - para indicar lista de passos
+    steps:      
+      - uses: actions/checkout@v3
+
+      - name: Run Install
+        run: npm install
+
+      # script criado no package.json
+      - name: Run Deploy      
+        run: npm run deploy:prod
+```
