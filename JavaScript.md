@@ -474,6 +474,22 @@ console.log(`O resultado de ${num1} + ${num2} é ${resultado}`);
 
 ## Funções
 
+São blocos de código que podem ser executados quantas vezes quiser. 
+
+- **executar** uma função, **invocar** uma função, **chamar** uma função, **rodar** uma função... são todos **sinônimos** e significa executar o bloco código definido na função.
+
+Quando uma função é definida em um **objeto como propriedade**, ela ganha o nome de **método**. Quando uma função é definida para **inicializar um novo objeto**, ela é chamada de **construtora**.
+
+> Leia mais sobre [Objetos](#objetos) e [Classes](#classes).
+
+Quando passamos uma **função como argumento para outra função** (ouviremos bastante sobre isso quando tratamos sobre JS assíncrono), podemos chamá-la de **callback**. Se a função é definida fora, passamos *somente o nome da função, sem os ()*, para evitar que ela seja imediatamente executada;
+
+Lembre-se que durante o [hoisting](#hoisting), funções são "elevadas" para o topo do bloco de código em que se encontram, e por isso **podem ser invocadas antes de serem declaradas** (com **exceção** das expressões de função e arrow functions, explicadas mais pra frente).
+
+**Curiosidade:** funções são tipos especializados de objetos, então elas **podem ter propriedades definidas dentro delas**. Isso possibilita armazenar valores dentro da função que se mantenham, mesmo após outra invocação. Da mesma forma, essas propriedades podem ser acessadas e manipuladas via código. Por exemplo, podemos criar uma propriedade de "cache" que armazena resultados de chamadas anteriores da função, e utilizar esse cache para retornar um resultado ao invés de computá-lo novamente.
+
+### Declaração
+
 Esqueleto de uma função:
 
 ```js
@@ -483,28 +499,43 @@ function nome(param_a, param_b, ...) {
 }
 ```
 
-- parâmetros e retorno são opcionais
+Parâmetros e retorno são **opcionais**:
 
-    - **parâmetro** é o nome dado quando você **DECLARA** a função; **argumento** é o nome dado quando você **INVOCA** a função;
-        
-        - "A função recebe como parâmetro..."
-        
-        - "Você passa à função como argumento...";
+- **parâmetro** é o nome dado quando você **DECLARA** a função; **argumento** é o nome dado quando você **INVOCA** a função;
+    
+    - "A função recebe como parâmetro..."
+    
+    - "Você passa à função como argumento...";
 
-    - parâmetros podem ter valor padrão (estilo Python); isso foi implementado a partir do ES6;
+- parâmetros podem ter valor padrão (estilo Python); isso foi implementado a partir do ES6;
 
-    - o objeto `arguments` pode ser acessado dentro da função e traz, dentro de um array, todos os argumentos que a função recebeu;
+- o objeto `arguments` pode ser acessado dentro da função e traz, dentro de um array, todos os valores dos argumentos que a função recebeu (ou seja, você acessa os valores pela posição, e não pelo nome do argumento). Essa é uma abordagem antiga e, a partir do ES6, você pode ao invés disso optar pelo rest parameters (ver abaixo);
 
-    - se a função não tiver um `return`, ao ser chamada ela irá retornar `undefined`.
+- os parâmetros se comportam como variáveis locais dentro do corpo da função;
 
-Quando a função é **atribuída a uma variável** (chamado de "função de expressão"), o nome da função é opcional, e torna-se o que se chama no JavaScript de "função anônima":
+- se a função não tiver um `return`, ao ser chamada ela irá retornar `undefined`.
+
+Quando uma função é invocada com um número de argumentos **menor** do que o número de parâmetros esperados, os parâmetros  que não receberam valor serão `undefined`.
+
+Quando uma função é invocada com um número de argumentos **maior** do que o número de parâmetros esperados, os parâmetros adicionais podem ser acessados pelo objeto `arguments` explicado acima. Se você não sabe quantos parâmetros sua função espera receber, pode usar o chamado **"rest parameters"** (ES6), isto é, definir um parâmetro no final, precedido de `...`: `function soma(val1, val2, ...outrosVal)`. Este parâmetro é **um array que contém os outros parâmetros recebidos**.
+
+- cuidado para não confundir o [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) (que "ajunta" os parâmetros em um array) com o [spread operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) (que "desempacota" os valores de um array). O primeiro pode ser útil na definição de uma função, enquanto o segundo pode ser útil na invocação de uma função.
+
+### Expressões de função e função anônima
+
+Quando a função é **atribuída a uma variável** ou como **argumento de outra função**, a chamamos de "expressão de função" - function expression. O nome da função é opcional (quando omitido, também podemos chamar de "função anônima"):
 
 ```js
-var soma = function() { 
+const soma = function() { // nome é opcional
     return 1 + 2; 
 }; 
 // para chamar a função, use soma();
 ```
+
+Uma boa prática é declarar a variável com `const`, para evitar sobrescrevê-la acidentalmente com outro valor.
+
+> O **hoisting não ocorre** em expressões de função, ou seja, não podem ser usadas antes de serem definidas.
+
 ### IIFE
 
 Uma função pode ser **autoinvocável** (IIFE: Immediately Invoked Function Expression): declare-a (anônima ou não) dentro de parênteses, seguido de `(parâmetros_opcionais)`;
@@ -515,39 +546,81 @@ Uma função pode ser **autoinvocável** (IIFE: Immediately Invoked Function Exp
 })();
 ```
 
-### Callback
-
-Nome dado quando passamos uma **função como argumento para outra função** (ouviremos bastante sobre isso quando tratamos sobre JS assíncrono); é passado *somente o nome da função, sem os ()*, senão ela será executada;
-
 ### Funções e o `this`
 
-Funções `call()` e `apply()`: quando uma função usa o `this`, você usa o `call`/`apply` para passar o `this` para a função; no `call`, outros argumentos são passados separado por vírgulas, e no `apply` você passa os outros argumentos dentro de um array 
+No JS, o `this` é uma referência ao contexto de execução de um bloco código. Quando uma função é invocada, o valor do this é:
 
-- Sim... é complicado de entender.... E tem também o `bind()`, que clona a função e você pode alterar o `this` dentro dela como argumento...
+- o objeto global (modo não restrito - non-strict mode);
 
-Vamos tentar novamente:
+- undefined (modo restrito - strict mode).
 
-- `call()` invoca uma função; o primeiro parâmetro é o `this` que será utilizado como contexto (por exemplo, um objeto); o segundo parâmetro em diante são os argumentos a serem passados para função invocada.
+No entanto, temos exceções:
 
-- `apply()` também invoca uma função, semelhante a `call()`, com o primeiro parâmetro sendo o `this` e o segundo sendo um **array** com os argumentos da função invocada.
+- [Arrow function](#arrow-function): herda o `this` do escopo em que foi definida;
 
--  com o `bind()` você cria uma função `x` baseada em outra função `y`, chamando o `bind()` em `y` para anexar o contexto que será utilizado quando a função for executada (`bind()` recebe como parâmetro o `this`); é um objeto emprestar o método de outro objeto. 
+- Métodos: acessam o `this` do objeto em que foram definidas. Conceito de programação orientada a objetos.  
+
+    - entretanto: funções aninhadas **não** herdam o `this` da sua função pai; então, se um método possui uma função aninhada, esta não terá acesso ao `this` do objeto, mas sim ao `this` do objeto global ou undefined (modos não restrito e restrito, respectivamente).
+
+#### `bind()`, `call()` e `apply()`
+
+Uma maneira de passar um `this` específico para uma função é por meio do métodos `bind()`, `call()` e `apply()`, vindos do prototype de `Function`.
+
+Os métodos `call()` e `apply()` fazem uma "invocação indireta" de uma função: você usa o `call`/`apply` para invocar a função e passar o `this` para ela. A diferença entre os dois é na forma como você para os argumentos para eles:
+
+- `call()`: o primeiro parâmetro é o `this` que será utilizado como contexto (por exemplo, um objeto); os **parâmetros seguintes** são os argumentos a serem passados como parâmetros para a função invocada;
+
+- `apply()`: o primeiro parâmetro é o `this` e o **segundo parâmetro é um array** com os argumentos a serem passados como parâmetro para a função invocada.
+
+---> melhorar essa parte
+
+Com o `bind()` você cria uma função `x` baseada em outra função `y`, chamando o `bind()` em `y` para anexar o contexto que será utilizado quando a função for executada (`bind()` recebe como parâmetro o `this`); é um objeto emprestar o método de outro objeto. 
 
 - São formas de usar o `this` como referência a um objeto dentro do escopo de funções. O `bind()` não executa imediatamente, enquanto `call()` e `apply()` sim.
 
+<--- melhorar essa parte
+
 - O W3Schools possui bons artigos explicando [call](https://www.w3schools.com/js/js_function_call.asp), [apply](https://www.w3schools.com/js/js_function_apply.asp) e [bind](https://www.w3schools.com/js/js_function_bind.asp), incluindo exemplos que podem ser testados online.
+
+#### Method chaining
+
+Quando você define um método e faz ele retornar o `this`, é possível criar o chamado "method chaining" ou cadeia de métodos, em que, de um mesmo objeto, um método pode invocar outro método e assim por diante. Esse processo é algo utilizado, por exemplo, pela biblioteca de visualização de dados [D3](https://d3js.org/).
+
+Operações que trabalham com [Promises](#promise) também são um exemplo de method chaining:
+
+```js
+getDadosAssincronos()
+    .then(fazAlgumaCoisa)
+    .then(fazOutraCoisa)
+    .catch(lidaComErros);
+```
+
+> O termo "method chaining" foi cunhado por Martin Fowler.
 
 ### Arrow function 
 
-São anônimas e também podem ser atribuídas a uma variável
+São funções anônimas e também podem ser atribuídas a uma variável. É uma maneira compacta de declarar uma função.
    
 ```js
-var soma = () => { 
-    return 1 + 2; 
+// a arrow function pode ser criada assim...
+const soma = (x, y) => { 
+    return x + y; 
 };
+
+// ... ou de uma forma ainda mais compacta
+// - sem parênteses caso seja somente um parâmetro
+// - sem return ou {} caso o retorno seja uma única
+// expressão e na mesma linha
+const quadrado = x => x * x; 
+
+// se o retorno for um objeto, e seja retornado
+// em uma única linha, obrigatório inserir o
+// parênteses no retorno para evitar ambiguidade 
+// com a abertura de um bloco de código.
+const objeto = () => ({ mensagem: 'Olá mundo' });
 ```
 
-- os argumentos e a "flecha" (`() =>`) precisam estar na **mesma linha**;
+- os parênteses e a "flecha" (`() =>`) precisam estar na **mesma linha**;
 
 - tem muito mais detalhes; ver a documentação: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions#syntax
 
@@ -555,11 +628,47 @@ var soma = () => {
 
 - `call()`, `apply()` e `bind()` **não irão** funcionar;
 
-- **não possui** this -> ela **herda automaticamente o contexto** de onde foi criada; 
+- **não possui** `this` próprio: ela **herda o valor do `this` do contexto** em que foi definida; 
 
-- arrow function e funções anônimas não são "hoisted", ou seja, são interpretadas no momento da sua execução, não podendo ser utilizadas antes de serem declaradas;
+- não é "hoisted", ou seja, são interpretadas no momento da sua execução, não podendo ser utilizadas antes de serem declaradas;
 
 - é **melhor usar const** ao atribuir uma arrow function a uma variável, já que o retorno dessa função é um valor constante;
+
+- são muito úteis para definição de uma função callback (função passada como argumento para outra função).
+
+## Closure
+
+[Explicação MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures)
+
+Conceito importante no JS e em outras linguagens. Uma closure é a combinação de uma função e seu escopo léxico (o contexto em que a função foi definida). 
+
+O **escopo léxico** se refere a como o interpretador do JS determina **onde uma variável pode ser acessada**, com base no local em que ela foi definida. Nesse caso, o escopo da variável é determinado no momento em que ela é **declarada**. 
+
+Em outras palavras, **uma closure é a combinação de uma função e as variáveis que ela tem acesso** no contexto em que ela está cercada (uma tradução para closure pode ser "fechamento"). No JS, o escopo das variáveis de uma closure é baseado em onde a função é **definida**, e não onde ela é executada - e isso faz muita diferença.
+
+De maneira prática, isso explica porque funções aninhadas têm acesso às variáveis da função externa (a "função-pai"), e preservam esse acesso mesmo depois que a função externa tenha terminado. 
+
+Suponha que uma função `A` retorna um função interna `B`, que faz uso de variáveis definidas em `A`. Quando você chama `let X = A()` e daí executa `X()`, a função `B` será executada e ainda terá acesso às variáveis definidas em A, mesmo que a função A já tenha sido executada. Internamente, é como se `B` se "lembrasse" das variáveis de seu escopo externo, criando um ambiente fechado em que `B` ainda pode utilizar essas variáveis.
+
+```js
+let scope = 'escopo externo';
+function funcaoExterna() {
+    let scope = 'escopo interno';
+    function funcaoInterna() { 
+        return scope; // 'escopo interno' 
+    }
+    return funcaoInterna;
+}
+
+// estamos executando a função e atribuindo o
+// retorno (que é outra função) a uma variável.
+let myScope = funcaoExterna(); 
+
+// funcaoInterna vai ser executada, mas ela se 
+// lembra do escopo em que foi DEFINIDA (ou seja, 
+// a variável scope definida internamente)
+myScope(); // 'escopo interno'
+```
 
 ## Arrays
 
@@ -1444,6 +1553,5 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-8
-
-pag. 338
+8.6
+pag. 376
