@@ -636,13 +636,15 @@ const objeto = () => ({ mensagem: 'Olá mundo' });
 
 - são muito úteis para definição de uma função callback (função passada como argumento para outra função).
 
-## Closure
+### Closure
 
-[Explicação MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures)
+🗒️ [Explicação MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures)
+
+🗒️ [Explicação CodeInfinity](https://codefinity.com/blog/JavaScript-Closures)
 
 Conceito importante no JS e em outras linguagens. Uma closure é a combinação de uma função e seu escopo léxico (o contexto em que a função foi definida). 
 
-O **escopo léxico** se refere a como o interpretador do JS determina **onde uma variável pode ser acessada**, com base no local em que ela foi definida. Nesse caso, o escopo da variável é determinado no momento em que ela é **declarada**. 
+O **escopo léxico** se refere a como o interpretador do JS determina **onde uma variável pode ser acessada**, com base no local em que ela foi definida (o nome que foi dado a ela e o valor associado). Nesse caso, o escopo da variável é determinado no momento em que ela é **declarada**. 
 
 Em outras palavras, **uma closure é a combinação de uma função e as variáveis que ela tem acesso** no contexto em que ela está cercada (uma tradução para closure pode ser "fechamento"). No JS, o escopo das variáveis de uma closure é baseado em onde a função é **definida**, e não onde ela é executada - e isso faz muita diferença.
 
@@ -669,6 +671,56 @@ let myScope = funcaoExterna();
 // a variável scope definida internamente)
 myScope(); // 'escopo interno'
 ```
+
+Quando uma função é executada e utiliza uma variável, esta variável **primeiro é procurada em seu escopo léxico local**. Caso não seja encontrada, ela é procurada um nível acima e assim por diante até encontrar a variável ou jogar um erro. É por isso que no exemplo acima o valor retornado por `myScope()` é o valor da variável `scope` definido em `funcaoExterna()`.
+
+#### Em outras palavras...
+
+Uma **função definida dentro de outra função** tem **acesso às variáveis da função externa** e pode manipulá-las. Isso é uma **closure**. 
+
+Indo além, se essa função interna é **retornada pela externa**, a função interna mantém uma referência às variáveis da função externa, mesmo após a invocação dessa função externa. A função interna tem seu **próprio "ambiente" em que essas variáveis existem**.
+
+> Lembre-se: quando uma função é invocada e termina sua execução, a grosso modo, ela deixa de existir. Ou seja, suas variáveis também deixam de existir. No entanto, devido à característica de uma closure, funções internas ainda "se lembram" do escopo da função externa, mesmo se a função externa deixou de existir.
+
+O mesmo é verdadeiro caso a função externa tenha **mais de uma função interna** e retorne elas em um objeto, por exemplo - neste caso, **cada função** interna continua tendo acesso às variáveis, **compartilhando um mesmo escopo**.
+
+- **cada invocação** da função irá criar um **novo escopo** para as funções internas retornadas, ou seja, o escopo **não** é compartilhado entre invocações. Veja o exemplo:
+
+```js
+function contador() {
+    let i = 0;
+    return {
+        incrementa: () => { return i++; },
+        reset: () => { i = 0; }
+    }
+}
+
+// a e b possuem escopos independentes
+let a = contador(); b = contador();
+a.incrementa(); // 0
+b.incrementa(); // 0
+
+// o reset de b não influencia a
+b.reset(); 
+a.incrementa(); // 1
+
+// mas o reset() e incrementa() de a 
+// compartilham do mesmo escopo
+a.reset(); 
+a.incrementa(); // 0
+```
+
+#### Vantagens
+
+Uma das vantagens de closures é possibilitar que funções tenham **"estados privados"**, isto é, variáveis que somente a função tem acesso. Conseguimos isso criando uma função que possui variáveis locais e retorna outra função que manipula essas variáveis. Assim, encapsulamos essas variáveis locais, impedindo seu acesso imediato, bem como uma manipulação maliciosa destes dados, possibilitando o acesso, por exemplo, por meio de getters e setters. Esse entendimento se aproxima de conceitos de OOP.
+
+Por manter estados privados dentro da função, podemos criar funções com características de cache, isto é, podemos armazenar informações dentro da função (resultados de chamadas anteriores, por exemplo) e utilizá-las para retornar dados sem necessariamente computá-los novamente, o que otimiza a performance. Isso é chamado de **memoização**.
+
+#### Closures e o `this`
+
+Lembre-se que somente as arrow functions herdam o valor  do `this` no escopo em que foram definidas. Então, se a sua closure necessitar do valor do `this`, use uma arrow function. 
+
+Caso não utilize arrow function, lembre-se de chamar o `bind()` na função para atrelar o `this` a ela, ou crie alguma estratégia que compartilhe o `this` (por exemplo, criar uma variável na função externa e atribuir o `this` a essa variável). 
 
 ## Arrays
 
