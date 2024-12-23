@@ -14,7 +14,7 @@ Site para a documentação oficial: https://www.typescriptlang.org/docs/.
 
 # TypeScript
 
-É uma **linguagem** e também uma **camada adicional** ao JavaScript (chamam também de "superset" do JS), que dá ao JS um sistema de tipos para as variáveis. Com o TS, haverá uma compilação do código, já informando ao programador qualquer erro de tipagem que for encontrado. Sem o TS, erros de tipagem apareceriam somente em tempo de execução, ou seja, após o código ter sido deployado (imagine descobrir esse erro somente em produção). 
+É uma **linguagem** e também uma **camada adicional** ao JavaScript (chamam também de "superset" do JS), que dá ao JS um sistema de tipos para as variáveis, uma tipagem estática e previsível. Com o TS, haverá uma compilação do código, já informando ao programador qualquer erro de tipagem que for encontrado. Sem o TS, erros de tipagem apareceriam somente em tempo de execução, ou seja, após o código ter sido deployado (imagine descobrir esse erro somente em produção). 
 
 TS foi desenvolvido e é mantido pela Microsoft, por isso ele possui uma ótima integração com o VS Code (autocomplete, ajudas e avisos de erros em tempo de desenvolvimento). 
 
@@ -24,15 +24,25 @@ O framework Angular utiliza o TS por padrão. Além disso, é possível utilizar
 
 Arquivos TypeScript possuem a extensão `.ts` (ou `.tsx`, se você quiser sinalizar que seu código retorna JSX).
 
-**Vantagem**: garantir que os tipos certos estejam sendo utilizados nas variáveis, evitando erros em operações e facilitando na manutenção do código (ao saber exatamente o que uma função, objeto, etc, aceita como parâmetro, propriedade, etc). Ela também pode obrigar que as variáveis sejam inicializadas com algum valor.
+**Vantagem**: garantir que os tipos certos estejam sendo utilizados nas variáveis, evitando erros em operações e facilitando na manutenção do código (ao saber exatamente o que uma função, objeto, etc, aceita como argumento, propriedade, etc). Ela também pode obrigar que as variáveis sejam inicializadas com algum valor.
 
-**Desvantagem**: adiciona um tempo de compilação ao deploy do código; aumenta a complexidade do código. 
+**Desvantagem**: adiciona um tempo de compilação ao deploy do código; aumenta a complexidade do código; tem uma curva de aprendizado.
 
 ## Instalando o TypeScript
 
-Utilize o comando abaixo para instalar o TypeScript (versão 4.2.2) em um ambiente de desenvolvimento:
+Utilize o comando abaixo para instalar o TypeScript standalone(versão 4.2.2) em um ambiente de desenvolvimento (não será instalado em produção):
 
     npm install typescript@4.2.2 --save-dev
+
+### Compilação
+
+Para compilar um arquivo `.ts` manualmente, utilizamos o comando
+
+    tsc <nome_do_arquivo>.ts
+
+Se não houver erros de compilação, isso irá gerar como saída um arquivo com a extensão `.js`, transformando o código TS em JS, que pode ser então executado.
+
+Podemos também automatizar com um arquivo [`package.json`](#arquivo-packagejson).
 
 ### Arquivo `tsconfig.json`
 
@@ -485,7 +495,7 @@ Quando um objeto "extende" de outro, ele também pode assumir o tipo de sua clas
 
 Uma interface é criada com a palavra chave `interface`. Nela, podemos informar propriedades e seus tipos. No entanto, **não podemos** atribuir valores, nem usar modificadores nas propriedades e nem definir implementações a ela.
 
-A interface pode ser utilizada para **tipar** uma variável que seja um objeto. Uma vantagem é que haverá autocomplete das propriedades que ela possui, e será informado erro caso o nome da propriedade seja digitado errado. Além disso, facilita a renomeação de uma propriedade (no VS Code, utlizando a tecla `F2` fará com que a propriedade seja automaticamente renomeada onde ela for chamada no código).
+A interface pode ser utilizada para **tipar** um objeto. Uma vantagem é que haverá autocomplete das propriedades que ela possui, e será informado erro caso o nome da propriedade seja digitado errado. Além disso, facilita a renomeação de uma propriedade (no VS Code, utlizando a tecla `F2` fará com que a propriedade seja automaticamente renomeada onde ela for chamada no código).
 
 ### Interfaces e API
 
@@ -537,6 +547,81 @@ Uma classe **pode implementar mais de uma interface**. Isso, no entanto, não é
 **Pergunta**: o arquivo JS gerado é somente uma linha de código `export {};`. Por quê?
 
 **Resposta**:  em TS, as interfaces não geram código em tempo de execução. Elas são apenas uma forma de definir a estrutura dos objetos em TS, mas não são convertidas em código JS. Basicamente, o export {}; é uma instrução que informa ao compilador que esse arquivo é um módulo válido e pode ser importado por outros arquivos, mesmo que não haja nenhum outro tipo ou declaração nele. É o funcionamento interno do TS para lidar com interfaces e permitir que elas funcionem na conversão para JS.
+
+### `interface` ou `type`
+
+Outra maneira de tipagem é por meio de um "type alias", isto é, um nome para **identificar um tipo** que criamos e queremos **reusar**. Para isso, basta usar a palavra-chave `type`, dar um nome ao tipo e então definir este tipo.
+
+```ts
+// criando um tipo para um objeto e dando a
+// este tipo o nome "Point"
+type Point = {
+    x: number;
+    y: number;
+}
+
+// criando um tipo que aceita string ou número
+type ID = string | number;
+
+// utilizando os tipos criados
+const myPoint: Point = { x: 10, y: 5 };
+const myId: ID = '11259333663';
+```
+
+**Qual escolher: `type` ou `interface`?**
+
+Ambos são semelhantes e, na maioria dos casos, você **escolhe baseado em sua preferência pessoal**. Há, no entanto, algumas diferenças entre eles, a começar pela sintaxe de criação. Este [artigo no StackOverflow](https://stackoverflow.com/questions/37233735/interfaces-vs-types-in-typescript/52682220#52682220) tem uma explicação bem detalhada e com exemplos. Há também explicação do [próprio handbook do TypeScript](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces).
+
+> O Handbook do TypeScript tende a favorecer o uso de `interface`.
+
+Aqui seguem duas diferenças importantes:
+
+1. ambos podem ser estendidos, mas a sintaxe muda: 
+
+    - `interface` usa a palavra-chave `extends`; 
+    
+    - type alias utiliza `&` (interseção);
+
+2. interfaces podem ser definidas múltiplas vezes e suas definições são **agregadas** (são adicionadas às definições anteriores). Já **type alias não** possibilita isso e irá gerar um erro se você tentar defini-lo outra vez.
+
+```ts
+interface Animal {
+    nome: string;
+}
+
+type Veiculo = {
+    marca: string;
+}
+
+// estendendo uma interface
+interface Vaca extends Animal {
+    mugir(): string;
+}
+
+// estendendo um type alias
+type Carro = Veiculo & {
+    qtdPortas: number;
+}
+
+// posso adicionar novos campos à interface 
+// definindo ela novamente (aglutinação)
+interface Animal {
+    especie: string;
+}
+
+// o objecto cachorro agora reflete ambas
+// as definições inseridas em Animal
+const cachorro: Animal = {
+    nome: 'Charlotte',
+    especie: 'cão'
+}
+
+// tentar redefinir um type gera erro:
+// Error: Duplicate identifier 'Veiculo'.
+type Veiculo = {
+    modelo: string;
+}
+```
 
 ## Enumerações (`enum`)
 
