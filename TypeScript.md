@@ -14,7 +14,7 @@ Site para a documentação oficial: https://www.typescriptlang.org/docs/.
 
 # TypeScript
 
-É uma **linguagem** e também uma **camada adicional** ao JavaScript (chamam também de "superset" do JS), que dá ao JS um sistema de tipos para as variáveis, uma tipagem estática e previsível. Com o TS, haverá uma compilação do código, já informando ao programador qualquer erro de tipagem que for encontrado. Sem o TS, erros de tipagem apareceriam somente em tempo de execução, ou seja, após o código ter sido deployado (imagine descobrir esse erro somente em produção). 
+É uma **linguagem** e também uma **camada adicional** ao JavaScript (chamam também de "superset" do JS), que dá ao JS um sistema de tipos para as variáveis, uma tipagem estática e previsível. Com o TS, haverá uma **compilação do código**, já informando ao programador qualquer erro de tipagem que for encontrado. Sem o TS, erros de tipagem apareceriam somente em tempo de execução, ou seja, após o código ter sido deployado (imagine descobrir esse erro somente em produção). 
 
 TS foi desenvolvido e é mantido pela Microsoft, por isso ele possui uma ótima integração com o VS Code (autocomplete, ajudas e avisos de erros em tempo de desenvolvimento). 
 
@@ -40,15 +40,17 @@ Para compilar um arquivo `.ts` manualmente, utilizamos o comando
 
     tsc <nome_do_arquivo>.ts
 
-Se não houver erros de compilação, isso irá gerar como saída um arquivo com a extensão `.js`, transformando o código TS em JS, que pode ser então executado.
+Isso irá gerar como saída um arquivo com a extensão `.js`, transformando o código TS em JS, que pode ser então executado por navegadores ou pelo node. Se houver erros na compilação, eles serão exibidos na tela.
 
 Podemos também automatizar com um arquivo [`package.json`](#arquivo-packagejson).
 
 ### Arquivo `tsconfig.json`
 
-Neste arquivo podemos adicionar configurações sobre como o TypeScript irá se comportar, podendo deixá-lo mais "flexível" ou restritivo.
+Neste arquivo podemos adicionar configurações sobre como o TypeScript irá se comportar e como irá lidar com os arquivos, podendo deixá-lo mais "flexível" ou mais restritivo.
 
-Segue exemplo do `tsconfig.json` com configurações a respeito de onde encontrar os códigos para compilação e onde deve ser salva a saída.
+Existem inúmeras possibilidades de configuração. A documentação tem uma [listagem de todas elas](https://www.typescriptlang.org/tsconfig/), com detalhes e exemplos. No GitHub, a comunidade também mantém alguns [templates pré-configurados](https://github.com/tsconfig/bases/?tab=readme-ov-file) para determinados projetos, permitindo que você estenda a partir deles e modifique por meio das suas configurações particulares (a [documentação](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html#tsconfig-bases) explica como fazer isso).
+
+Segue exemplo simples de um `tsconfig.json` com configurações a respeito de onde encontrar os códigos para compilação e onde deve ser salva a saída. Cada chave nesses objetos de configuração também podem ser usados como flags caso você esteja compilando usando o `tsc` via linha de comando.
 
 ```ts
 {
@@ -58,6 +60,7 @@ Segue exemplo do `tsconfig.json` com configurações a respeito de onde encontra
         "outDir": "dist/js",
 
         // versão do ECMASCRIPT que será utilizada para conversão para JS
+        // hoje em dia, a maioria dos navegadores já utilizan essa versão
         "target": "ES6",
     }, 
 
@@ -107,13 +110,24 @@ Com isso, `npm start` irá rodar os dois comandos. Isso só funciona se nas suas
 
 ## Tipagem
 
-No TS, caso você não informe de qual tipo é a variável, ele implicitamente irá considerá-la por padrão como `any`, ou seja, qualquer coisa. Isso pode ser desativado incluindo a seguinte entrada no `compilerOptions` do `tsconfig.json`: 
+No TS, caso você não informe de qual tipo é a variável, ele irá tentar inferir seu tipo com base no valor atribuído à variável. Caso não consiga fazer isso, ele irá considerá-la como `any`, ou seja, qualquer coisa. Isso pode ser desativado incluindo a seguinte entrada no `compilerOptions` do `tsconfig.json`: 
 
     "noImplicitAny": true
     
-Isso deixa o compilador do TS mais **rígido** ao avaliar o código.
+Isso deixa o compilador do TS mais **rígido** ao avaliar o código. Caso uma variável não tenha um tipo definido, o TS irá emitir um erro ao invés de considerá-la `any`.
 
-**Para tipar** suas variáveis/parâmetros/propriedades, você digita **`nomeDaVariavel: tipo`**. Os tipos podem ser os já conhecidos de JS (`Date`, `number`, etc.), mas também podem ser tipos do HTML (`HTMLElement`, `HTMLInputElement`, etc.). Exemplo tipando os parâmetros de um constructor:
+> O `any` é um tipo do TS usado quando você não quer que seja feita a checagem de tipo. Acaba fazendo com que o TS não sirva para nada neste caso, pois ele não irá verificar possíveis erros. Portanto, evite seu uso.
+
+**Para tipar** suas variáveis/parâmetros/propriedades, você digita **`nomeDaVariavel: tipo`**. Isso é chamado de "type annotation". Os tipos podem ser os já conhecidos de JS (`Date`, `number`, etc.), mas também podem ser tipos do HTML (`HTMLElement`, `HTMLInputElement`, etc.). 
+
+Um exemplo simples (e talvez ineficiente, já que o TS implicitamente conseguiria inferir o tipo destas variáveis por meio do valor da inicialização; valeria mais a pena se o tipo fosse mais complexo, como será visto mais adiante):
+
+```js
+let nomeCliente: string = 'Matheus';
+const dataCompra: Date = Date.now();
+```
+
+Exemplo tipando os parâmetros de um constructor:
 
 ```ts
 constructor(data: Date, quantidade: number, valor:number) { ... }
@@ -125,7 +139,7 @@ Exemplo tipando uma variável privada:
 private _inputData: HTMLInputElement;
 ```
 
-É possível também **tipar o retorno dos métodos** (porém, não é obrigatório):
+É possível também **tipar o retorno de funções/métodos** (porém, não é obrigatório):
 
 ```ts
 //função que não retorna nada
@@ -145,14 +159,14 @@ criaNegociacao(): NomeDeUmaClasse { ... }
 
 ### Tipagem de `Array`
 
-É possível utilizar `Array` na tipagem, mas neste caso seu array **precisa ter um tipo** (suporte ao `Generics`) É denominado `Array<T>` (diamante T), em que o `T` significa o tipo do array e é somente uma convenção, poderia ser chamado de `K`, `D`, etc.
+É possível utilizar `Array` na tipagem, mas neste caso seu array **precisa ter um tipo** (suporte ao `Generics`) É denominado **`Array<T>` **(diamante T), em que o `T` significa o tipo do array e é somente uma convenção, poderia ser chamado de `K`, `D`, etc.
 
 ```ts
 private _listaNegociacoes: Array<Negociacao> = [];
 private _listaDeFrutas: Array<string> = [];
 ```
 
-Também é possível declarar de forma mais simplificada (syntax sugar): 
+Também é possível declarar de **forma mais simplificada** (syntax sugar): 
 
 ```ts
 private _listaNegociacoes: Negociacao[] = [];
@@ -189,7 +203,7 @@ Em funções em geral, é possível tipar cada **parâmetro** e também seu **re
 
 Em funções mais complexas, é recomendável tipar o retorno para **deixar o código mais claro e legível**, além de auxiliar em **verificar erros e inconsistências**, pois o TS saberá de antemão o que a função pode retornar e se seu retorno é compatível com a atribuição de uma variável, por exemplo.
 
-Exemplo criado pela ChatGPT:
+Exemplo criado pela ChatGPT (a tipagem do retorno está aqui para exemplificar; na prática, não seria necessária, pois o TS consegue inferir o retorno baseado no tipo dos parâmetros e na operação):
 
 ```ts
 // o tipo após o parênteses é para tipar o retorno da função
@@ -344,7 +358,7 @@ constructor(
 
 Caso a classe possua outras propriedades, mas que não são passadas para o construtor, é possível declará-las do modo convencional.
 
-## Parâmetros opcionais
+## Parâmetros e propriedades opcionais
 
 No TS, as funções podem ter parâmetros opcionais, ou seja, elas podem ser invocadas sem alguns parâmetros. Para indicar que um parâmetro é opcional, você coloca `?` depois do nome do parâmetro (`param?: tipo`):
 
@@ -366,6 +380,8 @@ if (typeof(num3) !== 'undefined') {
 }
 // ...
 ```
+
+> O mesmo vale para **tipagem de propriedades opcionais de um objeto**. Para indicar propriedades opcionais, adicione `?`após o nome da propriedade. Vale a mesma recomendação sobre a verificação da propriedade ser `undefined` antes de ser acessada.
 
 ## Herança no TS
 
@@ -1301,3 +1317,7 @@ Outra convenção é criar a pasta `types` para guardar as tipagens comuns entre
 ## Responsabilidade por retorno nulo
 
 Quando usamos a exclamação (`!`) logo após o nome de uma variável (`let birthday = userInput!`) ou chamada de uma função que pode retornar nulo (`let birthday = getBirthday()!`), estamos garantindo ao TS (e nos responsabilizando) que aquela função **não** retornará nulo. Dessa forma, o TS irá ignorar o possível erro que isso poderia causar durante a compilação. É uma forma de forçar o TS a aceitar uma situação que poderia ocasionar em retorno de null. Deve ser usado com parcimônia.
+
+# Continuar em
+
+https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#union-types
