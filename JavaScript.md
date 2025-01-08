@@ -31,6 +31,8 @@ Complementos a essas anotações foram feitas utilizando como referência o livr
 
 ## Introdução
 
+> 👉 A W3Schools possui uma seção que aborda os **recursos (features) introduzidos em cada versão** do ECMAScript. É uma referência importante para saber o que há de disponível por versão, caso você trabalhe em projetos antigos. [Clique aqui para ver](https://www.w3schools.com/js/js_versions.asp).
+
 O JavaScript (JS) é **baseado no ECMAScript** (ES), que por sua vez é uma linguagem de programação baseada em scripts padronizada pela Ecma International na especificação ECMA-262.
 
 - JavaScript, ActionScript, JScript seguem os padrões da ECMAScript, e adicionalmente têm seus próprios recursos.
@@ -109,7 +111,7 @@ Variações especiais de objetos (possuem uma sintaxe especial ou operações vi
 
 Imutabilidade: significa que o valor não muda. O número 2 vai ser sempre 2, o valor false será sempre false.
 
-- Observe que **string** é tipo primitivo, portanto, **imutável** em JavaScript. Métodos como `toUpperCase` retornam uma nova string ao invés de modificar a original.
+- Observe que **string** é tipo primitivo, portanto, **imutável** em JavaScript. Métodos como `toUpperCase` retornam uma **nova string** ao invés de modificar a original.
 
 > **Não declaramos tipos** para as variáveis/constantes (no jargão de dev: "não tipamos"). A conversão é feita pelo JavaScript de acordo com o valor atribuído.
 
@@ -117,7 +119,7 @@ Imutabilidade: significa que o valor não muda. O número 2 vai ser sempre 2, o 
 
 Para declarar textos (strings), podemos utilizar aspas simples, duplas ou crase (backtick). O backtick foi adicionado pelo ES6 e permite interpolação de texto com expressões JS.
 
-> Quando usado o backtick, denominamos esse valor de *template literal*
+> Quando usado o backtick, denominamos esse valor de [*template literal* ou *template string*](#template-strings).
 
 Caracteres de escape são adicionados por meio da barra invertida (`\`). Por exemplo, para incluir uma quebra de linha no texto, podemos utilizar o `\n`; para adicionar aspas simples em um texto declarado com aspas simples, utilizamos `\'`, etc.
 
@@ -222,11 +224,11 @@ j = ++i; // i=3 e j=3 também
 
 O JS tem um objeto global que provê uma série de propriedades disponíveis para qualquer programa JS.
 
-No Node, esse objeto é acessado usando `global`. 
+No **Node**, esse objeto é acessado usando **`global`**. 
 
-No navegador, é acessado usando `window`.
+No **navegador**, é acessado usando **`window`**.
 
-O **ES2020** define o `globalThis` como o nome padrão de acesso ao objeto global, em substituição ao `global` e ao `window`.
+O **ES2020** define o **`globalThis`** como o nome **padrão** de acesso ao objeto global, em substituição ao `global` e ao `window`.
 
 ## Conversões úteis
 
@@ -240,7 +242,7 @@ Atalhos para conversão para número ou string:
 
 ```js
 +'2'; // a string será convertida para número
-3 + ''; // o valor número 3 será convertido para string '3'
+3 + ''; // o número 3 será convertido para string '3'
 ```
 
 ## Variáveis e escopo
@@ -290,7 +292,7 @@ Funciona bem para funções (é por isso que você pode usá-las antes de declar
 
 ### Destructuring assignment
 
-O ES6 possibilita inicializar uma ou mais variáveis baseada em valores vindos de um **array ou objeto**. Isso é chamado de `destructuring assignment`, pois é como se você estivesse abrindo/desestruturando aquele array ou objeto e colocando seus valores nas variáveis. Exemplos:
+O ES6 possibilita inicializar uma ou mais variáveis baseada em valores vindos de um **array ou objeto**. Isso é chamado de *destructuring assignment*, pois é como se você estivesse abrindo/desestruturando aquele array ou objeto e colocando seus valores nas variáveis. Exemplos:
 
 ```js
 // -- Arrays
@@ -318,7 +320,7 @@ let transparent = {
 // use o mesmo nome das propriedades que deseja extrair
 let {r, b} = transparent; // r=0.0 e b=0.0
 
-// pode também atribuir um nome diferente
+// pode também atribuir um nome diferente usando :
 {r: red, b: blue} = transparent; // red=0.0 e blue=0.0,
 ```
 
@@ -338,7 +340,7 @@ Pontos de atenção:
 
 ### Comparação em objetos
 
-Objetos não são comparados por valor, mas sim **por referência**. Os objetos são uma referência a uma posição da memória e, por conta disso, quando comparamos dois objetos que possuem as **mesmas propriedades e os mesmos valores** nestas propriedades, eles serão **diferentes**, pois estão referenciando diferentes regiões de memória.
+Objetos não são comparados por valor, mas sim **por referência**. Os objetos são uma referência a uma posição da memória e, por conta disso, quando criamos dois objetos que possuem as **mesmas propriedades e os mesmos valores** nestas propriedades, ao compará-los eles serão **diferentes**, pois estão referenciando diferentes regiões de memória.
 
 ```js
 let objA = { x: 10 };
@@ -464,7 +466,7 @@ async function printStream(stream) {
 
 ## Template Strings
 
-Usada com duas crases (\`\`), podendo **juntar** strings com expressões e variáveis (chamadas com `${nome_variável}`), sem necessidade de usar alguma função para concatenar.
+Usada com valores entre duas crases (\`\`), podendo **juntar** strings com expressões e variáveis (chamadas com `${nome_variável}`), sem necessidade de usar alguma função para concatenar.
 
 ```js
 console.log(`O resultado de ${num1} + ${num2} é ${resultado}`);
@@ -509,9 +511,9 @@ Parâmetros e retorno são **opcionais**:
     
     - "Você passa à função como argumento...";
 
-- parâmetros podem ter valor padrão (estilo Python); isso foi implementado a partir do ES6;
+- a partir do ES6, parâmetros podem ter valor padrão (estilo Python);
 
-- o objeto `arguments` pode ser acessado dentro da função e traz, na forma de um array-like, todos os valores dos argumentos que a função recebeu (ou seja, você acessa os valores pela posição, e não pelo nome do argumento). Essa é uma abordagem antiga e, a partir do ES6, você pode ao invés disso optar pelo rest parameters (ver abaixo);
+- o objeto `arguments` pode ser acessado dentro da função e traz, na forma de um array-like, todos os valores dos argumentos que a função recebeu (ou seja, você acessa os valores pela posição, e não pelo nome do argumento). Essa é uma abordagem antiga e, a partir do ES6, você pode ao invés disso optar pelo *rest parameters* (ver abaixo);
 
 - os parâmetros se comportam como variáveis locais dentro do corpo da função;
 
@@ -519,13 +521,13 @@ Parâmetros e retorno são **opcionais**:
 
 Quando uma função é invocada com um número de argumentos **menor** do que o número de parâmetros esperados, os parâmetros  que não receberam valor serão `undefined`.
 
-Quando uma função é invocada com um número de argumentos **maior** do que o número de parâmetros esperados, os parâmetros adicionais podem ser acessados pelo objeto `arguments` explicado acima. Se você não sabe quantos parâmetros sua função espera receber, pode usar o chamado **"rest parameters"** (ES6), isto é, definir um parâmetro no final, precedido de `...`: `function soma(val1, val2, ...outrosVal)`. Este parâmetro é **um array que contém os outros parâmetros recebidos**.
+Quando uma função é invocada com um número de argumentos **maior** do que o número de parâmetros esperados, os parâmetros adicionais podem ser acessados pelo objeto `arguments` explicado acima. Se você não sabe quantos parâmetros sua função espera receber, pode usar o chamado ***"rest parameters"*** (ES6), isto é, definir um parâmetro **no final**, precedido de `...`: `function soma(val1, val2, ...outrosVal)`. Este parâmetro é **um array que contém os outros parâmetros recebidos**.
 
 - cuidado para não confundir o [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters) (que "ajunta" os parâmetros em um array) com o [spread operator](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax) (que "desempacota" os valores de um array). O primeiro pode ser útil na definição de uma função, enquanto o segundo pode ser útil na invocação de uma função.
 
 ### Expressões de função e função anônima
 
-Quando a função é **atribuída a uma variável** ou como **argumento de outra função**, a chamamos de "expressão de função" - function expression. O nome da função é opcional (quando omitido, também podemos chamar de "função anônima"):
+Quando a função é **atribuída a uma variável** ou como **argumento de outra função**, a chamamos de "expressão de função" - *function expression*. O nome da função é opcional (quando omitido, também podemos chamar de "função anônima"):
 
 ```js
 const soma = function() { // nome é opcional
@@ -568,7 +570,7 @@ No entanto, temos **exceções**:
 
 Uma maneira de **passar um `this` específico** para uma função é por meio do métodos `bind()`, `call()` e `apply()`, vindos do prototype de `Function`.
 
-Os métodos `call()` e `apply()` fazem uma **"invocação indireta"** de uma função: você usa o `call`/`apply` para invocar a função e passar o `this` para ela. A diferença entre os dois é na forma como você para os argumentos para eles:
+Os métodos `call()` e `apply()` fazem uma **"invocação indireta"** de uma função: você usa o `call`/`apply` para invocar a função e passar o `this` para ela. A diferença entre os dois é na forma como você passa os argumentos para eles:
 
 - `call()`: o primeiro parâmetro é o `this` que será utilizado como contexto (por exemplo, um objeto); os **parâmetros seguintes** são os argumentos a serem passados como parâmetros para a função invocada;
 
@@ -634,7 +636,7 @@ outroObjeto.adicionaEmObjeto(2);
 // está vinculada a umObjeto
 ```
 
-O `bind()` também aceita **argumentos adicionais**, que serão **vinculados aos parâmetros da função** que utilizar o `bind()`. Com isso, você consegue definir parcialmente os parâmetros de uma função. Essa é uma técnica chamada de [currying](https://www.geeksforgeeks.org/what-is-currying-function-in-javascript/) (em homenagem a Haskell Curry, e não ao ingrediente indiano), em que você transforma uma função de vários parâmetros em outra com menos parâmetros.
+O `bind()` também aceita **argumentos adicionais**, que serão **vinculados aos parâmetros da função** que utilizar o `bind()`. Com isso, você consegue definir parcialmente os parâmetros de uma função. Essa é uma técnica chamada de [currying](https://www.geeksforgeeks.org/what-is-currying-function-in-javascript/) (em homenagem a Haskell Curry, e não ao ingrediente de pratos indianos), em que você transforma uma função de vários parâmetros em outra com menos parâmetros.
 
 ```js
 function exemplo(y, z) { 
@@ -798,7 +800,7 @@ Segundo o ChatGPT: closures funcionam inclusive em funções com mais de um nív
 
 #### Vantagens
 
-Uma das vantagens de closures é possibilitar que funções tenham **"estados privados"**, isto é, variáveis que somente a função tem acesso. Conseguimos isso criando uma função que possui variáveis locais e retorna outra função que manipula essas variáveis. Assim, encapsulamos essas variáveis locais, impedindo seu acesso imediato, bem como uma manipulação maliciosa destes dados, possibilitando o acesso, por exemplo, por meio de getters e setters. Esse entendimento se aproxima de conceitos de OOP.
+Uma das vantagens de closures é possibilitar que funções tenham **"estados privados"**, isto é, variáveis que somente a função tem acesso. Conseguimos isso criando uma função que possui variáveis locais e retorna outra função que manipula essas variáveis. Assim, encapsulamos essas variáveis locais, impedindo seu acesso imediato, bem como uma manipulação maliciosa destes dados, possibilitando o acesso, por exemplo, por meio de getters e setters. Esse entendimento se aproxima de conceitos de OOP (Object-Oriented Programming, ou POO - Programação Orientada a Objetos).
 
 Por manter estados privados dentro da função, podemos criar funções com características de cache, isto é, podemos armazenar informações dentro da função (resultados de chamadas anteriores, por exemplo) e utilizá-las para retornar dados sem necessariamente computá-los novamente, o que otimiza a performance. Isso é chamado de **memoização**.
 
@@ -855,7 +857,7 @@ Arrays podem ser **esparsos**, isto é, pode haver índices sem elemento (vazios
 ```js
 // Observe que se houver somente UMA vírgula no final, 
 // NÃO adiciona um elemento vazio no final - precisaria
-// ter duas vírgulas para isso. Ou seja, `'palavra'` 
+// ter duas vírgulas para isso. Ou seja, 'palavra'
 // é o último elemento desse array.
 const sparse = [1,,, false,, 'palavra',];
 
@@ -870,7 +872,7 @@ Para **acessar** elementos: coloque o índice entre colchetes: `arr[2]` irá ace
 
 - caso o array **não exista**, o acesso ao elemento irá resultar em um `ReferenceError`; caso seja atribuído `null` ou `undefined` (por exemplo, quando recebe o resultado de uma função), o acesso irá resultar em um `TypeError`;
 
-    - o ES2020 adicionou a possibilidade de acesso com `?.[]` (sim, com o ponto no meio) para evitar o erro quando a variável é `null` ou `undefined`. Será retornado `undefined`.
+    - o **ES2020** adicionou a possibilidade de **acesso com `?.[]`** (sim, com o ponto no meio) para evitar o erro quando a variável é `null` ou `undefined`. Será retornado `undefined`.
 
 - caso acesse um **índice** que não tem valor, o resultado será `undefined`.
 
@@ -878,7 +880,7 @@ Para saber o **tamanho** do array, use a propriedade `length`.
 
 - por ser uma propriedade, `length` pode ser manualmente alterado. No entanto, se for colocado um **valor menor** do que o tamanho atual, os elementos após o tamanho atribuído a `length` serão **removidos** e não podem ser recuperados (o array é "truncado"). Se for atribuído um **valor maior**, uma **área esparsa** (índices vazios) será colocada ao final do array até o tamanho atribuído. Isso, no entanto, não é uma prática comum.
 
-Para **adicionar** elementos: 
+Opções para **adicionar** elementos: 
 
 - atribua um valor a um índice que ainda não existe (atenção: pode tornar o array esparso se os índices anteriores também não existirem);
 
@@ -917,7 +919,7 @@ Para **deletar**: use o operador `delete` (exemplo: `delete arr[2]`). Diferente 
 
 - `includes(elemento)`: introduzido pelo ES2016, verifica se um elemento se encontra no array e retorna true/false. Se o que você precisa é saber o índice da primeira ocorrência de um elemento, use o método `indexOf(elemento)`;
 
-- reticências (`...`) antes de um array (`...arr`) pode indicar um **spread** ou um **rest**:
+- reticências (`...`) antes de um array (`...arr`) podem indicar um **spread** ou um **rest** operator:
 
     - Spread operator: acontece quando você quer "desempacotar" ou desmembrar os elementos de um array. Você pode usar para copiar os elementos de um array para outro array, sem precisar passar os valores um por um. Essa é uma shallow copy e modificações feitas nos valores **não** mudam o array original no qual foi feito o spread.
 
@@ -962,9 +964,9 @@ Você pode usar o `for` clássico ou o `for/of` para iterar sobre os elementos d
 
 O `forEach(callbackFn(elemento, indice, arr), thisValue)` espera uma função como primeiro argumento (callback). Essa função será executada para cada elemento do array e, por sua vez, pode receber três argumentos, providenciados pelo forEach: o primeiro é o elemento de cada iteração, o segundo é o índice desse elemento, e o terceiro é o array como um todo. 
 
-O callback pode ser definido dentro ou fora do loop, mas é uma prática comum fazer dentro, com uma arrow function. Em muitos casos você só está interessado no elemento, então o segundo e terceiro argumentos podem ser ignorados e você escreve sua função com somente um parâmetro.
+O callback pode ser definido dentro ou fora do loop, mas é uma prática comum fazer dentro, com uma arrow function. Em muitos casos você só está interessado no elemento, então o segundo e terceiro parâmetros podem ser ignorados e você escreve sua função com somente um parâmetro.
 
-O `forEach` the um segundo argumento opcional, aqui representado pelo `thisValue`. Ele pode ser utilizado para passar um outro contexto de `this` que a função vai acessar ao ser executada. É mais avançado e não tão comum, e a [MDN tem um exemplo](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach#using_thisarg) de utilização. 
+O `forEach` tem um segundo parâmetro opcional, aqui representado pelo `thisValue`. Ele pode ser utilizado para passar um outro contexto de `this` que a função vai acessar ao ser executada. É mais avançado e não tão comum, e a [MDN tem um exemplo](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach#using_thisarg) de utilização. 
 
 > Diferente dos loops `for` tradicionais, o `forEach` **não termina antecipadamente** usando o `break`, ou seja, o `forEach` **obrigatoriamente itera sobre todos os elementos**. Se você precisa de um loop que possa terminar antes de chegar ao final, utilize um dos `for` clássicos.
 
@@ -992,7 +994,7 @@ soma = 0;
 // numeros.entries() retorna um array de arrays
 // [ [idx0, val0], ..., [idxN, valN] ]
 for (let [indice, valor] of numeros.entries()) {
-    soma += valor?? 0; // evitar undefined na soma
+    soma += valor ?? 0; // evitar undefined na soma
     console.log('indice: ', indice);
     // => índice:  0
     // => índice:  1
@@ -1015,11 +1017,6 @@ O método `map()` é parecido com o `forEach()` com algumas diferenças, listada
 
 ```js
 const numeros = [1, 2, 3];
-// versão simplificada de arrow function, em que
-// estamos passando somente um parâmetro e 
-// retornando um valor em uma mesma linha, por
-// isso não precisamos dos parênteses no lado
-// esquerdo, nem da palavra return no direito
 const quadrados = numeros.map(val => val * val)
 quadrados; // => [1, 4, 9]
 ```
@@ -1040,7 +1037,7 @@ Na primeira iteração, os passos serão os seguintes:
 
 - o callback então é executado para o `elemento` da iteração. Se `valorInicial` foi passado, o `elemento` será  `arr[0]`; senão, será `arr[1]`;
 
-- o retorno do callback é atribuído a `acc`;
+- o retorno do callback é **atribuído** a `acc`;
 
 Nas iterações seguintes, a função é passada para os próximos elementos e o retorno vai sendo atribuído em `acc`, por isso `acc` seria um "acumulador".
 
@@ -1078,7 +1075,7 @@ Existem vários outros métodos e listá-los aqui seria exaustivo. Vale a pena c
 
 ### Matriz
 
-JS não oferece suporte a matrizes (ou arrays multidimensionais em geral). O que pode ser feito nesse caso é criar um **array de arrays** (um array cujos elementos também são arrays) e assim por diante. Fique ciente, no entanto, que o tamanho do array é definido pela sua quantidade de elementos diretos, ou seja, se um elemento também é um array, o seu tamanho não é adicionado ao tamanho do array-pai. Veja no exemplo:
+JS não oferece suporte a matrizes (ou arrays multidimensionais em geral). O que pode ser feito nesse caso é criar um **array de arrays** (um array cujos elementos também são arrays) e assim por diante. Fique ciente, no entanto, que o **tamanho** do array é definido pela sua **quantidade de elementos diretos**, ou seja, se um elemento também é um array, o seu tamanho não é adicionado ao tamanho do array-pai. Veja no exemplo:
 
 ```js
 // criando as linhas: array esparso de 10 posições
@@ -1108,7 +1105,7 @@ arr.flat(4) // => [1, 2, 3, 4]
 
 ## Objetos 
 
-Declarados entre `{}`. É uma coleção de **propriedades**, cada uma sendo um par de `chave: valor`, separados por vírgula. Quando uma propriedade é uma função, ela também pode ser chamada de **método** do objeto.
+Declarados entre `{}`. É uma coleção de **propriedades**, cada uma sendo um par de `chave: valor`, **separadas por vírgula**. Quando uma propriedade é uma **função**, ela também é chamada de **método** do objeto.
 
 ```js
 let objeto = {
@@ -1123,7 +1120,7 @@ let objeto = {
     // métodos (funções) podem ser declarados assim...
     ola: function(){
         console.log('Olá, sou um objeto!');
-    }
+    },
     // ... ou assim (ES6)
     tchau() {
         console.log('Até mais!');
@@ -1153,7 +1150,7 @@ let objeto = {
 
 - métodos são invocados pelo ponto + parênteses: `objeto.ola()`;
 
-- posso selecionar mais de uma propriedade de uma vez: `const { texto, valido } = objeto`;
+- posso selecionar mais de uma propriedade de uma vez (é o ["destructuring assignment"](#destructuring-assignment)): `const { texto, valido } = objeto`;
 
 - posso adicionar novas propriedades: `objeto.novaPropriedade = 'sou uma nova propriedade'`. O mesmo é utilizado para sobrescrever o valor de uma propriedade que já existe.
 
@@ -1175,20 +1172,20 @@ let objeto = {
 
 - `Object.assign(target, source1)`: copia as propriedades **próprias** (não herdadas) e enumeráveis de `source1` para `target`. Se `target` já tiver a propriedade, ela é sobrescrita com o valor de `source1`. Você pode passar outros objetos como argumento (`source2, ..., sourceN `) que também serão copiados para `target`, sendo que cada source novo irá sobrescrever as propriedades já existentes.
 
-    - você também pode fazer isso com o **spread operator** (ES2018): `target = {...source1, ...target}`. Ele também copia somente as propriedades próprias.
+    - você também pode fazer isso com o **spread operator** (ES2018): `target = {...target, ...source1}`. Ele também copia somente as propriedades próprias e sobrescreve propriedades que já existem.
 
 ### Acessando propriedades com get e set
 
-Você também pode definir métodos para acessar ou modificar uma propriedade (os chamados "getters" e "setters"). Isso foi introduzido no ES5.
+Você também pode definir **métodos** para acessar ou modificar uma propriedade (os chamados "getters" e "setters"). Isso foi introduzido no ES5. 
 
-Exemplo: 
+Apesar de serem definidos como métodos, o acesso/modificação **não** é feito por meio de invocação. Você acessa o valor da propriedade utilizando o `.` ou `[]` e modifica o valor utilizando atribuição (`=`). Veja o exemplo:
 
 ```js
 const ponto = {
     x: 3,
     y: 4,
 
-    // coloque o mesmo nome para o getter e o setter
+    // opte por usar o mesmo nome para o getter e o setter
     get r() {
         return Math.hypot(this.x, this.y)
     },
@@ -1215,29 +1212,19 @@ ponto.theta = 10;
 ponto.theta; // 0.9272952180016122
 ```
 
-Como pode ser visto no exemplo, quando crio somente um getter, a propriedade é read-only. Se eu atribuir um valor a essa propriedade, este valor será **ignorado**. 
+Como demonstrado no exemplo acima, quando crio somente um getter, a propriedade é read-only. Se eu atribuir um valor a essa propriedade, este valor será **ignorado**. 
 
 Também é possível criar uma propriedade write-only definindo somente um setter. Propriedades write-only retornam undefined quando são acessadas.
 
-> Observe que, dentro do objeto, quando quero acessar alguma de suas propriedades, utilizamos o `this`.
+> Observe que, dentro do objeto, quando quero acessar alguma de suas propriedades, **utilizamos o `this`**. Isso é **importante** e necessário para garantir que o acesso seja ao objeto que está chamando o método ou acessando a propriedade. Por exemplo, se o objeto for utilizado como modelo para criação de novos objetos (com o `Object.create()`, por exemplo), o uso do `this` garante que o novo objeto acesse os valores de suas próprias propriedades e não os valores do objeto usado de modelo.
 
-### JSON
+**Não** é possível utilizar **arrow function** em getters e setters. Primeiro por conta do comportamento do `this` em arrow functions; segundo por conta da sintaxe dos getters e setters, que precisa de uma função nomeada. O nome dessa função também será o nome to setter/getter.
 
-Formato `chave: valor`. Muito utilizado para comunicação entre back-end e front-end (APIs). Notação parecida com objetos, porém, mais restritiva com relação ao formato (o nome das chaves é entre aspas, não pode ter comentários, não pode ter uma vírgula no final da última propriedade (trailing comma), etc).
-
-`JSON.parse(dadosJSON)`: converte JSON para um objeto JavaScript. Comumente usado quando **recebemos** um JSON da API;
-
-`JSON.stringify(objetoJS)`: converte um objeto JavaScript para o formato JSON. Comumente usado quando **enviamos** dados para uma API. Esse processo também é conhecido como **serialização**.
-
-- propriedades cujo valor seja `undefined`, assim como funções, **não** são serializáveis, ou seja, são **omitidos** no resultado da conversão. 
-
-- O valor `null`, no entanto, **é** serializável;
-
-- existem outras particularidades, como a serialização de um objeto do tipo Date. Consulte a [documentação](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description).
+Por fim, vale lembrar que em objetos literais (ou seja, objetos criados diretamente usando `{}`) não existe a definição de propriedades privadas, ou seja, você **consegue acessar qualquer propriedade do objeto**, mesmo sem getter e setter. A criação de getter e setter é uma prática de desenvolvimento e uma convenção entre desenvolvedores para evitar esse acesso direto (é o conceito de encapsulamento de dados). Já quando utilizamos classes, a partir do ES2022 foi introduzida a definição de [campos privados](#campos-privados) (campo no caso é sinônimo de propriedade).
 
 ### Prototype
 
-No JS, **todos** os objetos herdam **propriedades e métodos de um prototype**. Se eu acesso a propriedade de um `obj`, será primeiro procurado se ele possui esta propriedade; se não possuir, vai subindo na cadeia procurando por ela nos pais e assim por diante.
+No JS, **todos os objetos herdam propriedades e métodos de um prototype**. Se eu acesso a propriedade de um `obj`, será primeiro procurado se ele possui esta propriedade; se não possuir, vai subindo na cadeia procurando por ela nos pais e assim por diante.
 
 `Object.prototype`: é o objeto no **topo** da cadeia de objetos do JS. Todos os objetos herdam propriedades dele. A única exceção é quando você cria um objeto sem prototype usando `Object.create(null)`.
 
@@ -1245,16 +1232,21 @@ No JS, **todos** os objetos herdam **propriedades e métodos de um prototype**. 
 
 ### Funções construtoras
 
-É possível **criar objetos a partir de um modelo**, por meio de funções construtoras. Esta era a maneira que o JS oferecia para se trabalhar antes de possibilitar o uso de classes na linguagem. A maneira moderna de criar objetos é por meio de classes.
+É possível **criar objetos a partir de um modelo**, por meio de **funções construtoras**. Esta era a maneira que o JS oferecia para se trabalhar antes de possibilitar o uso de `class` na linguagem. A maneira moderna de criar objetos é por meio de classes.
 
-- A criação antes era feita por meio de protótipos e cadeia de protótipos. Internamente, continua sendo assim - a maneira moderna é somente um "syntax sugar", ou seja, uma sintaxe mais fácil de ler por um humano. 
+- A criação antes era feita por meio de protótipos e cadeia de protótipos. Internamente, continua sendo assim - a maneira moderna é somente um "syntax sugar", ou seja, uma sintaxe mais fácil de ler por um humano.
 
-Hoje em dia, trabalha-se mais com classes, mas entender protótipos é ideal para entender as particularidades do JS e também no caso de cair em um projeto legado.
+Hoje em dia, trabalha-se mais com classes, mas entender protótipos é ideal para entender as particularidades do JS e também no caso de cair em um projeto legado. Veja mais sobre classes na [Seção sobre Classes](#classes).
 
 ```js
 // função construtora
-function User(nome, email) { // por convenção, o nome da função começa com maiúscula
-    this.nome = nome; // uso do this para referenciar o contexto do objeto quando criado
+// por convenção, o nome da função começa com maiúscula
+function User(nome, email) { 
+    // "new User(...)" vai executar essa função User 
+    // e criar um novo objeto vazio. No corpo da 
+    // função construtora, podemos adicionar
+    // propriedades a esse novo objeto por meio do this.
+    this.nome = nome; 
     this.email = email;
 
     this.exibirInfos = function() {
@@ -1262,59 +1254,436 @@ function User(nome, email) { // por convenção, o nome da função começa com 
     }
 }
 
-// criando um novo objeto a partir desse modelo User
+// Criando um novo objeto a partir desse modelo User.
+// O this da função User é determinado por esse novo 
+// objeto criado e atribuído a novoUsuario
 const novoUsuario = new User('Matheus', 'meu@email.br');
-console.log(novoUsuario.exibirInfos());
+console.log(novoUsuario.exibirInfos()); // => Nome: Matheus; e-mail: meu@email.br
 ```
 
-Objetos criados por meio de funções construtoras têm esta função como sendo seu protótipo.
+Objetos criados por meio de funções construtoras têm o **mesmo protótipo** que é retornado pela **propriedade `prototype` da função que o criou** (`Object.getPrototypeOf(novoUsuario) === User.prototype` retorna true).
 
-Outras forma de criar objetos a partir de um modelo é com o  [`Object.create()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create). Esse método estático permite passar o prototype desejado como primeiro argumento.
+Outra forma de criar objetos a partir de um modelo é com o  [`Object.create()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create). Esse método estático cria um novo objeto usando como modelo outro objeto, que é passado como primeiro argumento. Esse outro objeto se torna o prototype do novo objeto.
+
+Em resumo: **`new`** é usado para criar um novo objeto a partir de uma **função construtora**. **`Object.create()`** é usado para criar um novo objeto a partir de **outro objeto**.
+
+### JSON
+
+Formato `chave: valor`. Muito utilizado para comunicação entre back-end e front-end (APIs). Notação parecida com objetos, porém, mais restritiva com relação ao formato (o nome das chaves é entre aspas, não pode ter comentários, não pode ter uma vírgula no final da última propriedade (trailing comma), etc).
+
+`JSON.parse(dadosJSON)`: converte **JSON para um objeto JavaScript**. Comumente usado quando **recebemos** um JSON da API;
+
+`JSON.stringify(objetoJS)`: converte um **objeto JavaScript para o formato JSON**. Comumente usado quando **enviamos** dados para uma API. Esse processo também é conhecido como **serialização**.
+
+- propriedades cujo valor seja `undefined`, assim como funções, **não** são serializáveis, ou seja, são **omitidos** no resultado da conversão. 
+
+- O valor `null`, no entanto, **é** serializável;
+
+- existem outras particularidades, como a serialização de um objeto do tipo Date. Consulte a [documentação](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description).
 
 ## Classes 
 
-Surgiram a partir do ES6. 
+Classes são uma representação para grupos de objetos que compartilham de certas propriedades. Em outras palavras, grupos de objetos que **herdam propriedades de um mesmo objeto protótipo** (prototype object). Membros da classe (chamados de instâncias da classe) podem ter suas próprias propriedades, mas também possuem propriedades e métodos definidos pela classe. Por conta disso, a **herança em classes no JS é baseada em protótipo** (prototype-based inheritance).
 
-Não existem nativamente no JS, mas podem ser criadas como forma de facilitar a escrita/entendimento (o tal do *syntax sugar*). Por trás dos panos, o que há são objetos, que herdam métodos e propriedades de protótipos.
+👉 Se dois objetos herdam propriedades de um mesmo protótipo, podemos dizer que são instâncias de uma mesma classe.
 
-É possível declarar e inicializar propriedades dentro do constructor, sem a necessidade de declará-las fora. As propriedades declaradas e inicializadas no constructor ficam visíveis para o restante da classe.
+A vantagem de utilizar classes ao invés de uma função que gera objetos vem dessa característica de herança baseada em protótipo. Ao definir métodos em uma classe, esses **métodos são criados somente uma vez** e **compartilhados entre todas as instâncias** criadas por esta classe - quando uma instância invoca o método, ela acessa a referência a esse método e executa seu corpo. Se ao invés disso tivéssemos uma função que retornasse objetos, e dentro desses objetos definíssemos os métodos, esses métodos seriam criados para cada objeto novo, o que impactaria na performance em termos de alocação de memória.
 
-- Se o construtor da classe não recebe argumentos, você pode chamá-la sem o parênteses (`new SuaClasse` ou `new SuaClasse()`). Isso, no entanto, não é recomendado;
+Classes sempre estiveram presentes no JS, mas foi a partir do **ES6** que se introduziu a palavra-chave **`class` para criação de classes**. É somente  uma *syntax sugar*: por trás dos panos, o que há são objetos, que herdam métodos e propriedades de protótipos.
 
-- boa prática: propriedades que terão **getters e setters** costumam ter o nome **começando com underline**, para diferenciar do nome no get e set (que são palavras-chave: `get saldo = return this._saldo;`)
+As seções abaixo mostram primeiro como se trabalhava com classes "antigamente", e depois mostra como é feito com `class`, o "jeito moderno". Entender como era feito antes é bom para saber o que está acontecendo por trás dos panos no jeito moderno, bem como pode ser necessário quando se trabalha com projetos legados.
+
+### Criação com `Object.create()` e função do tipo factory
+
+> O livro usa o termo "prototype object", traduzido como "objeto protótipo". No entanto, eu prefiro seguir com as palavras em inglês.
+
+Uma das maneiras antigas de se definir uma classe é criar um objeto com propriedades que serão compartilhadas com outros objetos (esse seria o prototype object). Utilizando o método `Object.create()` e passando o prototype object como argumento, podemos criar um novo objeto que herda do prototype object, e com isso, temos a definição de uma classe em JS. 
+
+Podemos ainda utilizar uma função factory para criar as instâncias da classe e já inicializá-las.
+
+> Uma função factory (função de fabricação ou função fábrica) em JS implementa o padrão Factory. No caso, é uma função que é invocada para criar e retornar um objeto.
+
+Exemplo simples para entendimento:
+
+```js
+// criação do prototype object
+const carroPrototipo = {
+    // criação de métodos estilo ES6
+    acelerar() {
+        console.log('Carro acelerando.');
+    },
+
+    frear() {
+        console.log('Carro parado.');
+    },
+
+    toString() {
+        // o this será associado ao objeto que 
+        // invocar este método
+        return `Carro da marca ${this.marca}, modelo ${this.modelo}.`
+    }
+}
+
+// função factory que cria objetos (instâncias)
+// baseado em carroPrototipo
+function carro(marca, modelo) {
+    // quando invocada, cria uma instância baseada 
+    // em carroPrototipo
+    const novoCarro = Object.create(carroPrototipo);
+
+    // inicializa as propriedades da instância
+    novoCarro.marca = marca;
+    novoCarro.modelo = modelo;
+
+    return novoCarro;
+}
+
+const fox = carro('Volks', 'Fox');
+
+// como é uma instância de carroPrototipo, 
+// posso utilizar seus métodos
+fox.acelerar(); // 'Carro acelerando.'
+fox.toString(); // => 'Carro da marca Volks, modelo Fox.'
+
+// confirmando o protótipo da instância
+Object.getPrototypeOf(fox) === carroPrototipo; // => true
+carroPrototipo.isPrototypeOf(fox); // => true
+
+// veja que sem uma instância o this não tem 
+// valor definido
+carroPrototipo.toString(); // => 'Carro da marca undefined, modelo undefined'
+```
+
+### Criação com função construtora e `new`
+
+Um jeito mais natural (idiomático) de criar uma classe em JS, antes da introdução de `class`, é por meio de [funções construtoras](#funções-construtoras). Nesse caso, a função que inicializa um objeto pode ser chamada de "construtora" (constructor). Novamente, apesar da tradução, vou preferir usar o nome em inglês.
+
+Novos objetos são criados por meio da **palavra chave `new`**, que invoca o constructor, que então inicializa o novo objeto criado. Observe que neste caso não é necessário utilizar o método `Object.create()`. O `new` irá **criar um novo objeto**, depois irá **invocar o constructor** como método desse objeto, para finalmente retornar o objeto. Ou seja, o valor do **`this` será esse novo objeto** e estará acessível na invocação da função. Isso funciona por conta do uso do `new` para invocar o constructor, e não funcionará corretamente se o constructor for chamado da maneira usual.
+
+Mais do que isso, funções construtoras possuem uma **propriedade `prototype`**, que é **usada como o protótipo do novo objeto**. Com isso, podemos acessar `prototype` do constructor, que é um objeto, e **incluir nele as propriedades que serão herdadas** pelas instâncias que forem criadas por meio do `new`.
+
+- o objeto `prototype` possui uma propriedade predefinida `constructor`, que faz referência à própria função construtora. Se você criar um `prototype` do zero ao invés de adicionar propriedades ao objeto `prototype` de uma função construtora, você perde essa propriedade `constructor`. No exemplo abaixo, optamos por estender `prototype`, ou seja, adicionar novos métodos usando `Carro.prototype.<nomeDoNovoMétodo>`.
+
+Lembre-se: por convenção, o **nome** de uma função construtora **inicia com letra maiúscula**, para diferenciá-la de uma função "normal".
+
+Exemplo anterior, modificado com esta outra abordagem:
+
+```js
+// função construtora. Quando invocada, inicializa o objeto
+function Carro(marca, modelo) {
+    // this faz referência ao objeto que a invocou
+    this.marca = marca;    
+    this.modelo = modelo;
+}
+
+// inclusão dos métodos ao protótipo
+Carro.prototype.acelerar = function() {
+    console.log('Carro acelerando.');
+};
+
+Carro.prototype.frear = function() {
+    console.log('Carro parado.');
+}
+
+Carro.prototype.toString = function() {
+    // o this será associado ao objeto que 
+    // invocar este método
+    return `Carro da marca ${this.marca}, modelo ${this.modelo}.`;
+};
+
+// um novo objeto é criado, Carro é invocada para 
+// inicializar as propriedades desse novo objeto, 
+// e o novo objeto é atribuido à variável kwid.
+const kwid = new Carro('Renault', 'KWID');
+kwid.acelerar(); // 'Carro acelerando.'
+kwid.toString(); // => 'Carro da marca Renault, modelo KWID.'
+
+// verificando o prototype da instância
+Carro.prototype.isPrototypeOf(kwid); // => true
+kwid instanceof Carro; // => true
+
+// sem usar new, o `this` não será associado 
+// corretamente e provavelmente será undefined 
+// (modo restrito)
+const usoErrado = Carro('marca', 'modelo');
+usoErrado.toString(); // => Cannot read properties of undefined
+```
+
+Em resumo: o uso de funções construtoras, invocadas com a palavra chave `new`, faz o seguinte:
+
+- cria um novo objeto vazio;
+
+- define o protótipo desse novo objeto como a propriedade `prototype` da função construtora;
+
+- invoca a função construtora, associando o `this` ao novo objeto criado;
+
+- retorna automaticamente o novo objeto, a menos que a função construtora retorne algo explicitamente.
+
+Por fim, vale mencionar que **não é possível utilizar arrow functions** nos métodos ou na função construtora, seja nessa abordagem ou na anterior: arrow functions não possuem a propriedade `prototype` e não lidam com o `this` da maneira desejada para este caso.
+
+### Criação com `class`
+
+A introdução da palavra-chave `class` pelo ES6 veio para facilitar a sintaxe de criação de classes. O uso de `class` é só outra maneira de definir uma função construtora e métodos a serem herdados.
+
+> Classes não são "hoisted", ou seja, **não** é possível utilizá-las ou modificá-las **antes de serem definidas**.
+
+Dentro do **corpo da classe**, você **cria o constructor** que irá inicializar o objeto, usando a palavra-chave `constructor`. Caso você não defina `constructor` (por exemplo, se não é necessário inicializar o objeto), um constructor vazio será implicitamente criado. O **constructor será chamado** quando você cria uma nova instância usando **`new`** e o **nome da classe** (`const novoObj = new NomeDaClasse();`).
+
+Também dentro do corpo da classe, você **instancia variáveis e métodos**, mas sem a necessidade de separá-los por vírgula ou usar a abordagem `chave: valor`. Variáveis em uma classe costumam ser chamadas de **"campos" (fields)**, e seriam similares a propriedades em objetos.
+
+> O código no corpo da classe é executado em **modo restrito**.
+
+```js
+class Carro {
+    constructor(marca, modelo) {
+        this.marca = marca;
+        this.modelo = modelo;
+    }
+
+    // criação de métodos estilo ES6
+    acelerar() {
+        console.log('Carro acelerando.');
+    }
+
+    frear() {
+        console.log('Carro parado.');
+    }
+
+    toString() {
+        return `Carro da marca ${this.marca}, modelo ${this.modelo}.`;
+    }
+}
+
+const captiva = new Carro('Chevrolet', 'Captiva');
+captiva.acelerar(); // 'Carro acelerando.'
+captiva.toString(); // => 'Carro da marca Chevrolet, modelo Captiva.'
+
+// verificando o prototype da instância
+Carro.prototype.isPrototypeOf(captiva); // => true
+captiva instanceof Carro; // => true
+```
+
+#### Métodos estáticos
+
+Ao definir um método em uma classe, se você adicionar a palavra-chave `static` antes do nome deste método, você o transforma em método estático. Isso significa que este método **é chamado diretamente pela classe**, sem precisar criar uma instância dela. É o que acontece quando chamamos, por exemplo, `Math.abs()` ou `Date.now()`, etc.
+
+Métodos estáticos devem ser invocados através da classe, e não de instâncias, por isso, também são conhecidos como "métodos de classe". Ao tentar invocar um método de classe por meio de uma instância, você provavelmente irá receber um erro parecido com esse: "TypeError: instancia.nomeDoMetodoEstatico is not a function".
+
+> Internamente, métodos estáticos se tornam **propriedades da função construtora**, e não do prototype object (`NomeDaClasse.prototype`). Por essa razão, não estão disponíveis às instâncias da classe.
+
+Nada impede de você ter um método de instância e um método estático com o mesmo nome definido em uma classe. Basta adicionar o `static` ao método que será da classe. Quando chamado pela classe, o método estático é executado; quando chamado pela instância, o método de instância é executado.
+
+Apesar de incomum (e não recomendado), existe sim um jeito de invocar um método estático por meio de uma instância da classe: utilizando a propriedade `constructor` (ou seja, `nomeDoObjeto.constructor.nomeDoMetodoEstatico`).
+
+### Adição de métodos em classes existentes
+
+Se uma classe já foi criada e definida, você pode adicionar novos métodos a ela criando uma nova propriedade no `prototype` da classe e atribuindo a essa propriedade uma função. Esses métodos ficam disponíveis a **todas as instâncias**, inclusive àquelas que já tenham sido criadas.
+
+Da mesma forma, é possível também adicionar métodos estáticos diretamente na classe, atribuindo uma nova propriedade à própria classe ao invés de ao `prototype`.
+
+Exemplo considerando a classe Carro construída anteriormente:
+
+```js
+// adicionando novo método
+Carro.prototype.buzinar = function() {
+    console.log('FONK!'); 
+}
+
+// adicionando método estático
+Carro.describe = function () { 
+    console.log('Este é um carro');
+}
+
+captiva.buzinar(); // "FONK"
+Carro.describe(); // "Este é um carro"
+```
+
+Também é possível adicionar novos métodos em classes próprias do JS (Math, String, Date, etc), mas **não é recomendado**, pois pode causar confusão e incompatibilidade quando houver novas versões do JS.
+
+#### Campos (até ES6)
+
+Um campo (field) é o nome que damos às propriedades da classe ou de instâncias da classe que não são métodos (são as "variáveis" locais). 
+
+Até o ES6, para **definir campos** em instâncias de uma classe, eles devem ser criados e inicializados **na função construtora ou dentro dos métodos**, usando o `this.NomeDoCampo = valor;` (lembre-se: ao atribuir um valor a uma propriedade do objeto, se esta propriedade não existe, ela é criada e o valor é associado a ela). Isso foi visto no exemplo da classe `Carro` acima, com a criação dos campos marca e modelo dentro do constructor, acessíveis pelas instâncias da classe (ou dentro dela por meio do `this`).
+
+É também possível criar **campos estáticos**, acessados diretamente da classe (`Math.PI`, por exemplo). Para criá-los, primeiro é preciso definir a classe, e depois adicionar estes campos, atribuindo um valor a eles. Ou seja, campos estáticos são **criados fora do corpo da classe**.
+
+```js
+class Carro {
+    // código omitido
+}
+
+// criando um campo estático (ES6), após 
+// a classe ter sido definida
+Carro.qtdePneus = 4;
+
+const dolphin = new Carro('BYD', 'Dolphin');
+
+Carro.qtdePneus; // => 4
+dolphin.qtdePneus; // => undefined. É um campo estático.
+
+```
+
+A partir do **ES2022**, novas sintaxes foram atribuídas, facilitando e ampliando a criação e uso de campos, como pode ser visto na [próxima seção](#novidades-es2022). Vale, no entanto, estar atento a isso, caso se trabalhe com versões mais antigas do JS.
+
+#### Novidades ES2022
+
+> Como a edição do livro que eu usei é de 2020, esta seção é baseada na [documentação da MDN sobre classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_classes).
+
+A partir do ES2022, foi introduzida a **sintaxe para campos**, incluindo **campos estáticos**, bem como **métodos e campos privados**.
+
+##### Criação de campos
+
+Anteriormente, os campos só podiam ser declarados dentro do constructor ou dentro de métodos. Agora, campos podem ser declarados **fora do constructor** e sem o uso do `this`. Isso possibilita declarar todos os campos no topo do corpo da classe, o que facilita a leitura do código.
+
+- não é necessário inicializá-los. Neste caso, o valor será `undefined`;
+
+- note, no entanto, que para **acessar** esses campos dentro da classe você ainda precisa **referenciá-los com o `this`**.
+
+##### Campos privados
+
+É possível também criar **campos privados**, que são **acessíveis somente dentro da própria classe**. Você cria um campo privado prefixando `#` ao identificador (`#nomeDoCampoPrivado`). Para acessá-los, você continua usando o `#` (`this.#nomeDoCampoPrivado`).
+
+- propriedades privadas **não podem** ser acessadas nem modificadas **fora da classe** em que foram declaradas. Nem mesmo instâncias da classe possuem acesso a essas propriedades. Subclasses **também não** têm acesso nem podem modificar essas propriedades;
+
+- tentar acessar um campo privado por meio da instância resulta em SyntaxError;
+
+- métodos definidos na classe **conseguem acessar campos privados de outras instâncias**, desde que essas instâncias **sejam da mesma classe**. Isso pode acontecer, por exemplo, quando um método da classe recebe como parâmetro uma instância da mesma classe - nesse caso, o método pode acessar os campos privados dessa instância;
+
+Para possibilitar o acesso ou modificação a campos privados, é necessário criar getters e setters, ou outros métodos que possibilitem o acesso e modificação desses campos privados.
+
+Exemplo:
+
+```js
+class Conta {
+    #saldo = 1000; // propriedade privada
+    nome = 'Fulano'; // propriedade pública
+
+    // getter para acesso ao saldo
+    get saldo() { return this.#saldo }
+
+    // função que modifica o saldo
+    deposito(valor) { 
+        if (valor > 0) {
+            this.#saldo += valor;
+        }
+    }
+}
+
+// manipulando uma instância de Conta
+const minhaConta = new Conta();
+console.log(minhaConta.saldo); // => 1000
+minhaConta.deposito(450);
+console.log(minhaConta.saldo); // => 1450
+```
+
+**Vale uma observação:** no DevTools do navegador é possível que você consiga criar classes e acessar propriedades e métodos privados por meio das instâncias sem erros. Isso é um "relaxamento" da própria ferramenta para auxílio dos desenvolvedores. 
+
+##### Métodos privados
+
+Métodos também podem ser privados, bastando adicionar `#` antes da declaração do método. Para serem executados, devem ser chamados com a `#`. (`this.#metodoPrivado()`).
+
+##### Campos estáticos
+
+Do mesmo jeito que métodos estáticos, campos estáticos podem ser criados adicionando `static` antes do nome do campo, e são acessados pela classe ao invés da instância.
+
+```js
+class Conta {
+    static nomeDoBanco = 'Super Banco';
+}
+
+console.log(Conta.nomeDoBanco); // => Super Banco
+```
 
 ### Herança
 
+É possível aplicar herança tanto a classes criadas com `class` quanto da maneira anterior (pré-ES6). Para saber como era na abordagem anterior, veja no livro a Seção 9.5.1. Aqui irei explicar somente herança aplicada a classes criadas com `class` e `extends`.
+
+Uma classe `B` pode herdar de outra classe `A`. Nesse caso, chamamos **`A` de superclasse** e **`B` de subclasse**. 
+
+Como `B` é uma subclasse de `A`, isso significa que `B` **herda todos os métodos (estáticos e de classe) e campos públicos** de `A`. Além disso, `B` pode **definir seus próprios campos e métodos**, bem como pode **sobrescrever métodos de `A`** (o que chamamos de *overriding*).
+
+> O overriding está associado ao conceito de polimorfismo. **No JS**, apesar de ser possível o overriding, em que os métodos nas subclasses podem ter um comportamento diferente do da superclasse, **não é possível a sobrecarga (*overloading*)**, que ocorre quando **alteramos a assinatura de um método** (adicionando ou removendo parâmetros).
+
+Podemos **invocar o constructor e os métodos públicos da superclasse** utilizando a palavra reservada **`super`**. Seguem algumas considerações:
+
+- Se a subclasse tiver um **constructor**, é **obrigatório usar `super()`** para invocar o constructor da superclasse. Isso é necessário para que a instância seja inicializada corretamente e você tenha acesso a ela. 
+
+    - mesmo se a superclasse não possuir um constructor, caso a subclasse possua, é obrigatório chamar `super()`;
+
+    - Você só poderá usar o `this` no constructor após ter invocado `super()`;
+
+- Se a subclasse não tiver um constructor, o JS implicitamente irá criar um para você e chamar `super()`;
+
+- Ao **sobrescrever um método**, podemos invocar o método da superclasse utilizando **`super.nomeDoMetodo()`**. Se o método receber argumentos, podemos passá-los ao `super`. 
+    
+    - No caso de sobrescrita de métodos, o `super` pode ser invocado quantas vezes quiser e em qualquer posição do método;
+    
+    - observe que **não** é obrigatório invocar o método da superclasse se você não quiser;
+
+    - também observe que você pode invocar qualquer outro método da superclasse (e não somente o que está sendo sobrescrito) usando `super`, desde que o método não seja privado.
+
+Exemplo:
+
 ```js
-class NovaClasse { //sem atribuição
-    constructor(/*...*/) {
-        // ...
-    } 
-    // getters, setters, métodos
-}
-
-class ClasseFilha extends NovaClasse {
-    constructor(){ // pode ter atributos adicionais, específicos dessa classe
-        super(/*...*/) // chamada ao construtor da classe mãe, com os atributos que ela precisa
+class Animal {
+    constructor(nome) {
+        this.nome = nome
     }
-    // ...
+
+    falar() {
+        console.log('O animal está falando.');
+    }
+
+    toString() {
+        console.log(`Sou um animal. Meu nome é ${this.nome}.`);
+    }
 }
 
-let a = new NovaClasse();
-let b = new ClasseFilha();
+class Cao extends Animal {
+    constructor(nome, raca) {
+        // obrigatório invocar o construtor 
+        // da superclasse
+        super(nome);
+
+        // uso do this somente após ter
+        // invocado super
+        this.especie = 'Cão';
+        this.raca = raca;
+    }
+
+    // override usando super
+    falar() {
+        super.falar();
+        console.log('Au au au!');
+    }
+
+    // override sem super
+    toString() {
+        console.log(`Sou um ${this.especie} da raça ${this.raca} e meu nome é ${this.nome}.`);
+    }
+}
+
+// instância da superclasse
+const gata = new Animal('Filó');
+gata.falar(); // "O animal está falando."
+gata.toString(); // "Sou um animal. Meu nome é Filó."
+
+// instância da subclasse
+const pet = new Cao('Tobi', 'Pastor');
+pet.toString(); // "Sou um Cão da raça Pastor e meu nome é Tobi."
+pet.falar(); // "O animal está falando. Au au au!"
 ```
 
 ### Composição
 
-Na herança, o relacionamento é do tipo "É um". Na composição, o relacionamento é do tipo "Tem um". 
+Na herança, o relacionamento é do tipo "É um" (exemplo: "um carro *é um* veículo"). Na composição, o relacionamento é do tipo "Tem um" (exemplo: "um carro *tem um* motor"). Com essa ideia em mente, você consegue se orientar entre usar herança ou composição.
 
-No JS, **não** há herança múltipla. Neste caso, você pode utilizar de composição, em que uma classe pode conter outra ou outras classes -> você pode criar uma propriedade dentro dessa classe, sendo que essa propriedade é instância de uma outra classe (você dá um `new` dessa outra classe e atribui à propriedade).
+No JS, **não há herança múltipla**. Neste caso, você pode utilizar de **composição**, em que **uma classe pode conter instância de uma ou várias outras classes**: você pode criar um campo dentro dessa nova classe, e atribuir a este campo a instância de outra classe (você dá um `new` dessa outra classe e atribui ao campo). Você define sua nova classe como sendo a composição de uma ou mais classes, sem necessariamente herdar destas classes.
 
-- Isso é uma suposição minha. Nenhum instrutor chegou a dizer que composição é uma alternativa para herança múltipla. 
+Composição pode ser usada quando você quer usar o comportamento de outra classe, e não necessariamente **ser** uma instância por completo daquela classe. Nesse caso, você cria uma instância dessa outra classe para delegar comportamentos a ela, sem criar uma hierarquia rígida de herança (em outros termos, elas não seriam fortemente acopladas).
 
-Composição pode ser usada quando você quer usar o comportamento de outra classe, e não necessariamente **ser**  uma instância por completo daquela classe.
-
-Exemplo de composição gerado pelo ChatGPT
+Exemplo de composição (adaptado de um código gerado pelo ChatGPT):
 
 ```javascript
 // Classe que será composta
@@ -1323,113 +1692,42 @@ class Motor {
     this.velocidade = 0;
   }
 
-  // Método da classe Motor
   acelerar(incr) {
     this.velocidade += incr;
   }
 }
 
-// Classe que contém uma instância de Motor (composição)
+// Um Carro não é uma subclasse de Motor, mas faz 
+// uso de comportamentos de Motor, então podemos
+// aplicar composição
 class Carro {
   constructor() {
     this.motor = new Motor(); 
-    // Carro agora tem uma propriedade "motor", 
-    // que é um objeto da classe Motor
+    // Carro agora tem um campo "motor", 
+    // que é um objeto da classe Motor,
+    // podendo acessar seus comportamentos
   }
 }
 
-// Utilizando a composição para acessar métodos do objeto Motor
+// o comportamento de acelerar será delegado 
+// ao motor
 const meuCarro = new Carro();
 meuCarro.motor.acelerar(50);
-console.log(`Velocidade atual: ${meuCarro.motor.velocidade}`); // Saída: Velocidade atual: 50
-
+console.log(`Velocidade atual: ${meuCarro.motor.velocidade}`); // "Velocidade atual: 50"
 ```
 
-### Propriedades e métodos estáticos
+Optar por herança ou composição é o famoso "depende". Depende do seu problema e da solução que você quer propor. Se a sua solução resultar em várias classes em que você enxerga alguma forma de hierarquia bem definida, optar por herança parece ser mais útil, pois todas compartilharão de campos e métodos e poderão definir/sobrescrever seus próprios métodos. Caso sua solução resulte em classes que precisam de comportamentos de outras classes, mas não necessariamente sejam uma subclasse, optar por composição pode fazer mais sentido. Lembre-se sempre da relação "é um" (herança) e "tem um" (composição).
 
-Propriedades e métodos estáticos são declarados com a palavra reservada `static` antes do nome da variável:
+> 👉 Segundo o livro, há uma máxima de OOP e design pattern: **"favoreça composição ao invés de herança"**.
 
-```js
-class Quadrado {
-    static tipo = 'quadrado';
-    static calculaPerimetro(lado) { 
-        return lado * 4 
-    }
-}
-```
+### Classes abstratas
 
-Essas propriedades/métodos pertencem **à classe**, e não a uma instância da classe. Assim, quando uma instância é criada, estas propriedades/métodos **não** são acessíveis quando chamados a partir da instância. Por outro lado, você pode acessar estas propriedades/métodos diretamente da classe, sem a necessidade da criação de uma instância (um exemplo: `Date.now()`). 
+Em OOP, uma **classe abstrata** é aquela que define métodos (comportamentos) que subclasses devem ter, mas que **não os implementa** - fica **a cargo de cada subclasse implementá-los**. É uma forma de criar uma classe genérica que seria um "contrato" que subclasses devem seguir ao estender dela.
 
-O acesso a propriedade e métodos estáticos pode ser feito de duas maneiras: 
+- uma classe abstrata não precisa ser completamente abstrata: ela também pode conter alguns métodos "concretos" (isto é, implementados) e campos.
 
-1. diretamente da classe, sem a necessidade da criação de uma instância. 
+No JS **não há** uma definição formal nem palavra-chave para classes e métodos abstratos (como o `abstract` em outras linguagens, por exemplo). Mas você pode simular este comportamento criando uma superclasse com métodos que lançam erros informando que devem ser implementado pela subclasse. Dessa forma, você obriga as subclasses a sobrescrever estes métodos e implementá-los de fato.
 
-2. por uma instância da classe, utilizando a propriedade `constructor` (o `constructor` nesse caso permite o acesso à classe).
-
-```js
-// acesso pela classe
-console.log(Quadrado.tipo); // quadrado
-
-// acesso usando constructor
-const meuQuadrado = new Quadrado();
-console.log(meuQuadrado.constructor.tipo); // quadrado
-console.log(meuQuadrado.constructor.calculaPerimetro(4)); // 16
-
-// o acesso direto à propriedade estática da classe pela instância irá retornar undefined
-console.log(meuQuadrado.tipo); 
-
-// já o acesso ao método irá dar erro
-console.log(meuQuadrado.calculaPerimetro(4));
-```
-
-**Observação**: como a instância não "conhece" as propriedades e métodos da classe, você pode definir propriedades/métodos de mesmo nome para a instância. Isso no entanto, pode dificultar a leitura/entendimento do código.
-
-### Propriedades privadas 
-
-As propriedades de uma classe são públicas por padrão. Para torná-las privadas, adicione `#` como prefixo ao nome da propriedade:
-
-```js
-class Conta {
-    #saldo = 1000; // propriedade privada
-    nome = 'Fulano'; // propriedade pública
-
-    // se estivesse dentro de uma função
-    // this.#saldo
-}
-```
-
-Propriedades privadas *devem* ser declaradas *fora* do construtor, ou seja, na definição da classe.
-
-Propriedades privadas **não podem** ser acessadas nem modificadas **fora da classe** em que foram declaradas. Nem mesmo instâncias da classe possuem acesso a essas propriedades. Subclasses **também não** têm acesso nem podem modificar essas propriedades.
-
-Para fazer o acesso ou modificação, é necessário criar getters (com a palavra reservada `get` antes do nome da propriedade que irá retornar o valor da propriedade privada) e setters (mesma lógica, mas com a palavra reservada `set`)
-
-```js
-// adicionado ao código da class Conta
-get saldo() { return this.#saldo }
-
-set saldo(valor) { this.#saldo += valor }
-```
-
-Os getters são criados como funções, mas são acessados como propriedades (sem o `()`). Os setters também não precisam de `()` e o valor é passado como atribuição (uso do `=`). Os nomes para os getters e setters podem ser qualquer coisa, mas a convenção é ser o nome do atributo que eles acessam/modificam.
-
-```js
-const minhaConta = new Conta();
-console.log(minhaConta.saldo); // e não saldo(), nem minhaConta.#saldo
-minhaConta.saldo = 450;
-console.log(minhaConta.saldo); // 1450
-```
-
-### Métodos privados
-
-Métodos também podem ser privados, bastando adicionar `#` antes da declaração do método. Para serem executados, devem ser chamados com a `#`. (`this.#metodoPrivado()`).
-
-Vale uma observação: no DevTools do navegador ou no Node, é possível que você consiga acessar propriedades e métodos privados. Isso é um "relaxamento" da própria ferramenta para auxílio dos desenvolvedores.
-
-### Polimorfismos
-
-No JS pode haver **somente sobrescrita** de métodos (overriding), ou seja, os métodos nas subclasses podem ter um comportamento diferente da superclasse, mas a **assinatura do método não pode mudar** (não pode conter novos argumentos ou remover argumentos). Ou seja, a sobrecarga (overload) não é possível em JS.
- 
 ## Erros
 
 - `throw`: usado para **criar seu próprio erro**; pode substituir um return na função, jogando um erro que pode ser capturado e tratado. Se não for tratado na função, o erro "propaga" pela stack até encontrar um bloco que trata erros. Se nenhum for encontrado, o programa retorna um erro ao usuário. O erro dado pelo `throw` pode ser uma string, um número, ou uma instância da classe `Error`.
@@ -1709,5 +2007,5 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-8.7.6
-pag. 390
+10
+pag. 449
