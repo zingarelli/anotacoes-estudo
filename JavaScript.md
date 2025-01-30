@@ -1728,6 +1728,130 @@ Em OOP, uma **classe abstrata** é aquela que define métodos (comportamentos) q
 
 No JS **não há** uma definição formal nem palavra-chave para classes e métodos abstratos (como o `abstract` em outras linguagens, por exemplo). Mas você pode simular este comportamento criando uma superclasse com métodos que lançam erros informando que devem ser implementado pela subclasse. Dessa forma, você obriga as subclasses a sobrescrever estes métodos e implementá-los de fato.
 
+## Modularização
+
+Modularização de código significa quebrar seu código em diferentes arquivos / blocos independentes, e disponibilizá-los para que possam ser utilizados por outros códigos. Isso simplifica o projeto, permite a utilização de projetos de terceiros, além de melhorar o encapsulamento ou acesso ao código, explicitando o que será ou não disponibilizado para uso em outros códigos. 
+
+Por meio da modularização em JS, também conseguimos criar nossas próprias variáveis e funções sem a preocupação de sobrescrever alguma variável/função que venha de outro módulo - cada um tem seu escopo  próprio (chamado de "namespace"). Isto é, para usar alguma variável/função do módulo, você geralmente vai utilizar `nomeDoModulo.nomeDaFuncao`. Ou seja, se você criar uma função `contaCaracteres` e importar um módulo `Contador` que tenha uma função `contaCaracteres`, elas poderão existir no mesmo código e não se sobrescreverão (sua função será invocada por `contaCaracteres()` e a do módulo será invocada como `Contador.contaCaracteres()`).
+
+O **Node** tem sua própria maneira de trabalhar com módulos, usando a função **`require()`**. Já em **JS**, o ES6 introduz as palavras-chaves **`import`** e **`export`**.
+
+> Novas versões do Node (a partir da v12) também suportam `import`/`export` (parte do chamado "ES Modules") ao adicionar `type: "module"` no `package.json`. O `require()` é parte do chamado "CommonJS".
+
+### Módulos em Node
+
+Exportando funções de um módulo utilizando o objeto global `exports` do Node:
+
+```js
+// meuprojeto/calculadora.js
+
+const soma = (x, y) => x + y;
+const subtracao = (x, y) => x - y;
+const funcaoInterna = () => console.log('função indisponível para outros módulos');
+
+// somente o que estiver no objeto exports pode ser 
+// exportado por outros arquivos
+module.exports = { soma, subtracao }
+```
+
+Importando módulos próprios e de bibliotecas com `require()`:
+
+```js
+// meuprojeto/main.js
+
+// necessário informar o caminho do arquivo (relativo ou 
+// absoluto) para módulos próprios
+const calc = require('./calculadora.js'); // o .js é opcional
+
+// posso também importar somente aquilo que me interessa
+const { soma } = require('./calculadora.js'); 
+
+// para módulos do Node ou instalados via package manager
+// não é preciso informar o caminho, somente o nome
+const fs = require('fs'); 
+
+console.log(soma(1, 3)); // 4
+console.log(calc.soma(1, 3)); // 4
+```
+
+### Módulos com ES6
+
+O mesmo exemplo anterior, mas agora usando a sintaxe do ES6 para `import` e `export`:
+
+```js
+// meuprojeto/calculadora.js
+
+// opção 1: exportar individualmente cada variável/função/classe
+export const soma = (x, y) => x + y;
+export const subtracao = (x, y) => x - y;
+const funcaoInterna = () => console.log('função indisponível para outros módulos');
+
+// opção 2: fazer um export único no final do arquivo
+// export { soma, subtracao };
+
+// --------
+
+// meuprojeto/main.js
+// OBRIGATÓRIO informar o caminho do arquivo
+import { soma, subtracao } from './calculadora.js'; // o .js é OBRIGATÓRIO
+
+// ou se quiser importar tudo e definir um alias:
+import * as calc from './calculadora.js'
+
+// para módulos instalados via package manager, e caso 
+// você utilize um bundler (Webpack, Vite, etc), seu 
+// bundler pode reconhecer esses módulos instalados e, 
+// nesse caso não é necessário passar o caminho 
+// completo, somente o nome do módulo.
+
+console.log(soma(1, 3)); // 4
+console.log(calc.soma(1, 3)); // 4
+```
+
+Quando o módulo exporta **somente um valor** (uma classe, por exemplo), podemos utilizar o **`export default`**.
+
+```js
+// meuprojeto/Automovel.js
+export default class Automovel {
+    // ...
+}
+
+// meuprojeto/carros.js
+// para export default, não é necessário utilizar {} no import
+import voceDecideONome from './Automovel.js';
+```
+
+**Observações**:
+
+- `export` e `import` não podem ser usados dentro de classes, funções, loops ou condicionais, ou seja, devem ser colocados no nível mais externo do seu código;
+
+- a convenção é declarar todos os imports no começo do código. Eles podem ser colocados em qualquer lugar (desde que não dentro de blocos internos, como mencionado anteriormente), pois são elevados pelo hoisting, mas isso deixa o código ruim de ler;
+
+- você pode renomear um valor importado utilizando `as`: `import { soma as adiciona } from './calculadora.js'`. O mesmo pode ser feito para valores exportados, mas é algum incomum;
+
+- você pode criar um módulo que importa diferentes módulos e os exporta novamente. Isso acontece em projetos React, por exemplo, em que vários componentes ficam dentro de uma mesma pasta: você pode criar um arquivo `index.js` que importa e re-exporta os componentes, facilitando para que outros componentes possam importá-los em um único import.
+
+    ```js
+    // meuprojeto/components/Form/index.js
+
+    // assumindo que os componentes são export default
+    import Input from './Input/index.jsx';
+    import Select from './Select/index.jsx';
+    import Checkbox from './Checkbox/index.jsx';
+    export { Input, Select, Checkbox};
+
+    // outra maneira, combinando export e from:
+    export { default as Input } from './Input/index.jsx';
+    export { default as Select } from './Select/index.jsx';
+    export { default as Checkbox } from './Checkbox/index.jsx';
+
+    // caso os componentes não fossem export default
+    // poderia simplificar para
+    // export * from './';  
+    ```
+
+- O ES2020 introduziu o **operador `import('caminhoDoModulo')`**. Ele possibilita **imports dinâmicos**, retornando uma Promise, que é "fullfiled" quando o import termina de carregar. Neste caso, o import pode acontecer em qualquer parte do código, inclusive dentro de funções, loops, condicionais ou qualquer outro bloco de código. O módulo é carregado sob demanda (somente quando necessário), o que pode melhorar a performance.
+
 ## Erros
 
 - `throw`: usado para **criar seu próprio erro**; pode substituir um return na função, jogando um erro que pode ser capturado e tratado. Se não for tratado na função, o erro "propaga" pela stack até encontrar um bloco que trata erros. Se nenhum for encontrado, o programa retorna um erro ao usuário. O erro dado pelo `throw` pode ser uma string, um número, ou uma instância da classe `Error`.
@@ -2007,5 +2131,5 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-10
-pag. 449
+11
+pag. 479
