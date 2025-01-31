@@ -1281,6 +1281,109 @@ Formato `chave: valor`. Muito utilizado para comunicação entre back-end e fron
 
 - existem outras particularidades, como a serialização de um objeto do tipo Date. Consulte a [documentação](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#description).
 
+## Classes Set e Map
+
+Podemos usar as propriedades de objetos para mapear strings a valores. Dependendo da estrutura e operações que você precisa, trabalhar com as classes Set e Map pode ser mais vantajoso do que utilizar objetos.
+
+### Set
+
+Em JS, um set (conjunto em português) é um conjunto de valores únicos, não ordenados e não indexáveis.
+
+- **valores únicos**: valores duplicados não são permitidos; ao tentar inserir um valor já existente em um set, este valor é ignorado;
+
+- não ordenado: a ordem dentro de um set é **baseada na ordem de inserção**. Ao iterar em um set (usando `for/of` ou `forEach`), os elementos serão enumerados pela ordem de inserção;
+
+- **não indexáveis**: não é possível recuperar um elemento pelo seu índice, como em um array, pois não há índices em um set.
+
+A **maior vantagem** do set é quando você precisa **verificar se elementos fazem parte de um conjunto**. O set é otimizado para fazer essa verificação de maneira mais rápida do que em outras classes, como Arrays. A verificação é feita com o método `has()`. Além disso, com um set você tem a garantia de que não há repetição de elementos.
+
+Por ser um conjunto, também estão disponíveis ao set [operações matemáticas de conjuntos](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set#set_composition), como intersecção e união.
+
+```js
+// um set pode ser iniciado sem valores ou passando algum
+// objeto iterável como argumento.
+const valoresUnicos = new Set(); 
+
+// método add adiciona UM valor por vez e retorna o set
+// com o valor adicionado. 
+valoresUnicos.add(5);
+
+// posso ter valores de diferentes tipos
+valoresUnicos.add(true);
+
+// a comparação leva em conta o tipo, então 5 e "5" 
+// serão valores distintos
+valoresUnicos.add("5");
+
+// devolve o tamanho do set
+valoresUnicos.size; // => 3
+
+// Se você passar um array, a REFERÊNCIA ao array é 
+// adicionada ao set como valor, e não seus elementos.
+valoresUnicos.add([0, 2, 4]);
+valoresUnicos; // => Set(4) {5, true, '5', Array(3)}
+
+// remove UM valor por vez e retorna true se o elemento 
+// foi encontrado e removido, senão retorna false
+valoresUnicos.delete(5); // => false
+valoresUnicos.size; // => 3
+
+// tentar remover o array não irá dar certo, a não ser 
+// que você passe a referência ao mesmo array adicionado
+// ao set
+valoresUnicos.delete([0, 2, 4]); // => false
+valoresUnicos.size; // => 3
+
+// clear() remove todos os elementos de uma vez
+valoresUnicos.clear();
+valoresUnicos.size; // => 0
+```
+
+O método `add()` insere um valor **por vez**. O que pode ser feito é inicializar o set (`new Set()`) e passar um iterável como argumento, um array por exemplo. Neste caso, o array é desmembrado e seus elementos únicos passam a ser elementos do set. Como o `add()` retorna o set atualizado, é possível fazer o method chaining (`valoresUnicos.add(5).add(10).add('texto')`)
+
+**Cabe ressaltar**: passar um **array para `add()` não insere seus elementos**, mas sim uma **referência em memória ao array**. Isso acaba se **refletindo também na remoção**: passar um array para `delete()` não necessariamente irá deletar um elemento array no set, mesmo se os valores são iguais - você precisa **passar a referência ao array como argumento do `delete()`**.
+
+Por fim, um set pode ser convertido em array utilizando o spread operator. Com isso, podemos utilizar o set como uma forma útil de remover elementos duplicados de um array ou string:
+
+```js
+const cidade = 'Araraquara';
+const valoresRepetidos = [2, 3, 5, 2, 3, 5, 5, 5, 2, 3, 10, 5, 7, 2, 3]
+const c = [...new Set(cidade)]; 
+const v = [...new Set(valoresRepetidos)];
+console.log(c); // => ['A', 'r', 'a', 'q', 'u']
+console.log(v); // => [2, 3, 5, 10, 7]
+```
+
+### Map
+
+Um map é parecido com um objeto: é um **conjunto de pares chave-valor**, onde um valor é mapeado a uma chave. Diferente de objetos, no entanto, as **chaves** em um map podem ser de **qualquer valor**, incluindo funções, objetos e primitivas. Em objetos, as chaves são somente strings ou Symbol.
+
+Outras diferenças em relação a objetos:
+
+- map tem a propriedade `size` que informa sua quantidade de items;
+
+- map é otimizado e tem melhor performance em **cenários que involvem operações frequentes de adição e remoção de elementos**. A busca por um elemento, no entanto, tem performance similar.
+
+Você pode inicializar um map vazio ou passar um iterável que contenha como elementos arrays de 2 elementos `[chave, valor]`.
+
+Da mesma forma que um set, map tem os métodos `has()`, `delete()` e `clear()`. A chave é passada como argumento para `has()` e `delete`.
+
+Adicionar uma nova chave/valor, no entanto, é por meio do **método `set(<chave>, <valor>)`**, que adiciona um valor por vez e retorna o map atualizado (permitindo o method chaining). Além disso, as **chaves também são únicas**, ou seja, adicionar um valor a uma chave já existente sobrescreve o antigo valor. Com isso, `set()` também funciona como um método de update. Como em um set, a **comparação do valor da chave leva em conta seu tipo**, e quando é passado um array ou objeto como valor da chave, é **utilizada a referência em memória**.
+
+Recuperar um valor é por meio do método `get()`, que retorna o valor da chave passada como argumento. Caso a chave não exista no map, é retornado `undefined`. Por conta de a chave utilizar a referência em memória quando definida como um array ou objeto, vale a mesma ressalva feita para set:
+
+```js
+let m = new Map(); 
+m.set({}, 1); // mapeia a referência a um objeto vazio
+m.set({}, 2); // mapeia a referência a OUTRO objeto vazio
+m.size // => 2
+m.get({}) // => undefined: referência a um TERCEIRO objeto vazio
+```
+
+Maps são iteráveis e retornam um array `[chave, valor]` em cada iteração. A ordem em um map é baseada na ordem de inserção dos elementos, como em um set. Também é possível iterar somente nas chaves ou valores, por meio dos métodos `keys()` e `values()`.
+
+Vale uma ressalva ao utilizar o `forEach`: o callback passado ao forEach tem como **primeiro argumento o valor**, e como **segundo argumento a chave**: `m.forEach((valor, chave) => {...});`. Cuidado para não confundir a ordem, que é inverso do chave/valor.
+
 ## Classes 
 
 Classes são uma representação para grupos de objetos que compartilham de certas propriedades. Em outras palavras, grupos de objetos que **herdam propriedades de um mesmo objeto protótipo** (prototype object). Membros da classe (chamados de instâncias da classe) podem ter suas próprias propriedades, mas também possuem propriedades e métodos definidos pela classe. Por conta disso, a **herança em classes no JS é baseada em protótipo** (prototype-based inheritance).
