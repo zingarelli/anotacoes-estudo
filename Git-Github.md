@@ -1,38 +1,38 @@
 # Anotações sobre Git e GitHub
 
-## Instrutores
+Anotações baseadas em cursos da Alura e também do Bootcamp TQI | DIO. 
 
-- [Vinicius Dias](https://www.linkedin.com/in/cviniciussdias/) 
+📖 Posteriormente atualizadas pelo livro: **Pro Git (Scott Chacon & Ben Straub)**, [disponível gratuitamente](https://git-scm.com/book/en/v2) (em inglês).
 
-- [Gabrielle Ribeiro Gomes](https://www.linkedin.com/in/gabrielleribeiro/)
+**Instrutores e cursos Alura:**
 
-- [Rodrigo da Silva Ferreira Caneppele](https://www.linkedin.com/in/rcaneppele)
+🎓 [Vinicius Dias](https://www.linkedin.com/in/cviniciussdias/) 
 
-Cursos: 
+🎓 [Gabrielle Ribeiro Gomes](https://www.linkedin.com/in/gabrielleribeiro/)
 
-- ["Git e GitHub: Controle e compartilhe seu código"](https://www.alura.com.br/curso-online-git-github-controle-de-versao--amp)
+🎓 [Rodrigo da Silva Ferreira Caneppele](https://www.linkedin.com/in/rcaneppele)
 
-- ["Git e GitHub: estratégias de ramificação, Conflitos e Pull Requests"](https://www.alura.com.br/curso-online-git-github-branching-conflitos-pull-requests)
+🖥️ ["Git e GitHub: Controle e compartilhe seu código"](https://www.alura.com.br/curso-online-git-github-controle-de-versao--amp)
 
-*Com algumas anotações do curso de GIT do Bootcamp TQI | DIO*
+🖥️ ["Git e GitHub: estratégias de ramificação, Conflitos e Pull Requests"](https://www.alura.com.br/curso-online-git-github-branching-conflitos-pull-requests)
 
-Atualização 2024:
+🖥️ [Git e GitHub: compartilhando e colaborando em projetos](https://cursos.alura.com.br/course/git-github-compartilhando-colaborando-projetos)
 
-- [Git e GitHub: compartilhando e colaborando em projetos](https://cursos.alura.com.br/course/git-github-compartilhando-colaborando-projetos)
-
-- [Git e GitHub: dominando controle de versão de código](https://cursos.alura.com.br/course/git-github-dominando-controle-versao-codigo)
+🖥️ [Git e GitHub: dominando controle de versão de código](https://cursos.alura.com.br/course/git-github-dominando-controle-versao-codigo)
 
 ## Introdução
 
-Git é uma ferramenta para controle de versões de arquivos. Auxilia não ter que criar diversos arquivos com conteúdos semelhantes e nomes tipo "versao_2", "ultima_edicao", "final", "final_revisado", etc. Também permite trabalho em grupo em um mesmo conjunto de arquivos, controlando quem fez as edições e possibilitando tratar de conflitos de edições em um mesmo arquivo.
+Git é uma ferramenta para **controle de versões de arquivos**. Auxilia não ter que criar diversos arquivos com conteúdos semelhantes e nomes tipo "versao_2", "ultima_edicao", "final", "final_revisado", etc. Também permite trabalho em grupo em um mesmo conjunto de arquivos, controlando quem fez as edições e possibilitando tratar de conflitos de edições em um mesmo arquivo.
+
+Git foi criado em 2005 pela comunidade de desenvolvimento do Linux, para terem sua própria ferramenta de controle de versões distribuída.
 
 As letras que formam GIT não têm um significado, mas é alvo de sarcasmo do próprio criador, Linus Torvalds.
 
 Git precisa ser instalado na máquina (no Linux às vezes já vem instalado). 
 
-> Link: https://git-scm.com/
+> Link: https://git-scm.com/downloads
 
-Uma das **vantagens** do Git sobre outros sistemas de controle de versão é que com o Git você tem uma versão no seu repositório local, na sua máquina, podendo trabalhar em cima dessa versão e depois fazer o push para o repositório remoto, ou seja, um repositório acessado por todos da equipe, o que centraliza todas as mudanças. Possível **trabalhar "offline" e de modo distribuído** (cada pessoa tem o arquivo em seu repositório local, depois devem ser resolvidos os problemas de merge entre alterações diferentes em um mesmo arquivo).
+Uma das **vantagens** do Git sobre outros sistemas de controle de versão é que com o Git você tem uma versão no seu repositório local, na sua máquina, podendo trabalhar em cima dessa versão e depois fazer o push para o repositório remoto, ou seja, um repositório acessado por todos da equipe, o que centraliza todas as mudanças. Possível **trabalhar "offline" e de modo distribuído** (cada pessoa tem o arquivo em seu repositório local, depois devem ser resolvidos os problemas de merge entre alterações diferentes em um mesmo arquivo). Por isso é considerado um DVCS (Distributed Version Control System)
 
 ## Definições
 
@@ -42,11 +42,23 @@ O **Git** é a **ferramenta** para o versionamento; o **GitHub** é um **reposit
 
 > O [GitHub](https://github.com) é muito utilizado pelos programadores e também pode servir de "vitrine"/portifólio para aqueles que procuram por um emprego na área, de modo a poderem mostrar aos recrutadores os projetos que desenvolvem ou já desenvolveram.
 
-**Git Bash**: é um terminal de comando que pode ser instalado durante a instalação do Git. Lembra o Vim. Os comandos para navegar em pastas e tal são iguais aos do Linux. Também tem umas cores para tornar a interface mais amigável e facilitar a leitura/execução dos comandos. 
+**Git Bash**: é um terminal de comando que pode ser instalado durante a instalação do Git. Lembra o Vim. Os comandos para navegar em pastas e tal são iguais aos do Linux. Também tem umas cores para tornar a interface mais amigável e facilitar a leitura/execução dos comandos, além de autocomplete de comandos e caminhos ao pressionar `Tab`. 
 
 > É possível também chamar o Git pelo CMD do Windows (acertando as variáveis no PATH). 
 
 > Você também pode clicar com o botão direito na pasta em que está seu código e selecionar para abrir com o Git Bash; com isso, ele será aberto já no caminho para esta pasta.
+
+## Estados de um arquivo
+
+Arquivos de um projeto versionado pelo Git podem possuir um de **três estados**: **modified**, **staged**, **committed**.
+
+- modified: o arquivo foi alterado, mas essa alteração ainda não foi enviada para o gerenciamento de versão (não está na base de dados do git daquele projeto);
+
+- staged: o arquivo alterado foi marcado para ser adicionado à próxima alteração do gerenciamento de versão (ao próximo commit). Costumamos dizer que estes arquivos estão na "staging area";
+
+- committed: o arquivo está devidamente versionado e faz parte do diretório do git (está na base do git daquele projeto).
+
+A staging area é importante por te dar o controle de selecionar quais arquivos farão parte do próximo commit. Isso possibilita ter um histórico de commits bem organizado, facilitando identificar quais arquivos foram alterados a cada commit, bem como facilitando a reversão para o caso de algum bug ter sido introduzido ao projeto, por exemplo. 
 
 ## Versionamento e repositórios
 
@@ -54,7 +66,7 @@ O Git versiona **repositórios**, ou seja, é necessário **criar uma pasta** pa
 
 **HEAD**: pensando em uma linha do tempo de versionamento, o HEAD indica a posição atual nos arquivos versionados. Geralmente é o topo do versionamento, fazendo referência ao último commit feito (mais sobre commits [nesta Seção](#commit)).
 
-**master**: antigamente era o nome padrão dado à branch principal do repositório (mais sobre branch [nesta Seção](#branch)). Hoje em dia é considerado um nome depreciativo (lembra master/slave, ou mestre/escravo) e tem-se utilizado mais a denominação de "main".
+**master**: antigamente era o nome padrão dado à branch principal do repositório (mais sobre branch [nesta Seção](#branch)). Hoje em dia é considerado um nome depreciativo (lembra master/slave, ou mestre/escravo) e tem-se utilizado mais a denominação de "main". O GitHub começou a usar "main" em meados de 2020.
 
 ### `.gitignore`
 
@@ -62,9 +74,11 @@ O Git versiona **repositórios**, ou seja, é necessário **criar uma pasta** pa
 
 - no caso de pastas, digite o caminho até a pasta (relativo à raiz do repositório) e insira a barra / no final do nome da pasta;
 
-- informar o nome de uma pasta faz com que **todo conteúdo dentro dela (incluindo subpastas)** também seja ignorado.
+- informar o nome de uma pasta faz com que **todo conteúdo dentro dela (incluindo subpastas)** também seja ignorado;
 
-- também é possível ignorar todos os arquivos de uma extensão, por meio da máscara `*.nome_da_extensao`
+- também é possível ignorar todos os arquivos de uma extensão, por meio da máscara `*.nome_da_extensao`;
+
+- usar `**` indica que todas as pastas e subpastas devem ser consideradas. Por exemplo: `doc/**/*.pdf` irá ignorar todos os arquivos .pdf que estejam dentro da pasta doc e subpastas dentro dela.
 
 Exemplos: 
 
@@ -145,11 +159,30 @@ Resolvidos os conflitos, segue o processo de commit dessas mudanças e, aí ent�
 
 ## Comandos git
 
-Segue abaixo uma lista de comandos git, com uma descrição do que fazem e como executá-los no terminal. Essa lista é uma referência e não está em uma ordem específica.
+Segue abaixo uma lista de comandos git, com uma descrição do que fazem e como executá-los no terminal. Essa lista é uma referência e não está em uma ordem específica. A maioria dos comandos, senão todos, devem ser usados na pasta raiz do projeto que esteja ou que vai ser versionado (seu repositório local, ou *working directory*).
 
 ### `--help`
 
-Essa é uma **opção** que você pode adicionar a qualquer comando git (exemplo: `git status --help`) para obter um manual de como o comando funciona e quais opções ele aceita. Em versões atuais, esse manual será aberto no navegador, e não na linha de comando.
+Essa é uma **opção (ou flag, se preferir)** que você pode adicionar a qualquer comando git (exemplo: `git status --help`) para obter um manual de como o comando funciona e quais opções ele aceita. Em versões atuais, esse manual será aberto no navegador, e não na linha de comando.
+
+Se quiser somente saber as opções disponíveis para um comando git, de maneira mais concisa, pode usar a flag `-h`.
+
+### `git config`
+
+```bash
+git config user.name "Seu nome aqui"
+git config user.email "seu@email.aqui"
+```
+
+Os dois comandos acima servem para informar o nome e e-mail de quem está trabalhando no repositório local. Essas informações serão necessárias para fazer commits na sua máquina. 
+
+O Git trabalha com diferentes níveis de arquivos `config`. Quando o comando é usado como mostrado acima, as configurações de nome e e-mail são **salvas localmente**, ou seja, somente para o repositório atual. O comando acima é o mesmo que `git config --local user.name "Seu nome aqui"`, sendo que a flag `--local` é o padrão, então pode ser omitida.
+
+- Caso queira que a configuração de nome e e-mail seja salva e utilizada por **todos** os seus repositórios locais (no Windows, isso significa o usuário que está logado), **use o `--global`**. Na prática, é mais conveniente já setar como global e alterar para um projeto específico caso precise de nome/e-mail diferentes. Para isso, basta rodar o comando no projeto que deseja, sem a flag `--global`. As configurações locais sempre prevalecerão sobre as globais.
+
+`git config --list` : mostra a lista de configurações salvas em todos os arquivos config, tanto o local quanto global e de sistema. 
+
+`git config --local --unset <nome_da_configuracao>`: apaga da lista de configuração local a propriedade informada.
 
 ### `git init`
 
@@ -157,24 +190,31 @@ Essa é uma **opção** que você pode adicionar a qualquer comando git (exemplo
 git init
 ```
 
-Inicia o versionamento em um diretório (cria um repositório). Necessário navegar até a pasta onde estão os códigos a serem versionados e então executar este comando.
+Inicia o versionamento em um diretório, ou seja, cria um repositório local na pasta em que o comando foi executado. Portanto, se você quer versionar um projeto, é necessário navegar até a pasta onde estão os códigos a serem versionados e então executar o comando.
+
+Será criada uma pasta oculta `.git`. Ela é a responsável por fazer todas a operações que o git precisa para versionar o projeto.
 
 - flag `--bare` indica que o repositório é "puro", ou seja, só irá conter arquivos e receber modificações. Pode ser utilizado quando criamos localmente o repositório remoto, que será o repositório acessado por todos para baixar arquivos e subir mudanças.
 
-### `git config`
+### `git clone`
 
 ```bash
-git config --local user.name "Seu nome aqui"
-git config --local user.email "seu@email.aqui"
+git clone url_ou_caminho_do_repositorio_remoto nome_para_a_pasta_local
 ```
 
-Os dois comandos acima servem para informar o nome e e-mail de quem está trabalhando naquele repositório local. É útil quando se trabalha em equipe, assim é possível identificar os autores das mudanças. 
+Caso você vá trabalhar em um projeto que já está versionado, uma opção para obter uma cópia do projeto em sua máquina é usando o `git clone`. Como o nome diz, este comando clona o projeto, ou seja, baixa de um repositório **remoto** todos os arquivos e todo o versionamento e os salva para uma pasta `nome_para_a_pasta_local`. 
 
-- O comando `--local` adiciona essas informações ao repositório **corrente**; caso queira que seja uma informação para **todos** os seus repositórios locais, use o `--global`. Essas duas configs são necessárias, caso contrário vai dar problema na hora do commit.
+- Se quiser salvar o repositório na pasta corrente (e ela estiver **vazia**), basta usar o ponto (`.`) ao invés de `nome_para_a_pasta_local`: `git clone url_ou_caminho_do_repositorio_remoto .`
 
-`git config --list` : mostra a lista de configurações salvas. 
+- Se você **não passar** o `nome_para_a_pasta_local`, será criada uma pasta com o nome do repositório clonado. Por exemplo, usando o comando `git clone https://github.com/zingarelli/anotacoes-estudo.git`, será criada a pasta `anotacoes-estudo` e o conteúdo do repositório será salvo dentro dela.
 
-`git config --local --unset <nome_da_configuracao>`: apaga da lista de configuração local a propriedade informada.
+Com o projeto clonado, é possível alterar os arquivos, commitar e fazer push para o repositório remoto. 
+
+> Caso o projeto não seja seu, será necessário ter permissão da pessoa dona do projeto para que seu usuário possa fazer push.
+
+O `url_ou_caminho_do_repositorio_remoto` pode ser a URL de um repositório online ou o caminho para uma pasta na máquina local.
+
+O  nome do repositório remoto será "`origin`" para o projeto clonado, mas pode ser renomeado com `git remote rename nome_atual novo_nome`.
 
 ### `git status`
 
@@ -182,7 +222,14 @@ Os dois comandos acima servem para informar o nome e e-mail de quem está trabal
 git status
 ```
 
-Dá detalhes sobre os arquivos em seu repositório. Por exemplo, o comando informa se há arquivos que foram criados ou modificados e que ainda não foram commitados ou enviados ao repositório remoto. Também informa em qual branch você está trabalhando.
+Dá detalhes sobre os arquivos em seu repositório. Por exemplo, o comando informa se há arquivos que foram criados ou modificados e que ainda não foram commitados ou enviados ao repositório remoto, bem como arquivos que estão na staging area prontos para serem commitados. Também informa em qual branch você está trabalhando.
+
+Você pode utilizar a flag `--short` ou `-s` para ter uma saída mais concisa do status. Arquivos serão listados linha a linha, com uma letra no início para informar seu status:
+
+- `??`: novo arquivo ainda não versionado;
+- `M`: arquivo foi modificado mas ainda não adicionado à staging area;
+- `A`: arquivo adicionado para a staging area;  
+- `MM`: arquivo foi modificado, adicionado à staging area e posteriormente modificado novamente.
 
 ### `git add`
 
@@ -196,7 +243,9 @@ Informa ao git que o arquivo deverá ser adicionado ao próximo commit a ser exe
 
    - `git add .`
 
-   - **Atenção**: nesse caso, serão adicionados **todos** os arquivos que foram alterados/criados/removidos no repositório local. 
+   - **Atenção**: nesse caso, serão adicionados **todos** os arquivos que foram alterados/criados/removidos na pasta atual.
+
+- caso queira adicionar todos os arquivos de uma pasta específica, informe o caminho relativo até aquela pasta, a partir da pasta em que se encontra atualmente. Isso irá incluir também subpastas e arquivos em subpastas a partir da pasta informada. 
    
 - Para selecionar os arquivos manualmente, você pode inseri-los separados por espaço: 
 
@@ -212,9 +261,13 @@ git commit -m "descricao_curta_de_seu_commit"
 
 "Commita" suas alterações que estão em "stage", e as prepara para serem salvas no repositório remoto. Ou seja, é um jeito de informar alterações que foram feitas no projeto para resolver uma tarefa, corrigir um bug, etc. 
 
-Isso ajuda a manter um histórico de modificações no projeto e quais arquivos foram alterados/adicionados/removidos. Por meio de outros comandos git, podemos usar esse histórico para "navegar no tempo" do projeto, verificando como ele estava em diferentes etapas.
+Isso ajuda a manter um histórico de modificações no projeto e quais arquivos foram alterados/adicionados/removidos. Por meio de outros comandos git, podemos usar esse histórico para "navegar no tempo" do projeto, verificando como ele estava em diferentes etapas, ou até mesmo reverter para um commit anterior.
+
+A flag `-m` e a mensagem são opcionais. Se você usar somente `git commit`, será aberto o editor de texto padrão da sua máquina para que você inclua a mensagem. O commit é finalizado ao salvar a mensagem e fechar o editor de texto.
 
 > As alterações "commitadas" ficam salvas no repositório **local**. Para de fato salvá-las no repositório remoto, utilizamos o comando [`git push`](#git-push).
+
+A flag `-a` permite commitar todos os arquivos que foram **modificados** (os "untracked" não entram aqui) sem precisar enviá-los primeiro à staging area. É uma maneira de **pular a etapa de `git add`**. Use com cautela, pois eventualmente você pode estar commitando arquivos que você ainda não gostaria de commitar.
 
 ### `git log`
 
@@ -226,7 +279,7 @@ Exibe o histórico de commits feitos, em ordem decrescente de data, trazendo nom
 
 > `git log --oneline`: histórico resumido; mostra somente parte do hash e mensagem de cada commit. Facilita quando você só quer ler as mensagens de cada commit para uma consulta rápida;
 
-> `git log -p`: histórico detalhado: mostra também as alterações (diff) feitas por cada commit em relação ao commit anterior.
+> `git log -p` (ou `--patch`): histórico detalhado: mostra também as alterações (diff) feitas por cada commit em relação ao commit anterior.
 
 > `git log --graph`: mostra os commits com alguns símbolos auxiliares no começo de cada linha (`|`, `\`, `/`) para criar "bifurcações" na linha do tempo, de modo a facilitar a visualização de branches e merges que aconteceram. O símbolo `|` indica que os commits estão seguindo uma linha direta, ou seja, pertencem a uma mesma branch (geralmente a main). O símbolo `/` indica quando uma branch começou e o `\` indica o momento em que houve um merge dessa branch. Desse modo, você consegue ver o histórico de commits de uma maneira identada, permitindo verificar o histórico por branches.
 
@@ -246,9 +299,11 @@ Mostra o commit específico e também o diff dele com o commit anterior a ele.
 git diff
 ```
 
-Mostra as **diferenças** no código atual e o código do último commit, caso você tenha modificações nos códigos que ainda não estão em stage. 
+Mostra as **diferenças** no código atual e o código que está na sua staging area (ou do último commit, se não houver nada em stage). 
 
-E se for mais de um arquivo? Ele vai mostrar as diferenças arquivo por arquivo; a linha de comando dá indicações de quando um arquivo termina e um novo será mostrado.
+E se mais de um arquivo tiver sido modificado? Ele vai mostrar as diferenças arquivo por arquivo; a linha de comando dá indicações de quando um arquivo termina e um novo será mostrado.
+
+A flag `--stage` ou `--cached` mostra as diferenças que estão em staging em comparação ao último commit.
 
 > `git diff hash_commmit_X..hash_commmit_Y`: mostra as diferenças desde o `hash_commmit_X` até o `hash_commmit_Y`. Se **X for um commit mais antigo que Y**, serão mostradas as diferenças em ordem **cronológica**. Caso X seja um commit mais novo que Y, as diferenças serão mostradas em ordem cronológica reversa (meio que mostrando o que será desfeito de X para Y).
 
@@ -324,26 +379,6 @@ Salva os arquivos em um **local temporário** da sua máquina, por exemplo, para
 
 > `git stash clear`: limpa todas as modificações salvas no stash. Use com cautela.
 
-### `git clone`
-
-```bash
-git clone caminho_do_repositorio_remoto nome_para_a_pasta_local
-```
-
-Clona um projeto, ou seja, baixa os arquivos de um repositório **remoto** para uma pasta da sua máquina com o `nome_para_a_pasta_local`. 
-
-> Se quiser salvar o repositório na pasta corrente (e ela estiver **vazia**), basta usar o ponto (`.`) ao invés de `nome_para_a_pasta_local`: `git clone caminho_do_repositorio_remoto .`
-
-> Se você **não passar** o `nome_para_a_pasta_local`, será criada uma pasta com o nome do repositório clonado. Por exemplo, usando o comando `git clone https://github.com/zingarelli/anotacoes-estudo.git`, será criada a pasta `anotacoes-estudo` e o conteúdo do repositório será salvo dentro dela.
-
-Com o projeto clonado, é possível alterar os arquivos, commitar e fazer push para o repositório remoto. 
-
-> Caso o projeto não seja seu, será necessário ter permissão da pessoa dona do projeto para que seu usuário possa fazer push.
-
-O `caminho_do_repositorio_remoto` pode ser a URL de um repositório online ou o caminho para uma pasta na máquina local.
-
-O  nome do repositório remoto será "`origin`" para o projeto clonado, mas pode ser renomeado com `git remote rename nome_atual novo_nome`.
-
 ### `git branch`
 
 ```bash
@@ -380,7 +415,7 @@ Navega para um commit específico do log. Serão carregados os arquivos desse co
 
 > Atualmente, o git fornece um comando alternativo, mais intuitivo: o [`git restore`](https://git-scm.com/docs/git-restore). Essa mudança veio por conta da confusão da dupla responsabilidade do `git checkout`, que serve tanto para mudar de branch quanto para restaurar arquivos navegando por commits.
 
-### git merge
+### `git merge`
 
 ```bash
 git merge outra_branch
@@ -608,3 +643,7 @@ O GitHub possui algo parecido, chamado "GitHub Actions".
 Sugestões de softwares com GUI para facilitar a visualização/utilização do Git: Git Cola, GitHub Desktop, GitKraken (este último tem até a implementação da estratégia do Git Flow).
 
 O próprio VS Code possui algumas funcionalidades para versionar com o git e linkar com o GitHub.
+
+### Continuar em...
+
+"Undoing things" na pág. 46
