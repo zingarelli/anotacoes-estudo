@@ -66,7 +66,7 @@ O Git versiona **repositórios**, ou seja, é necessário **criar uma pasta** pa
 
 **HEAD**: pensando em uma linha do tempo de versionamento, o HEAD indica a posição atual nos arquivos versionados. Geralmente é o topo do versionamento, fazendo referência ao último commit feito (mais sobre commits [nesta Seção](#commit)).
 
-**master**: antigamente era o nome padrão dado à branch principal do repositório (mais sobre branch [nesta Seção](#branch)). Hoje em dia é considerado um nome depreciativo (lembra master/slave, ou mestre/escravo) e tem-se utilizado mais a denominação de "main". O GitHub começou a usar "main" em meados de 2020.
+**master**: antigamente era o nome padrão dado à branch principal do repositório (mais sobre branch [nesta Seção](#branching)). Hoje em dia é considerado um nome depreciativo (lembra master/slave, ou mestre/escravo) e tem-se utilizado mais a denominação de "main". O GitHub começou a usar "main" em meados de 2020.
 
 ### `.gitignore`
 
@@ -145,15 +145,25 @@ Você decide quando fazer ou não um commit, no entanto, uma convenção é **nu
 
 - quando você trabalhar em uma empresa, possivelmente haverá uma "etiqueta" a ser seguida pelo time para fazer commits e pushes de maneira padronizada.
 
-## Branch 
+## Branching
 
-É uma maneira de criar **vertentes/ramos de desenvolvimento** dentro de um repositório, de modo a não interferir no código principal (geralmente chamada de branch main). 
+Uma tradução em português para "branch" seria "ramo" ou "galho".
 
-O uso de branches serve, por exemplo, para desenvolver uma nova feature do projeto ou dividir o trabalho de uma equipe.
+O processo de branching uma maneira de criar **vertentes/ramos de desenvolvimento** dentro de um repositório, de modo a não interferir no código principal (geralmente chamada de branch main). 
+
+Uma branch, em termos básicos, é uma lista de commits sucessivos (um histórico de commits, ou uma linha do tempo). Cada novo commit é adicionado ao "topo" da branch, ou seja, a branch ativa tem um ponteiro apontando para o último commit feito. Criar uma nova branch significa criar um novo ponteiro a partir do último commit, sendo que novos commits irão atualizar para onde o ponteiro aponta, dependendo de qual branch estiver ativa.
+
+Por exemplo, suponha que você tem a branch main, apontando para o commit abc1234. Você então cria e ativa uma nova branch "teste". Um ponteiro para essa branch é criado e também aponta para o commmit abc1234. Suponha que você fez um novo commit, cde5678; neste caso, o ponteiro de "teste", que é a branch ativa, irá apontar para cde5678, enquanto o ponteiro da branch main continua apontando para abc1234. Novos commits continuarão atualizando o ponteiro de "teste". Por fim, suponha que o último commit feito na branch "teste" foi ijk2345, e que agora você retornou para a branch main (main está ativa) e fez um novo commit, lmn6789. Neste caso, branch main irá apontar para este commit. Com isso, você agora tem duas ramificações na linha do tempo dos commits, iniciado no commit abc1234, mas com a branch main apontando para lmn6789 e a branch teste apontando para ijk2345.
+
+Outra nomenclatura envolvida no branching é o conceito de **HEAD**. O HEAD é um ponteiro especial que **aponta para a branch ativa**. Ao trocar de branches, o que você está de fato fazendo é movendo o HEAD para apontar para a branch desejada.
+
+O uso de branches serve, por exemplo, para desenvolver uma nova feature do projeto ou dividir o trabalho de uma equipe, possibilitando que cada um faça suas alterações de maneira independente, que posteriormente podem ser unidas à branch main (ou qualquer outra branch) por meio de um processo de merging.
 
 O site https://git-school.github.io/visualizing-git/ é um bom exemplo para entender branches de maneira visual.
 
-A branch pode ser incluída à main por meio do **merge**. Os comandos para isso são o [`merge`](#git-merge) e o [`rebase`](#git-rebase). A ação de merge pode gerar conflitos quando um mesmo arquivo está diferente entre diferentes branches. Nesse caso, o Git irá adicionar linhas nos arquivos que estão gerando conflito, indicando aonde esses conflitos acontecem, e **você é responsável por resolvê-los** (eliminando as linhas que você considera que não são mais necessárias para o atual estado de seu projeto, por exemplo). 
+Os comandos para branching, tanto o antigo (`checkout`) quanto o novo (`switch`) podem ser vistos na seção do [`git branch`](#git-branch).
+
+Os comandos envolvidos no merging são o [`merge`](#git-merge) e o [`rebase`](#git-rebase). A ação de merge pode gerar conflitos quando um mesmo arquivo está diferente entre diferentes branches. Nesse caso, o Git irá adicionar linhas nos arquivos que estão gerando conflito, indicando aonde esses conflitos acontecem, e **você é responsável por resolvê-los** (eliminando as linhas que você considera que não são mais necessárias para o atual estado de seu projeto, por exemplo). 
 
 Resolvidos os conflitos, segue o processo de commit dessas mudanças e, aí então o merge/rebase é finalizado (no caso do rebase, quando eu testei, foi necessário executar o comando `git rebase --continue` para encerrar o rebase. Mais sobre comandos na [próxima Seção](#comandos-git)).
 
@@ -417,7 +427,9 @@ Cria nova branch, porém, **não** a ativa como principal; você continuará na 
 git checkout -b nome_da_nova_branch
 ```
 
-- Atualmente, também temos o comando `git switch` para trabalhar com branches, substituindo o `git checkout`. O comando para criar a branch e ativá-la como principal fica:
+O comando acima cria a branch e faz o HEAD apontar para ela (leia sobre HEAD na [Seção sobre branching](#branching)). 
+
+- Atualmente, também temos o comando `git switch` para trabalhar com branches, substituindo o `git checkout`. O comando para criar a branch e ativá-la como principal (flag `-c` ou `--create`) fica:
    
 ```bash
 git switch -c nome_da_nova_branch
@@ -481,7 +493,7 @@ Funciona como um `Ctrl+Z` para um arquivo (ou vários arquivos), quando eu quero
 
    - Se quiser restaurar todos os arquivos, você pode usar o `git restore .`
 
-**Atenção**: você **perde** suas modificações ainda não commitadas no arquivo ou ainda não adicionadas ao stage. Se você não quer perder, pode usar outras estratégia como o [`git stash`](#git-stash) ou criar uma nova [branch](#branch).
+**Atenção**: você **perde** suas modificações ainda não commitadas no arquivo ou ainda não adicionadas ao stage. Se você não quer perder, pode usar outras estratégia como o [`git stash`](#git-stash) ou criar uma nova [branch](#branching).
 
 **Atenção 2**: se você já tiver adicionado o arquivo ao stage (por meio do `git add nome_do_arquivo`), esse comando de restore não irá funcionar; primeiro você precisará fazer o comando abaixo.
 
@@ -666,4 +678,4 @@ O próprio VS Code possui algumas funcionalidades para versionar com o git e lin
 
 ### Continuar em...
 
-"Undoing things" na pág. 46
+"Basic Branching and merging" na pág. 70
