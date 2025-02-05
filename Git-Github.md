@@ -161,6 +161,8 @@ Resolvidos os conflitos, segue o processo de commit dessas mudanças e, aí ent�
 
 Segue abaixo uma lista de comandos git, com uma descrição do que fazem e como executá-los no terminal. Essa lista é uma referência e não está em uma ordem específica. A maioria dos comandos, senão todos, devem ser usados na pasta raiz do projeto que esteja ou que vai ser versionado (seu repositório local, ou *working directory*).
 
+Como alternativa, você pode optar por softwares que oferecem uma interface gráfica para a maioria desses comandos. O VS Code, por exemplo, tem uma seção na barra lateral esquerda chamada "Source Control". Por meio dela, é possível visualizar os arquivos modificados, deletados e adicionados, além de fazer commit e push, ver o histórico de commits, etc.
+
 ### `--help`
 
 Essa é uma **opção (ou flag, se preferir)** que você pode adicionar a qualquer comando git (exemplo: `git status --help`) para obter um manual de como o comando funciona e quais opções ele aceita. Em versões atuais, esse manual será aberto no navegador, e não na linha de comando.
@@ -269,6 +271,18 @@ A flag `-m` e a mensagem são opcionais. Se você usar somente `git commit`, ser
 
 A flag `-a` permite commitar todos os arquivos que foram **modificados** (os "untracked" não entram aqui) sem precisar enviá-los primeiro à staging area. É uma maneira de **pular a etapa de `git add`**. Use com cautela, pois eventualmente você pode estar commitando arquivos que você ainda não gostaria de commitar.
 
+#### `git commit --amend`
+
+```bash
+git commit --amend -m "sua_mensagem_editada"
+``` 
+
+Use esse comando para incluir novas alterações ao **último commit** e/ou editar a mensagem de commit. Ao invés de criar um novo commit, o último commit é "editado" com as novas alterações/mensagem, e um novo hash é gerado para ele.
+
+> Use a flag `--no-edit` se você não quer editar a mensagem original, mas sim somente incluir as alterações ao último commit
+
+Novamente **atenção**: use o amend caso o commit **não** tenha sido enviado para o repositório **remoto**, para não modificar o histórico de commits que já foi compartilhado com outras pessoas. É possível forçar a alteração para o repositório remoto, mas o comando não é mencionado aqui.
+
 ### `git log`
 
 ```bash
@@ -315,15 +329,25 @@ A flag `--stage` ou `--cached` mostra as diferenças que estão em staging em co
 git remote add nome_do_repositorio_remoto endereco_para_o_repositorio_remoto
 ```
 
-Cria uma ligação entre o repositório local e um repositório remoto. O endereço pode ser tanto uma pasta da própria máquina (precisa ser preparada com o `git init --bare`), quanto uma URL (para um repositório online criado no GitHub, por exemplo). O `nome_do_repositorio_remoto` é o nome que você dará para esse repositório remoto, e que será necessário na hora do `push`/`pull`. A convenção é usar o nome "origin".
+Cria uma ligação entre o repositório local e um repositório remoto. O endereço pode ser tanto uma pasta da própria máquina (precisa ser preparada com o `git init --bare`), quanto uma URL (para um repositório online criado no GitHub, por exemplo). O `nome_do_repositorio_remoto` é o nome que você dará para esse repositório remoto, e que será necessário na hora do `push`/`pull`. A convenção é usar o nome "origin" para o repositório remoto principal (esse é o nome que o Git usa quando você clona um projeto).
 
-> Para listar todos os repositórios remotos vinculados ao seu repositório local, use o comando: `git remote -v`. Se quiser só ver o nome dos repositórios, omita o `-v`.
+> Para listar todos os repositórios remotos vinculados ao seu repositório local e a URL associada a cada um, use o comando: `git remote -v`. Se quiser só ver o nome dos repositórios, omita o `-v`.
 
-> Para remover (desvincular) um repositório remoto: `git remote remove nome_do_repositorio_remoto`.
+> Para remover (desvincular) um repositório remoto: `git remote remove nome_do_repositorio_remoto` ou `git remote rm nome_do_repositorio_remoto`.
 
 > Para atualizar o caminho de um repositório remoto: `git remote set-url nome_do_repositorio_remoto novo_endereco_para_o_repositorio_remoto`
 
 > Para renomear um repositório remoto: `git remote rename nome_atual novo_nome`
+
+### `git fetch`
+
+```bash
+git fetch nome_do_repositorio_remoto
+```
+
+Este comando baixa os dados do repositório remoto que você ainda não tem no seu repositório local, incluindo novas branches que você ainda não tenha. No entanto, o comando **não** faz o merge automático do que foi baixado com as mudanças que você tenha feito localmente - você deve fazer isso manualmente, para evitar gerar algum conflito.
+
+Como alternativa para um fetch + merge automático, temos o [`git pull`](#git-pull).
 
 ### `git push` 
 
@@ -331,9 +355,11 @@ Cria uma ligação entre o repositório local e um repositório remoto. O endere
 git push nome_do_repositorio_remoto nome_da_branch
 ```
 
-Envia as mudanças commitadas para o repositório remoto.
+Envia para o repositório remoto todas mudanças commitadas localmente que ainda não tenham sido enviadas.
 
-`git push -u`: memoriza o repositório e a branch desse `push` e deixa você usar o comando `git push` sem precisar informar repositório e branch toda vez. **Use com cautela**: caso você comece a trabalhar com outras branches e se esqueça de alterar na hora de fazer o `push`, poderá estar fazendo o push na branch ou repositório errados, então o recomendado é fazer o push completo, com nome do repositório remoto e nome da branch.
+Atenção: caso você tente fazer um push e o repositório remoto tenha commits que você ainda não tem, seu push será rejeitado. Nesse caso, primeiro você vai ter que fazer o fetch, incorporar os commits que você ainda não tinha (e resolver qualquer conflito) para daí então "pushar" seus commits. Isso mantém o histórico de commits íntegro e único.
+
+A flag `-u` (`git push -u nome_do_repositorio_remoto nome_da_branch`) memoriza o repositório e a branch desse `push` e deixa você usar o comando `git push` sem precisar informar repositório e branch toda vez. **Use com cautela**: caso você comece a trabalhar com outras branches e se esqueça de alterar na hora de fazer o `push`, poderá estar fazendo o push na branch ou repositório errados, então o recomendado é fazer o push completo, com nome do repositório remoto e nome da branch.
 
 ### `git pull`
 
@@ -443,25 +469,29 @@ Como as mudanças são aplicadas commit a commit, conflitos podem acontecer e de
 
 ### `git restore`
 
+#### Arquivos modificados
+
 ```bash
 git restore nome_do_arquivo
 ```
 
-Comando antigo (versões mais velhas do Git): `git checkout -nome_do_arquivo`.
+Comando antigo (versões mais velhas do Git): `git checkout -- nome_do_arquivo`.
 
 Funciona como um `Ctrl+Z` para um arquivo (ou vários arquivos), quando eu quero **descartar** as alterações feitas em um arquivo que está com o **status "modified"**. Irá restaurar o arquivo corrente ao meu repositório local. 
 
    - Se quiser restaurar todos os arquivos, você pode usar o `git restore .`
 
-**Atenção**: você **perde** suas modificações ainda não commitadas no arquivo ou ainda não adicionadas ao stage. 
+**Atenção**: você **perde** suas modificações ainda não commitadas no arquivo ou ainda não adicionadas ao stage. Se você não quer perder, pode usar outras estratégia como o [`git stash`](#git-stash) ou criar uma nova [branch](#branch).
 
 **Atenção 2**: se você já tiver adicionado o arquivo ao stage (por meio do `git add nome_do_arquivo`), esse comando de restore não irá funcionar; primeiro você precisará fazer o comando abaixo.
+
+#### Arquivos em staging 
 
 ```bash
 git restore --staged nome_do_arquivo
 ```
 
-Serve para **remover** um arquivo que foi adicionado para ser commitado (ou seja, desfaz a ação de um `git add nome_do_arquivo`). Seu versionador voltará a olhar para o HEAD como sendo o estado atual e o arquivo voltará a aparecer como modified ao dar um `git status`.
+Serve para **remover** um arquivo que está na staging area, ou seja, que foi adicionado para ser commitado (ou seja, desfaz a ação de um `git add nome_do_arquivo`). Seu versionador voltará a olhar para o HEAD como sendo o estado atual e o arquivo voltará a aparecer como modified ao dar um `git status` - neste caso, você não perde as alterações feitas no arquivo.
 
 Comando antigo (versões mais velhas do Git): `git reset HEAD nome_do_arquivo`.
 
@@ -495,19 +525,7 @@ git reset --soft HEAD~1
 
 **Desfaz** seu último commit, removendo-o do histórico, mas **mantém** as alterações que haviam sido feitas (por conta da flag `--soft`). Útil quando, por exemplo, você commitou, mas viu que faltou uma pequena alteração. Ao invés de aplicar a alteração e criar um novo commit, você pode usar esse comando para desfazer o commit, aplicar a alteração, e então commitar. Seria como um "`Ctrl+Z`".
 
-> Uma alternativa melhor é usar o comando `git commit --amend`
-
-### `git commit --amend`
-
-```bash
-git commit --amend -m "sua_mensagem_editada"
-``` 
-
-Use esse comando para incluir novas alterações ao último commit e/ou editar a mensagem de commit. Ao invés de criar um novo commit, o último commit é "editado" com as novas alterações/mensagem, e um novo hash é gerado para ele.
-
-> Use a flag `--no-edit` se você não quer editar a mensagem original, mas sim somente incluir as alterações ao último commit
-
-Novamente **atenção**: use o amend caso o commit **não** tenha sido enviado para o repositório remoto, para não modificar o histórico de commits que já foi compartilhado com outras pessoas. É possível replicar a alteração para o repositório remoto, mas o comando não é mencionado aqui.
+> Uma alternativa melhor é usar o comando [`git commit --amend`](#git-commit---amend).
 
 ### `git tag`
 
@@ -521,15 +539,17 @@ Imagine que você chegou a uma etapa importante do seu projeto e vai entregar a 
 
 > `git tag -a nome_da_tag -m "mensagem"`: chamada de "annotated tag" (opção `-a`), é possível adicionar uma mensagem à tag criada.
 
-   - annotated tags também criam outros metadados, como o nome do autor e data que a tag foi criada. Se quiser ver essas informações, use `git tag -v nome_da_tag` (não funciona para tags que não são annotated, chamadas de "lightweight tags").
+   - annotated tags também criam outros metadados, como o nome do autor e data que a tag foi criada. Se quiser ver essas informações, use `git tag -v nome_da_tag` ou `git show nome_da_tag` (não funciona para tags que não são annotated, chamadas de "lightweight tags").
+
+> `git tag -a nome_da_tag numero_do_commit`: gera uma tag para um commit específico (por exemplo, quando você esqueceu de criar uma tag e já fez outros commits posteriores). Pode ser o hash completo ou os primeiros sete dígitos.
 
 > `git tag`: mostra todas as tags criadas.
 
-> `git tag -d nome_da_tag`: remove a tag em seu repositório local.
+> `git tag -d nome_da_tag`: remove a tag em seu repositório local. Para remover do repositório remoto, use `git push nome_do_repositorio_remoto --delete nome_da_tag`
 
 > `git push nome_do_repositorio_remoto nome_da_tag`: comando necessário para enviar a tag para o repositório remoto.
 
-> `git push nome_do_repositorio_remoto --tags`: envia todas as tags para o repositório remoto.
+> `git push nome_do_repositorio_remoto --tags`: envia para o repositório remoto todas as tags ainda não enviadas.
 
 ## Funcionalidades do GitHub
 
