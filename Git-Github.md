@@ -147,25 +147,53 @@ Você decide quando fazer ou não um commit, no entanto, uma convenção é **nu
 
 ## Branching
 
-Uma tradução em português para "branch" seria "ramo" ou "galho".
+👉 Uma tradução em português para "branch" seria "ramo" ou "galho".
 
-O processo de branching uma maneira de criar **vertentes/ramos de desenvolvimento** dentro de um repositório, de modo a não interferir no código principal (geralmente chamada de branch main). 
+O processo de branching é uma maneira de criar **vertentes/ramos de desenvolvimento** dentro de um repositório, de modo a não interferir no código principal (que geralmente fica na chamada branch "main"). 
 
 Uma branch, em termos básicos, é uma lista de commits sucessivos (um histórico de commits, ou uma linha do tempo). Cada novo commit é adicionado ao "topo" da branch, ou seja, a branch ativa tem um ponteiro apontando para o último commit feito. Criar uma nova branch significa criar um novo ponteiro a partir do último commit, sendo que novos commits irão atualizar para onde o ponteiro aponta, dependendo de qual branch estiver ativa.
 
-Por exemplo, suponha que você tem a branch main, apontando para o commit abc1234. Você então cria e ativa uma nova branch "teste". Um ponteiro para essa branch é criado e também aponta para o commmit abc1234. Suponha que você fez um novo commit, cde5678; neste caso, o ponteiro de "teste", que é a branch ativa, irá apontar para cde5678, enquanto o ponteiro da branch main continua apontando para abc1234. Novos commits continuarão atualizando o ponteiro de "teste". Por fim, suponha que o último commit feito na branch "teste" foi ijk2345, e que agora você retornou para a branch main (main está ativa) e fez um novo commit, lmn6789. Neste caso, branch main irá apontar para este commit. Com isso, você agora tem duas ramificações na linha do tempo dos commits, iniciado no commit abc1234, mas com a branch main apontando para lmn6789 e a branch teste apontando para ijk2345.
+Por exemplo, suponha que você tem a branch `main`, apontando para o commit `abc1234`. Você então cria e ativa uma nova branch `teste`. Um ponteiro para essa branch é criado e também aponta para o commmit `abc1234`. Suponha que você fez um novo commit, `cde5678`; neste caso, o ponteiro de `teste`, que é a branch ativa, irá apontar para `cde5678`, enquanto o ponteiro da branch `main` continua apontando para `abc1234`. Novos commits continuarão atualizando o ponteiro de `teste`. Por fim, suponha que o último commit feito na branch `teste` foi `ijk2345`, e que agora você retornou para a branch `main` (`main` está ativa) e fez um novo commit, `lmn6789`. Neste caso, branch `main` irá apontar para este commit. Com isso, você agora tem duas ramificações na linha do tempo dos commits, iniciado no commit `abc1234`, mas com a branch `main` apontando para `lmn6789` e a branch `teste` apontando para `ijk2345`.
 
 Outra nomenclatura envolvida no branching é o conceito de **HEAD**. O HEAD é um ponteiro especial que **aponta para a branch ativa**. Ao trocar de branches, o que você está de fato fazendo é movendo o HEAD para apontar para a branch desejada.
 
 O uso de branches serve, por exemplo, para desenvolver uma nova feature do projeto ou dividir o trabalho de uma equipe, possibilitando que cada um faça suas alterações de maneira independente, que posteriormente podem ser unidas à branch main (ou qualquer outra branch) por meio de um processo de merging.
 
-O site https://git-school.github.io/visualizing-git/ é um bom exemplo para entender branches de maneira visual.
+>👉 O site https://git-school.github.io/visualizing-git/ é um bom exemplo para entender branches de maneira visual.
 
-Os comandos para branching, tanto o antigo (`checkout`) quanto o novo (`switch`) podem ser vistos na seção do [`git branch`](#git-branch).
+Os comandos para manipulação de branches, tanto o antigo (`checkout`) quanto o novo (`switch`) podem ser vistos na seção do [`git branch`](#git-branch).
 
-Os comandos envolvidos no merging são o [`merge`](#git-merge) e o [`rebase`](#git-rebase). A ação de merge pode gerar conflitos quando um mesmo arquivo está diferente entre diferentes branches. Nesse caso, o Git irá adicionar linhas nos arquivos que estão gerando conflito, indicando aonde esses conflitos acontecem, e **você é responsável por resolvê-los** (eliminando as linhas que você considera que não são mais necessárias para o atual estado de seu projeto, por exemplo). 
+## Merging
 
-Resolvidos os conflitos, segue o processo de commit dessas mudanças e, aí então o merge/rebase é finalizado (no caso do rebase, quando eu testei, foi necessário executar o comando `git rebase --continue` para encerrar o rebase. Mais sobre comandos na [próxima Seção](#comandos-git)).
+👉 Uma tradução em português para "merge" seria "combinar" ou "mesclar".
+
+O processo de merging implica em juntar duas branches em apenas uma. Isso é comum no desenvolvimento de projetos em grupo, em que você cria uma branch para desenvolver a tarefa que foi atribuída a você e, após a tarefa ser feita, testada e aprovada, é feito o merge desta branch à branch main, para que suas mudanças sejam incorporadas ao código principal (um jargão usado é que o código foi "para produção").
+
+Existem alguns métodos de merging que o Git pode utilizar. Um deles é o chamado **"fast-forward"**, mais simples, que é quando uma branch `A` está somente "para trás" na linha do tempo de commits em relação a outra branch `B`. Neste caso, o git somente vai avançar (o chamado "fast-forward") o ponteiro de `A` até aonde o ponteiro de `B` está apontando. 
+
+Um caso mais complexto é quando as branches `A` e `B` **divergiram**, isto é, a partir de um ponto em comum, cada uma evoluiu para lados diferentes (houve commits posteriores tanto em `A` quanto em `B` após esse ponto em comum). Ao tentar fazer o merge de `B` para `A`, o Git irá tentar mesclar as mudanças do último commit apontado por cada branch, baseado no commit em comum compartilhado por elas, e aí criar um novo commit que faz a união dessas três "pontas". A isso é dado no nome de **"three-way merge"** (combinação de três caminhos) e o commit resultante é chamado de **merge commit**, diferente dos outros commits por possuir dois "pais": o último commit de `A` e o último commmit de `B`.
+
+Durante o three-way merge, o git irá tentar uma estratégia recursiva para fazer a combinação das mudanças efetuadas em cada branch. Caso não encontre nenhum conflito entre as mudanças, é feito o merge commit e a branch atual aponta para ele. No entanto, pode ser que alguns **arquivos tenham sido modificados em ambas as branches** e seus conteúdos sejam diferentes. Neste caso, o Git não tem como saber qual modificação deveria estar valendo, e isso é apontado como um **conflito**, que deve ser resolvido antes da finalização do merge. 
+
+O Git irá adicionar algumas linhas nos arquivos que estão gerando conflito, indicando onde eles acontecem. Segue um exemplo de arquivo em conflito:
+
+```
+<<<<<<< HEAD:index.html
+<div id="footer">contact : email.support@github.com</div>
+=======
+<div id="footer">
+please contact us at support@github.com
+</div>
+>>>>>>> iss53:index.html
+```
+
+Tudo que estiver entre `<<<<<<<` e `=======` são as mudanças contidas na branch atual (no caso do exemplo, o ponteiro `HEAD`). Tudo que estiver abaixo de `=======` e acimda de `>>>>>>>` são as mudanças contidas na branch a ser incorporada (no caso, `iss53`). Cabe a **você ser responsável por resolver os conflitos**, decidindo por qual mudança deve ser aceita, ou até mesmo mesclando partes de cada uma. Você também precisa tirar essas linhas adicionadas pelo git.
+
+Resolvidos os conflitos no arquivo (ou arquivos), eles devem ser salvos, adicionados ao staging e commitados. Este commit irá ser o merge commit.
+
+> O VS Code tem uma ferramenta mais visual que auxilia no processo de merging. Há outras ferramentas disponíveis.
+
+Os comandos envolvidos no merging são o [`merge`](#git-merge) e o [`rebase`](#git-rebase) (clique no comando para ir até a seção que o detalha).
 
 ## Comandos git
 
@@ -427,21 +455,43 @@ Cria nova branch, porém, **não** a ativa como principal; você continuará na 
 git checkout -b nome_da_nova_branch
 ```
 
-O comando acima cria a branch e faz o HEAD apontar para ela (leia sobre HEAD na [Seção sobre branching](#branching)). 
+O comando acima cria a branch e faz o HEAD apontar para ela (leia sobre HEAD na [Seção sobre Branching](#branching)). 
 
-- Atualmente, também temos o comando `git switch` para trabalhar com branches, substituindo o `git checkout`. O comando para criar a branch e ativá-la como principal (flag `-c` ou `--create`) fica:
+---
+
+>👉 Atualmente, também temos o **comando `git switch`** para trabalhar com branches, substituindo o `git checkout`. O comando para criar a branch e ativá-la como principal (flag `-c` ou `--create`) fica:
    
 ```bash
 git switch -c nome_da_nova_branch
 ```
 
-> `git branch -M novo_nome_da_branch`: comando para renomear a branch atual **localmente**. 
+---
+
+> `git branch`: lista todas as branches. A flag `--all` irá listar também as branches do repositório remoto.
+
+> `git branch -M novo_nome_da_branch`: comando para renomear a branch atual **localmente**. Cuidado ao renomear branches que já estejam no repositório remoto (e possivelmente sendo usadas por outros devs).
 
 > `git checkout nome_da_branch` ou `git switch nome_da_branch` : altera a branch que será a ativa (move seu HEAD para esta nova branch), carregando a versão mais atual dos arquivos que estão nessa branch.
 
+1. Vale apontar que **não será possível mudar de branch** caso você tenha **arquivos alterados não commitados** que podem causar **conflito** com a branch para a qual você quer mudar. Neste caso, o que pode ser feito é um [`git stash`](#git-stash) antes.
+
+2. Ao mudar de branch, o git atualiza seu "working directory" com os arquivos desta branch, adicionando, removendo e modificando os arquivos automaticamente.
+
+> `git checkout nome_branch_remota` ou `git switch nome_branch_remota`: atalho para criar uma branch local baseada em uma branch que existe somente no repositório remoto. 
+
+1. Só funciona se você não possuir nenhuma branch com o mesmo nome no seu repositório local e existir somente um repositório remoto que tenha essa branch com esse nome. 
+
+2. A versão mais longa desse comando é `git checkout -b nome_branch_local nome_repositorio_remoto/nome_branch_remota` ou `git switch -c nome_branch_local --track nome_repositorio_remoto/nome_branch_remota`. 
+
+3. No caso da versão mais longa, você pode dar o nome que você quiser à sua branch local, mas o comum é usar o mesmo nome da branch remota.
+
+4. Exemplo: `git switch -c nova_feature --track origin/nova_feature`.
+
 > `git branch -d nome_da_branch`: remove `nome_da_branch` do seu repositório **local**. Caso queira remover também do remoto, o comando é `git push nome_do_repositorio_remoto --delete nome_da_branch` (ou `git push nome_do_repositorio_remoto :nome_da_branch`).
 
-- É considerada uma boa prática remover branches após finalizar a feature que estava atrelada àquela branch, para manter o projeto limpo.
+1. Atenção com a flag! É `d` minúsculo. O `D` maiúsculo é uma remoção forçada. Suponha que você está querendo remover uma branch que ainda não foi "mergeada" em outra branch: a flag `-d` irá avisá-lo sobre isso e não fará a remoção; já `-D` irá remover a branch e qualquer trabalho que tenha sido feito nela será perdido.
+
+2. É considerada uma boa prática remover branches após finalizar a feature que estava atrelada àquela branch e ter feito o merge para a main, de modo a manter o projeto limpo. Isso não causa problemas, já que imediatamente após o merge ambas as branches estão apontando para o mesmo commit.
 
 ### `git checkout`
 
@@ -453,19 +503,18 @@ Navega para um commit específico do log. Serão carregados os arquivos desse co
 
 > Atualmente, o git fornece um comando alternativo, mais intuitivo: o [`git restore`](https://git-scm.com/docs/git-restore). Essa mudança veio por conta da confusão da dupla responsabilidade do `git checkout`, que serve tanto para mudar de branch quanto para restaurar arquivos navegando por commits.
 
+
 ### `git merge`
 
 ```bash
 git merge outra_branch
 ```
 
-Faz um merge (combinação) da branch atual com o commit mais atual da `outra_branch`, para que as **duas ramificações se unam em uma só**. 
+Faz um merge (combinação) da branch em que você se encontra atualmente com o commit mais atual da `outra_branch`, para que as **duas ramificações se unam em uma só**. 
 
-Existe um método de merge chamado "fast-forward", que é quando a branch atual está somente "para trás" na linha do tempo de commits em relação à `outra_branch`. Neste caso, o git somente vai avançar a branch atual, fazendo com que ela "aponte" para o último commit da `outra_branch`. 
+No caso de haver conflitos entre arquivos modificados em ambas as branches, vocês precisará fazer manualmente a resolução do conflito antes de finalizar o merge.
 
-Existe um caso diferente em que a branch atual e a `outra_branch` divergiram, isto é, a partir de um ponto em comum, cada uma evoluiu para lados diferentes (houve commits tanto na branch_atual quanto na `outra_branch` após esse ponto em comum). Neste caso, o git também vai fazer com que a branch atual aponte para o último commit da `outra_branch`, e irá tentar mesclar as mudanças entre esse dois commits (o último da branch atual e o último da `outra_branch`). Caso não haja nenhum conflito, irá solicitar a inclusão de uma mensagem de commit de merge (caso abra o editor de texto VIM, se não quiser escrever nada, digite `:x` e pressione `ENTER`; caso esteja no modo de INSERT, pressione `ESC` antes de digitar o `:x`). 
-
-No processo de merge, os commits anteriores da `outra_branch` são **incorporados** à branch atual, ou seja, eles passam a fazer parte do histórico da branch atual. No entanto, os commits também continuam presentes no histórico da `outra_branch`, caso você faça um checkout nela. A visualização do log nestes caso fica mais fácil com o comando `git log --graph`.
+Saiba mais sobre o processo de merging e resolução de conflitos na [Seção sobre Merging](#merging)
 
 ### `git rebase`
 
@@ -678,4 +727,4 @@ O próprio VS Code possui algumas funcionalidades para versionar com o git e lin
 
 ### Continuar em...
 
-"Basic Branching and merging" na pág. 70
+"Rebasing" na pág. 95
