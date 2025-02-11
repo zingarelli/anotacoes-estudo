@@ -4,6 +4,8 @@ Anotações baseadas em cursos da Alura e também do Bootcamp TQI | DIO.
 
 📖 Posteriormente atualizadas pelo livro: **Pro Git (Scott Chacon & Ben Straub)**, [disponível gratuitamente](https://git-scm.com/book/en/v2) (em inglês).
 
+🔖 O [tutorial da Atlassian](https://www.atlassian.com/git) (em inglês) também é um ótimo recurso, que inclui tópicos detalhados e com imagens para exemplificar as operações.
+
 **Instrutores e cursos Alura:**
 
 🎓 [Vinicius Dias](https://www.linkedin.com/in/cviniciussdias/) 
@@ -193,7 +195,37 @@ Resolvidos os conflitos no arquivo (ou arquivos), eles devem ser salvos, adicion
 
 > O VS Code tem uma ferramenta mais visual que auxilia no processo de merging. Há outras ferramentas disponíveis.
 
-Os comandos envolvidos no merging são o [`merge`](#git-merge) e o [`rebase`](#git-rebase) (clique no comando para ir até a seção que o detalha).
+> O comando para iniciar o processo de merging é o [`git merge`](#git-merge) (clique no comando para ir até a seção que o detalha).
+
+## Rebasing
+
+Rebasing é outra maneira de integrar duas branches que divergiram para um ponto em comum. Diferente do merge, o rebase busca manter uma linha do tempo única e linear dos commits, eliminando os caminhos divergentes criados por outras branches. Isso é feito por meio de um processo de replicação (um *replay*), commit a commit, das mudanças feitas em uma branch para a outra branch.
+
+Supondo, por exemplo, que você vai fazer o rebase de uma branch `teste` para a branch `main`, o passo a passo feito pelo Git é o seguinte:
+
+1. vai para o ancestral comum das duas branches (o commit em que ambas divergiram);
+
+2. faz o diff das mudanças introduzidas pela branch `teste` a partir deste ponto em comum;
+
+3. faz a branch `teste` apontar para a onde a branch `main` está apontando. Os commits de `teste` nesse caso deixam de fazer parte do seu histórico, mas suas mudanças foram salvas na etapa 2;
+
+4. replica cada uma das mudanças introduzidas pela branch `teste`, gerando **novos commits** e avançando o apontador de `teste`;
+
+Depois disso, a sua linha do tempo volta a ser linear, com os commits introduzidos pela branch `teste` agora incorporados a essa linha do tempo a partir do último commit de `main` (com novos códigos SHA1, já que o histórico foi reescrito). Você pode então aplicar um merge de fast-forward para que `main` avance até aonde `teste` está agora apontando.
+
+No ponto 4, é possível que **conflitos ocorram**. Nesse caso, eles devem ser **resolvidos** manualmente para que o processo de rebase continue. Se na próxima mudança a ser replicada ocorra um novo conflito, ele deve ser resolvido para que o processo de rebase continue e assim por diante.
+
+> O comando para iniciar o processo de rebase é o [`git rebase`](#git-rebase) (clique no comando para ir até a seção que o detalha e que também trata da resolução de conflitos).
+
+## Merge ou Rebase?
+
+É o famoso "depende". 
+
+Se para você e seu time o histórico é sagrado, e querem manter um registro de tudo que de fato aconteceu no projeto, incluindo os pontos em que ocorreram divergências e convergências (possibilitando uma rastreabilidade do projeto), utilize o `git merge`. 
+
+Caso você queria um projeto com um histórico mais "limpo" e linear, em que sua preocupação seja em mostrar como chegou de um ponto A até um ponto B, opte pelo `git rebase` (o livro dá o exemplo da publicação de um livro: você dá somente o produto final, e não os rascunhos e versões inacabadas). 
+
+Uma **sugestão do livro é**: faça o rebase das suas mudanças **locais** antes de fazer o push para o repositório remoto, "limpando" o seu trabalho, mas **nunca** faça o rebase de commits que **já foram** pushados para o repositório remoto (os commits públicos), pois pode ser que esses commits tenham sido utilizados por outros membros da equipe como ponto de partida para outra branch - ao fazer o rebase, o histórico é reescrito e esse commit deixa de existir, causando uma confusão na linha do tempo e uma dor de cabeça para consertar. 
 
 ## Comandos git
 
@@ -524,7 +556,7 @@ git rebase outra_branch
 
 Traz todos os commits da `outra_branch` para a branch atual e atualiza as modificações. Os commits da `outra_branch` serão inseridos na "linha do tempo" dos commits a partir do momento em que houve a criação da `outra_branch`, ou seja, o head da branch atual é movido para o último commit da `outra_branch` e as mudanças feitas em cada commit da branch atual serão aplicadas, commit a commit, após este último commit de `outra_branch`. Ou seja, novos commits são gerados (uma nova chave hash) e o head da branch atual vai avançando commit por commit, até chegar no último commit que havia na branch atual. Ao final, temos uma "linha do tempo" única novamente para a branch atual, unificada com as mudanças de `outra_branch`.
 
-Como as mudanças são aplicadas commit a commit, conflitos podem acontecer e devem ser resolvidos também commit a commit.
+Como as mudanças são aplicadas commit a commit, conflitos podem acontecer e devem ser resolvidos também commit a commit. Após resolvido, você faz o `git add` dos arquivo modificados para enviá-los à area de staging e roda o comando `git rebase --continue`. O git criará um novo commit e irá prosseguir com o rebase. Caso um novo conflito ocorra, o processo se repete até o rebase ser finalizado.
 
 > Lembre-se do site para uma experiência visual de merge, rebase, etc: https://git-school.github.io/visualizing-git/
 
@@ -727,4 +759,4 @@ O próprio VS Code possui algumas funcionalidades para versionar com o git e lin
 
 ### Continuar em...
 
-"Rebasing" na pág. 95
+pág. 105
