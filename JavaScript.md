@@ -1955,6 +1955,222 @@ import voceDecideONome from './Automovel.js';
 
 - O ES2020 introduziu o **operador `import('caminhoDoModulo')`**. Ele possibilita **imports dinâmicos**, retornando uma Promise, que é "fullfiled" quando o import termina de carregar. Neste caso, o import pode acontecer em qualquer parte do código, inclusive dentro de funções, loops, condicionais ou qualquer outro bloco de código. O módulo é carregado sob demanda (somente quando necessário), o que pode melhorar a performance.
 
+## Expressões regulares
+
+No JS, uma expressão regular é um **objeto que descreve um padrão textual**, utilizando uma gramática própria. Ela pode ser usada para encontrar ocorrências de uma combinação de caracteres dentro de uma string ou texto.
+
+> Nas anotações, acabo usando as palavras "match", "matching",  "buscar", "encontrar". Considere todas como sinônimos nesse caso, pois estão relacionadas à busca na string pelo padrão inserido na expressão regular.
+
+Você pode criar uma expressão regular de duas formas:
+
+- usando o **construtor do objeto `RegExp`** (`new RegExp(expressão)`);
+
+- usando a notação literal (literal de expressão regular), que é **colocar a expressão entre barras** (`/expressão/`).
+
+A expressão pode ser uma combinação de caracteres alfabéticos e dígitos, além de caracteres especiais por meio do uso da barra invertida (por exemplo, `\n` representa uma nova linha).
+
+Caracteres de **pontuação** têm um **significado especial** na gramática da expressão regular. Se você precisar **incluí-los literalmente** na expressão, utilize a **barra invertida** (`\`) antes do caracter de pontuação.
+
+### Classes de caracteres
+
+A gramática de expressão regular possui o conceito de classes de caracteres (*character classes*), representado pelo uso de **colchetes** (`[caracteres]`). É uma forma de você sinalizar uma lista de caracteres que podem ser avaliados durante o matching.
+
+Por exemplo `/[246]/` indica que é para procurar a ocorrência de um **(e somente um)** dos dígitos 2, 4 ou 6 (a busca por mais de uma ocorrência será vista mais pra frente). 
+
+O código abaixo retorna o dígito `2` no índice `2` da string, pois é o primeiro dígito contido na classe de caracteres que aparece na string. Se o `4` aparecesse antes do `2` na string, o match seria feito com ele, e o mesmo seria com o `6`. Se nenhum dos dígitos estivesse presente na string, não haveria match e seria retornado nulo.
+
+```js
+"9922299456566".match(/[246]/); // -> ['2', index: 2, input: '9922299456566', groups: undefined]
+```
+
+O uso de **hífen** dentro de uma classe de caracteres possibilita representar uma **faixa de caracteres**, ou seja `/[a-z]/` indica todos os caracteres latinos minúsculos. Observe que o hífen vem no meio para representar um intervalo. Quando presente no início ou final da classe, ele representa literalmente o caracter.
+
+Já o uso do **acento circunflexo** (`^`) logo após o colchete de abertura faz a **negação da classe**. Ou seja, `/[^a-z]/` indica um match de qualquer outro caracter que não seja um dos caracteres latinos minúsculos.
+
+Existem sequências de escape que representam as classes de caracteres mais comuns, como: 
+
+- `\w`: equivalente a `[a-zA-Z0-9_]`, ou seja, todos as letras minúsculas e maiúsculas, todos os dígitos e também o underline (que são os caracteres ASCII);
+
+- `\d`: equivalente a `[0-9]`.
+
+A lista completa pode ser vista [neste link da MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Character_classes#types).
+
+Um padrão para buscar a ocorrência de um DDD (011, 021, etc), por exemplo, poderia ser assim: `/\(0\d\d\)/`. Lembrando que o parênteses é um caracter de pontuação, e por isso deve ser precedido de barra invertida (`\(` e `\)`) quando usado literalmente na expressão.
+
+Segue um exemplo que procura uma ocorrência do padrão de "número seguido por um caracter alfanumérico":
+
+```js
+let texto = 'Com 2B, 9abc, 026k6J, o match vai ser em 2B';
+const padrao = /\d\w/;
+console.log(texto.match(padrao));
+// => ['2B', index: 4, input: 'Com 2B, 9abc, 026k6J, o match vai ser com 2B', groups: undefined]
+
+texto = 'aqui não tem match: B2, aA, P9';
+console.log(texto.match(padrao)); // => null
+```
+
+### Repetição de caracteres
+
+Há uma sintaxe especial para representar repetição de caracteres sequenciais.
+
+| caracter | descrição |
+|--|--|
+|{n,m}| repete pelo menos `n` vezes e no máximo `m` vezes. Observe que **não** pode haver espaço entre a vírgula e o m (`,m` e não `, m`) 
+|{n,}| repete `n` ou mais vezes. |
+|{n}| repete exatamente `n` vezes |
+|?| repete **zero** ou **uma** vez |
+|+| repete **uma** ou **mais** vezes |
+|*| repete **zero** ou **mais** vezes |
+
+Para utilizar na expressão regular, você inclui o caractere de repetição logo após o item que você quer avaliar. Exemplos:
+
+```js
+"A bcdefgh".match(/\w{1,5}/); // match com "A"
+"A bcdefgh".match(/\w{2,5}/); // match com "bcdef" (g e h ultrapassam o valor máximo)
+"Ab c def gh".match(/\w{3,5}/); // match com "def"
+"Abcdefgh".match(/\w{5}/); // match com "Abcde"
+"Abcdefgh".match(/\w?/); // match com "A"
+"Abcdefgh".match(/\w+/); // match com "Abcdefgh"
+"Abcdefgh".match(/\w*/); // match com "Abcdefgh"
+```
+
+### Alternativas, agrupamento e referências
+
+Você pode usar o pipe (`|`) para representar alternativas dentro de um padrão. Por exemplo: `/ab|cd|ef/` irá tentar um match por qualquer um destes três padrões: "ab", "cd" ou "ef". As alternativas são consideradas da esquerda para a direita e param assim que um match é encontrado.
+
+Você pode usar **parênteses** para representar uma **subexpressão dentro da expressão**, tratando o que estiver dentro do parênteses como um único item (seria um agrupamento). Com isso, é possível aplicar a repetição para este item. Por exemplo: `/(ab|cd)+|ef/` irá tentar um match por uma ou mais **repetições** de "ab" **ou** "cd", **ou** "ef" sozinho.
+
+Os parênteses também podem ser usados para fazer **referência a uma subexpressão anterior**, tanto por posição do parênteses quanto por um nome dado à referência. Esse é um conceito mais avançado e é explicado com detalhes e exemplos [neste link da MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Groups_and_backreferences).
+
+### Flags
+
+Flags modificam o comportamento do matching. Elas podem ser adicionadas de duas formas:
+
+- no construtor do `RegExp`, são passadas como segundo argumento (`new RegExp('amor', 'g')`);
+
+- na notação literal, são colocadas logo após a segunda `/` (`/amor/g`).
+
+Existem 6 flags, representadas por letras, e que podem ser usadas sozinhas ou em conjunto, e em qualquer combinação (por exemplo: `/amor/gi` ou `/amor/ig` possuem o mesmo comportamento).
+
+| flag | descrição |
+| -- | -- |
+| g | Busca global. Procura por todos os matches dentro da string, não só o primeiro. |
+| i | Busca ignora maiúscula ou minúscula (case insensitive). Amor, amOr, aMor, por exemplo, teriam match com `/amor/i` |
+| m | Modo multilinha. Existem [caracteres âncoras](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Assertions) que especificam que a busca deve ser feita no ínício (`^`) ou final (`$`) da string. Quando a flag `m` é usada, essas âncoras também farão o matching com o início e final de linha. |
+| s | Também usada em textos com quebras de linha, especifica que o caracter `.` faça matching com qualquer caracter, incluindo terminadores de linha (por padrão, o `.` não inclui esses terminadores). Por conta dessa característica, também é chamado de "*dot all*" (meio que "ponto considera tudo"). |
+| u | Habilita que o matching considere todos os caracteres Unicode, e não só os de 16-bits por padrão. Isso possibilita o matching por emojis e caracteres chineses, por exemplo. |
+| y | Representa que a expressão regular "gruda" (*sticks*) em uma determinada posição. O matching é feito no início da string ou no primeiro caracter seguido do matching anterior. Em outras palavras, o matching começa a partir do índice indicado pela propriedade `lastIndex` do objeto `RegExp` (por padrão, inicia em 0). É mais fácil de entender seu [uso e a diferença em relação à flag `g`](#diferenças-ao-usar-flags-g-e-y) por meio dos métodos `match()` e `exec()` e a manipulação do `lastIndex`. |
+
+### Métodos de String que usam expressões regulares
+
+A classe String possui alguns métodos que podem usar expressões regulares. Dentre eles, temos:
+
+- `search(regEx)`: caso haja match, retorna a posição do início do primeiro match; caso contrário, retorna -1. **Não** tem suporte à busca global (ou seja, ignora a flag `g`);
+
+- `replace(regEx, novoValor)`: retorna uma **nova string**, substituindo o match pelo `novoValor` passado como segundo argumento. Se usar a flag `g`, faz a substituição para todos os matches. O método é bem mais poderoso, podendo receber uma função como segundo parâmetro, bem como outros padrões para substituição. Vale a pena [consultar a documentação](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/replace#description) para mais detalhes;
+
+- `match(regEx)`: retorna null se nenhum match for encontrado; caso contrário, retorna um array com os resultados do match. O array vai ser diferente, dependendo da flag usada:
+
+    - flag `g`: retorna um array com todos os matches;
+
+    - sem flag `g`: também retorna um array, mas a primeira posição é a string que deu match, e as posições seguintes são as substrings caso você tenho utilizado parênteses para criar agrupamentos. Além disso, o array possui algumas propriedades (lembrando que um array é um objeto especializado): `input` (a string que invocou o método), `index` (o índice em que o match iniciou) e `groups` (um objeto para os [grupos de captura nomeados](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#using_named_capturing_groups)).
+
+- `matchAll(regEx)`: introduzido pelo ES2020, o método exige uma expressão regular com a flag `g`. Ele retorna um iterator, podendo ser utilizado para fazer um loop nos elementos que deram match. Cada iteração retorna um array semelhante àquele retornado por `match()` quando não usa a flag `g` (ou seja, o valor do match e propriedades como `index` e `groups`);
+
+- `split(separador)`: o split é um método que divide a string em substrings a partir do `separador` informado, e retorna um array com essas substrings. O `separador` pode ser uma string normal, bem como uma expressão regular.
+
+### Métodos da classe RegExp
+
+Um objeto RegExp tem à disposição dois métodos: `test()` e `exec()`.
+
+- `test(string)`: retorna `true` se há match entre a expressão e a string; `false` caso contrário;
+
+- `exec(string)`: retorna null se não houver match. Caso um match seja encontrado, retorna um array semelhante àquele retornado por `match()` quando não usa a flag `g`. 
+
+    - aqui há uma diferença: mesmo se a **flag `g` ou `y`** estiver presente, o retorno do `exec()` é sempre **um** array com o match encontrado, ou seja, ele **não** prossegue com a busca. O que o `exec()` faz quango as flags `g` ou `y` estão presentes é **atualizar o `lastIndex`** para a próxima busca (e se não houver match, reseta `lastIndex` para 0). Veja mais sobre o [uso das flags `g` ou `y` na próxima Seção](#diferenças-ao-usar-flags-g-e-y);
+
+    - por conta desse comportamento com as flags `g` ou `y`, é bom tomar cuidado ao fazer loops, já que a busca vai levar em conta o `lastIndex`. Nesse caso, o método **`matchAll()` é o mais indicado**.
+
+### Diferenças ao usar flags `g` e `y`
+
+A flag `y` faz o comportamento da busca ser "sticky", ou seja, gruda em uma posição específica da string que será analisada. Essa posição é determinada pela propriedade `lastIndex`, que inicia em 0 por padrão, mas pode ser alterada manualmente. 
+
+Quando usada nos **métodos `match()` e `exec()`**, o **comportamento da busca é alterado pela flag `y`**, tanto sozinha quanto acompanhada por `g`.
+
+#### `match()`
+
+Se houver somente a flag `y`, inicia a busca a partir de `lastIndex`. Se encontra um match, atualiza `lastIndex` com o índice do próximo caracter após o match e retorna um array com o resultado do match. Se não encontrar match, `lastIndex` volta a ser 0 e retorna `null`. Se chamar a `match()` novamente, a busca inicia a partir da posição indicada em `lastIndex`.
+
+```js
+const texto = 'nanabanana';
+const regexY = /na/y;
+
+// lastIndex por padrão inicia em 0. 
+// Se der match, atualiza lastIndex com o índice 
+// do próximo caracter após o match.
+console.log(texto.match(regexY)); // ['na'], index: 0, ...
+regexY.lastIndex; // => 2
+console.log(texto.match(regexY)); // ['na'], index: 2, ...
+regexY.lastIndex; // => 4
+console.log(texto.match(regexY)); // null
+regexY.lastIndex; // => 0
+
+// como lastIndex voltou para 0, uma nova chamada 
+// reinicia a busca
+console.log(texto.match(regexY)); // ['na'], index: 0, ...
+regexY.lastIndex; // => 2
+
+// posso manipular lastIndex para indicar a partir de que posição iniciar a busca
+regexY.lastIndex = 8;
+console.log(texto.match(regexY)); // ['na'], index: 8, ...
+regexY.lastIndex; // => 10
+```
+
+Com as flags **`g` e `y`**, a busca **inicia obrigatoriamente** no **começo da string** (mesmo se você alterar manualmente `lastIndex`) e matches subsequentes iniciam no character que segue imediatamente após o match anterior (a busca "gruda" no próximo caracter após o match). A partir do momento em que o padrão não encontra um match, a busca para.
+
+```js
+const regexYG = /na/yg;
+
+// começa obrigatoriamente do início e para 
+// assim que não encontra match com "na"
+console.log(texto.match(regexYG)); // ["na", "na"]
+
+// mesmo se alterássemos lastIndex, a busca 
+// continuaria iniciando pelo começo da string
+const outroTexto = 'bananabanana';
+regexYG.lastIndex = 2;
+console.log(outroTexto.match(regexYG)); // null
+```
+
+Observe que se houvesse **somente a flag `g`**, a busca seria feita globalmente e **continuaria** a partir de onde o último match ocorreu, **até chegar ao final** da string. Compare as saídas do exemplo abaixo com as do exemplo anterior.
+
+```js
+const regexG = /na/g;
+console.log(texto.match(regexG)); // ["na", "na", "na", "na"]
+console.log(outroTexto.match(regexG)); // ["na", "na", "na", "na"]
+```
+
+#### `exec()`
+
+O comportamento de `exec()` com as flags **`g` e `y`** é semelhante ao de `match()`, porém, no caso em que as duas flags estão presentes, a busca vai iniciar a partir da posição informada por `lastIndex` (no `match()`, ela sempre inicia no começo da string, masmo se você alterar manualmente `lastIndex`).
+
+```js
+const fruta = 'banana';
+const padraoMatch = /na/gy;
+const padraoExec = /na/gy;
+
+// alterar lastIndex não influencia o match
+// quando as flags g e y estão presentes
+padraoMatch.lastIndex = 2;
+console.log(fruta.match(padraoMatch)); // null
+
+// mas no caso de exec, o valor de lastIndex é 
+// considerado
+padraoExec.lastIndex = 2;
+console.log(padraoExec.exec(fruta)); // [na, index: 2]
+padraoExec.lastIndex; // => 4
+```
+
 ## Erros
 
 - `throw`: usado para **criar seu próprio erro**; pode substituir um return na função, jogando um erro que pode ser capturado e tratado. Se não for tratado na função, o erro "propaga" pela stack até encontrar um bloco que trata erros. Se nenhum for encontrado, o programa retorna um erro ao usuário. O erro dado pelo `throw` pode ser uma string, um número, ou uma instância da classe `Error`.
@@ -2234,5 +2450,6 @@ Diferença entre Local Storage e Cookie:
 
 # Continuar em
 
-11
-pag. 479
+13 - pag. 601
+
+... e depois voltar para 11.4 - pag. 536
