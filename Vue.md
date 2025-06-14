@@ -70,6 +70,7 @@ São formas de adicionar instruções extras para os elementos HTML, de modo a "
 | Diretiva | Para que serve |
 | --- | --- |
 | `v-bind:nomeDoAtributo` | liga uma variável do objeto `data` da instância do Vue ao valor do `nomeDoAtributo` |
+| `v-on:nomeDoEvento="metodoOuExpressaoJS"` | adiciona um evento HTML ao elemento, e o método ou expressão JS a ser executado quando o evento é disparado. No caso de um método, ele será invocado mesmo se você não usar parênteses (mas vai ser necessário se precisar enviar parâmetros) |
 
 ### Shortcuts
 
@@ -101,4 +102,44 @@ methods: {
     return this.textoA; // <- este this NÃO é da instância Vue
   }
 }
+```
+
+## O objeto `event`
+
+Quando um event listener é adicionado a um atributo HTML (seja via JS puro ou pela diretiva v-on), o evento disparado é passado, por **padrão**, como **argumento ao método** que é executado. Esse argumento é um objeto contendo os dados do evento disparado. 
+
+Com isso, ao criar um método em sua instância Vue para ser executado após algum evento, você pode capturar esse objeto `event` (ou qualquer nome que você queira dar) como sendo o primeiro parâmetro do método.
+
+No caso do seu método ter **outros parâmetros**, aí você explicitamente precisa enviar o objeto `event` ao método. Neste caso, você utiliza a variável `$event` disponibilizada pelo Vue, que te dá acesso ao evento disparado. Essa é uma palavra reservada no Vue, então o nome não pode ser mudado.
+
+```html
+<input type="text" v-on:input="setNome">
+<input type="text" v-on:input="setNomeCompleto($event, 'da Silva')">
+```
+
+```js
+setNome(e) { this.name = e.target.value },
+setNomeCompleto(ev, lastName) { 
+  this.name = ev.target.value + ' ' + lastName;
+}
+```
+
+## Modificadores de eventos e teclas
+
+O Vue possibilita modificar a ação padrão de alguns eventos, ao incluir modificadores **após o nome do evento** que você está manipulando. Por exemplo, se houver um evento de submit e você quer impedir o comportamento padrão do navegador de fazer um reload da página, você pode usar `v-on:submit.prevent="executaSeuMetodo"`.
+
+Lista de modificadores e mais detalhes: https://vuejs.org/guide/essentials/event-handling#event-modifiers
+
+O Vue também disponibiliza modificadores baseados ao [pressionar algumas teclas](https://vuejs.org/guide/essentials/event-handling#key-modifiers) e também [botões do mouse](https://vuejs.org/guide/essentials/event-handling#mouse-button-modifiers).
+
+Você pode concatenar modificadores, bem como criar mais de um listener, com modificadores diferentes, fazendo ações diferentes.
+
+```html
+<button v-on:click.right.prevent="subtract(5)">Diminuir 5</button>
+<!-- ^ concatenando dois modificadores, executando subtract somente quando 
+ o botão direito do mouse é clicado, e também prevenindo a ação padrão de 
+ acontecer, que seria abrir o menu de contexto -->
+<input type="text" v-on:input="setName" v-on:keyup.enter="confirmInput">
+<!-- ^ setName será invocado a cada tecla pressionada, mas confirmInput só 
+ será invocado quando a tecla ENTER for pressionada -->
 ```
