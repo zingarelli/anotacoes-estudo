@@ -67,12 +67,13 @@ Os métodos podem ser invocados dentro de elementos HTML usando a **interpolaç�
 
 São formas de adicionar instruções extras para os elementos HTML, de modo a "injetar" o Vue por meio de **atributos** com o sufixo `v-`.
 
+Duas diretivas (`v-bind` e `v-on`) são tão comumente utilizadas que receberam **formas abreviadas**. Você pode optar por usar tanto a forma completa quanto abreviada (mas tente manter a consistência no seu código).
+
 | Diretiva | Para que serve |
 | --- | --- |
-| `v-bind:nomeDoAtributo` | liga uma variável do objeto `data` da instância do Vue ao valor do `nomeDoAtributo` |
-| `v-on:nomeDoEvento="metodoOuExpressaoJS"` | adiciona um evento HTML ao elemento, e o método ou expressão JS a ser executado quando o evento é disparado. No caso de um método, ele será invocado mesmo se você não usar parênteses (mas vai ser necessário se precisar enviar parâmetros) |
-
-### Shortcuts
+| `v-bind:nomeDoAtributo` (ou a forma abreviada `:nomeDoAtributo`) | liga uma variável do objeto `data` da instância do Vue ao valor do `nomeDoAtributo` |
+| `v-on:nomeDoEvento="metodoOuExpressaoJS"` (ou a forma abreviada `@nomeDoEvento="metodoOuExpressaoJS"`) | adiciona um evento HTML ao elemento, e o método ou expressão JS a ser executado quando o evento é disparado. No caso de um método, ele será invocado mesmo se você não usar parênteses (mas vai ser necessário se precisar enviar parâmetros) |
+| `v-model:dataProperty` | é um two-way binding, possibilitando ao mesmo tempo obter e alterar o valor do `dataProperty`, ou seja, de uma das variáveis reativas. É uma combinação de `v-bind:value` e `v-on:input` (Vue 2), funcionando em elementos HTML e componentes que possuam uma prop `value` e um evento `input` |
 
 ## Sobre o `this` em Vue
 
@@ -106,11 +107,11 @@ methods: {
 
 ## O objeto `event`
 
-Quando um event listener é adicionado a um atributo HTML (seja via JS puro ou pela diretiva v-on), o evento disparado é passado, por **padrão**, como **argumento ao método** que é executado. Esse argumento é um objeto contendo os dados do evento disparado. 
+Quando um event listener é adicionado a um atributo HTML (seja via JS puro ou pela diretiva v-on), por **padrão** o evento disparado é passado como **argumento ao método** que será executado. Esse argumento é um objeto contendo os dados do evento disparado. 
 
 Com isso, ao criar um método em sua instância Vue para ser executado após algum evento, você pode capturar esse objeto `event` (ou qualquer nome que você queira dar) como sendo o primeiro parâmetro do método.
 
-No caso do seu método ter **outros parâmetros**, aí você explicitamente precisa enviar o objeto `event` ao método. Neste caso, você utiliza a variável `$event` disponibilizada pelo Vue, que te dá acesso ao evento disparado. Essa é uma palavra reservada no Vue, então o nome não pode ser mudado.
+No caso do seu método ter **outros parâmetros**, aí você explicitamente precisa enviar o objeto `event` ao método. Neste caso, você utiliza a **variável `$event`** disponibilizada pelo Vue, que te dá acesso ao evento disparado. Essa é uma **palavra reservada** no Vue, então o nome não pode ser mudada.
 
 ```html
 <input type="text" v-on:input="setNome">
@@ -130,7 +131,7 @@ O Vue possibilita modificar a ação padrão de alguns eventos, ao incluir modif
 
 Lista de modificadores e mais detalhes: https://vuejs.org/guide/essentials/event-handling#event-modifiers
 
-O Vue também disponibiliza modificadores baseados ao [pressionar algumas teclas](https://vuejs.org/guide/essentials/event-handling#key-modifiers) e também [botões do mouse](https://vuejs.org/guide/essentials/event-handling#mouse-button-modifiers).
+O Vue também disponibiliza modificadores baseados na [tecla pressionada](https://vuejs.org/guide/essentials/event-handling#key-modifiers) e também nos [botões do mouse](https://vuejs.org/guide/essentials/event-handling#mouse-button-modifiers).
 
 Você pode concatenar modificadores, bem como criar mais de um listener, com modificadores diferentes, fazendo ações diferentes.
 
@@ -143,3 +144,66 @@ Você pode concatenar modificadores, bem como criar mais de um listener, com mod
 <!-- ^ setName será invocado a cada tecla pressionada, mas confirmInput só 
  será invocado quando a tecla ENTER for pressionada -->
 ```
+
+## Computed properties
+
+São como métodos que **retornam um valor**, mas só são executados se uma das propriedades reativas das quais ele é dependente for mudada. É **similar ao `useMemo` do React**, com as variáveis listadas no array de dependências, otimizando a performance. Quando há um re-render da página, as computed properties serão re-executadas somente se uma das suas dependências for alterada.
+
+- as dependências serão as variáveis reativas utilizadas no corpo do método (`this.nomeDaVar1`, `this.nomeDaVar2`, ...). Até mesmo **outras computed properties** podem entrar como dependência, caso sejam utilizadas no corpo do método.
+
+As computed properties vão em outra propriedade da instância do Vue: `computed`, que recebe um objeto, em que cada propriedade é um método que vai retornar o valor da computed property. Quando usada no HTML, você **não precisa executar o método**, somente usar o nome dado à computed property.
+
+```js
+  computed: {
+    // computed properties sempre retornam um valor
+    nomeCompleto() {
+      if (this.nome === '') return '';
+      return this.nome + ' da Silva'; 
+    }
+  },
+```
+
+```html
+<p>O nome completo será: {{ nomeCompleto }}</p>
+```
+
+## Watcher
+
+**Similar a computed properties**, um watcher é uma função que será executada quando o valor de alguma de suas dependências for alterado. No entanto, um watcher **não precisa retornar um valor**. Pode ser algum pedaço de código que você quer que seja executado como um "efeito colateral" baseado na mudança em alguma variável. Por conta disso, é **semelhante a um useEffect do React**.
+
+Watchers são interessantes, por exemplo, para quando você precisa fazer algum fetch na sua API baseado em alguma mudança que ocorreu em uma variável reativa.
+
+Os watchers ficam na propriedade `watch` da instância do Vue, composta por um objeto cujas propriedades são métodos, cujo **nome é o mesmo nome da variável ou computed property que você quer observar**. Se você tem uma variável `nome` dentro da propriedade `data`, por exemplo, você pode criar um watcher `nome(novoValor)` para ela. O **primeiro parâmetro** do watcher é o **novo valor** da propriedade observada. O **valor antigo** da propriedade pode ser obtido do **segundo parâmetro**. Ambos os parâmetros são opcionais. 
+
+Você pode usar watchers tanto para propriedades de `data` quanto para computed properties.
+
+```js
+data() {
+  return {
+    qtdeItensNoCarrinho: 0,
+  };
+},
+watch: {
+  qtdeItensNoCarrinho(novoValor) {
+    atualizaItensNoCarrinho(novoValor);
+  }
+}
+```
+
+## Classes dinâmicas
+
+Quando usamos o `v-bind` no atributo `class` de um elemento, podemos passar um **objeto** a ele e setar dinamicamente quando uma classe deve ser ou não adicionada. Cada **propriedade** desse objeto representa uma **classe**, e seus valores são **booleanos**: quando verdadeiro, a classe é adicionada.
+
+Podemos também ter `class` e `v-bind:class` em um mesmo elemento, mantendo em `class` as classes que nunca mudam e em `v-bind:class` as que serão adicionadas de maneira dinâmica.
+
+```html
+<div 
+  class="demo" 
+  :class="{ active: boxASelected }" 
+  @click="selectBox('A')"
+></div>
+<!-- ^ demo é uma classe "fixa" e active é adicionada dinamicamente, 
+ dependendo do valor da variável boxASelected -->
+```
+
+Se quiser manter o HTML mais limpo, você pode criar uma computed property que retorna um objeto com as classes, e usar essa computed como valor de `:class`.
