@@ -36,7 +36,7 @@ O jeito mais **simples** é adicionar o pacote do Vue no `index.html`, seja no f
 
 ## Propriedade `data` e interpolação
 
-Ao criar sua instância de Vue (`Vue.createApp`), você passa a ela um objeto com as configurações dessa instância. A propriedade `data` faz parte dessa configuração (este nome não pode ser alterado). Ela contém uma função anônima que retorna um objeto. Este objeto contém as **variáveis reativas** do projeto (variáveis cujos valores, ao serem alterados, automaticamente fazem um re-render da aplicação, e alteram este conteúdo no HTML).
+Ao criar sua instância de Vue (`Vue.createApp`), você passa a ela um objeto com as configurações dessa instância. A propriedade `data` faz parte dessa configuração (este nome não pode ser alterado). Ela contém uma função anônima que retorna um objeto. Este objeto contém as **variáveis reativas** do projeto (variáveis cujos valores, ao serem alterados, automaticamente fazem um **re-render da aplicação**, e alteram este conteúdo no HTML).
 
 Para passar o conteúdo de alguma variável de `data` para um **elemento HTML**, utilizamos a **interpolação**. Essa é a forma do Vue "injetar" o conteúdo no HTML. Fazemos isso passando o nome da variável entre chaves duplas (`{{ nomeDaVariável }}`).
 
@@ -73,7 +73,16 @@ Duas diretivas (`v-bind` e `v-on`) são tão comumente utilizadas que receberam 
 | --- | --- |
 | `v-bind:nomeDoAtributo` (ou a forma abreviada `:nomeDoAtributo`) | liga uma variável do objeto `data` da instância do Vue ao valor do `nomeDoAtributo` |
 | `v-on:nomeDoEvento="metodoOuExpressaoJS"` (ou a forma abreviada `@nomeDoEvento="metodoOuExpressaoJS"`) | adiciona um evento HTML ao elemento, e o método ou expressão JS a ser executado quando o evento é disparado. No caso de um método, ele será invocado mesmo se você não usar parênteses (mas vai ser necessário se precisar enviar parâmetros) |
-| `v-model:dataProperty` | é um two-way binding, possibilitando ao mesmo tempo obter e alterar o valor do `dataProperty`, ou seja, de uma das variáveis reativas. É uma combinação de `v-bind:value` e `v-on:input` (Vue 2), funcionando em elementos HTML e componentes que possuam uma prop `value` e um evento `input` |
+| `v-model:dataProperty` | é um *two-way binding*, possibilitando ao mesmo tempo obter e alterar o valor do `dataProperty`, ou seja, de uma das variáveis reativas. É uma combinação de `v-bind:value` e `v-on:input` (Vue 2), funcionando em elementos HTML e componentes que possuam uma prop `value` e um evento `input` |
+| `v-if="condicao"` | é uma renderização condicional. O elemento (e seus subelementos) serão **adicionados ao DOM** somente se a `condicao` for verdadeira. Quando a condição é falsa, um **comentário** é adicionado ao DOM (`<!--v-if-->`).  |
+| `v-else-if="outraCondicao"` e `v-else` | **logo após** um `v-if`, possibilitam encadear condições e escolher qual elemento (e subelementos) serão adicionados ao DOM. |
+| `v-show="condicao"` | é uma alternativa ao `v-if`, porém, no caso de a condição ser **falsa**, ao invés de não adicionar o elemento, ele só o **esconde** por meio da propriedade CSS **`display: none`**. Em questão de performance, adicionar/remover elemento ao DOM é mais custoso, então usar o `v-show` pode ser vantajoso em elementos cuja visibilidade é frequentemente alterada (um accordion, por exemplo) |
+| `v-for="item in lista"` | Suponha que `lista` é um array (ou qualquer outro enumerable), o `v-for` possibilita percorrer cada item desse array e armazená-lo em `item` (`item` e `lista` são nomes arbitrários). O **elemento** em que `v-for` foi definido será **repetido no HTML** e poderá **acessar o conteúdo** de `item`. Use **`:key`** (atenção ao v-bind) para auxiliar o Vue no gerenciamento da lista. |
+| `v-for="(item, index) in lista"` | variação do `v-for`, em que podemos acessar o **índice do item** por meio de `index` (`index` é outro nome arbitrário) |
+| `v-for="(valor, chave) in objeto"` | outra variação do `v-for`, iterando um objeto, em cada iteração acessando uma **chave e seu valor** (atenção que eles vêm **invertido nos parênteses**). Se você quiser só o valor, pode usar `v-for="valor in objeto"`. Também é possível pegar o **índice** do item como **terceiro parâmetro**. |
+| `v-for="n in numero` | nessa variação, o elemento será repetido **`n` vezes**, de acordo com o valor de `numero`. |
+|  |  |
+|  |  |
 
 ## Sobre o `this` em Vue
 
@@ -206,4 +215,23 @@ Podemos também ter `class` e `v-bind:class` em um mesmo elemento, mantendo em `
  dependendo do valor da variável boxASelected -->
 ```
 
-Se quiser manter o HTML mais limpo, você pode criar uma computed property que retorna um objeto com as classes, e usar essa computed como valor de `:class`.
+Se quiser manter o HTML mais limpo, você pode criar uma variável com o valor de uma classe, ou uma computed property que retorna um objeto com as classes, e usá-las em `:class`.
+
+## Condicionais e loops
+
+As diretivas de condicionais e loops foram explicadas na [Seção de Diretivas](#diretivas). Segue aqui um código de exemplo de uso delas:
+
+```html
+<h2 v-if="isAdmin">Painel Administrativo</h2>
+<h2 v-else-if="isGerente">Painel Gerencial</h2>
+<nav v-else>
+  <ul>
+    <li 
+      v-for="item in listaDeMenus" 
+      :key="item.id"
+    >
+      <a :href="item.link">{{ item.text }}</a>
+    </li>
+  </ul>
+</nav>
+```
