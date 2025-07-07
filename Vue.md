@@ -36,13 +36,15 @@ O jeito mais **simples** é adicionar o pacote do Vue no `index.html`, seja no f
 
 ## Propriedade `data` e interpolação
 
-Ao criar sua instância de Vue (`Vue.createApp`), você passa a ela um objeto com as configurações dessa instância. A propriedade `data` faz parte dessa configuração (este nome não pode ser alterado). Ela contém uma função anônima que retorna um objeto. Este objeto contém as **variáveis reativas** do projeto (variáveis cujos valores, ao serem alterados, automaticamente fazem um **re-render da aplicação**, e alteram este conteúdo no HTML).
+Ao criar sua instância de Vue (`Vue.createApp`), você passa a ela um **objeto com as configurações** dessa instância. A propriedade `data` faz parte dessa configuração (este nome não pode ser alterado). Ela contém uma função anônima que retorna um objeto. Este objeto contém as **variáveis reativas** do projeto (variáveis cujos valores, ao serem alterados, automaticamente fazem um **re-render da aplicação**, e alteram este conteúdo no HTML).
 
 Para passar o conteúdo de alguma variável de `data` para um **elemento HTML**, utilizamos a **interpolação**. Essa é a forma do Vue "injetar" o conteúdo no HTML. Fazemos isso passando o nome da variável entre chaves duplas (`{{ nomeDaVariável }}`).
 
 ```html
-<p>{{ tarefa }}</p>
-<!-- ^ interpolação -->
+<section id='myVueApp'>
+  <p>{{ tarefa }}</p>
+  <!-- ^ interpolação -->
+</section>
 ```
 
 ```js
@@ -53,7 +55,11 @@ const app = Vue.createApp({
     };
   }
 });
+
+app.mount('#myVueApp');
 ``` 
+
+Você pode ter **mais de uma instância Vue** na sua aplicação (mais de um ``Vue.createApp`), e montar essa instância em outra parte do seu HTML, ou seja, referenciar outro bloco HTML em que essa instância Vue será utilizada. No entanto, **cada instância** possui **suas próprias propriedades**, e uma não pode acessar as propriedades da outra. Ou seja, são *standalone*.
 
 ## Propriedade `methods`
 
@@ -79,10 +85,8 @@ Duas diretivas (`v-bind` e `v-on`) são tão comumente utilizadas que receberam 
 | `v-show="condicao"` | é uma alternativa ao `v-if`, porém, no caso de a condição ser **falsa**, ao invés de não adicionar o elemento, ele só o **esconde** por meio da propriedade CSS **`display: none`**. Em questão de performance, adicionar/remover elemento ao DOM é mais custoso, então usar o `v-show` pode ser vantajoso em elementos cuja visibilidade é frequentemente alterada (um accordion, por exemplo) |
 | `v-for="item in lista"` | Suponha que `lista` é um array (ou qualquer outro enumerable), o `v-for` possibilita percorrer cada item desse array e armazená-lo em `item` (`item` e `lista` são nomes arbitrários). O **elemento** em que `v-for` foi definido será **repetido no HTML** e poderá **acessar o conteúdo** de `item`. Use **`:key`** (atenção ao v-bind) para auxiliar o Vue no gerenciamento da lista. |
 | `v-for="(item, index) in lista"` | variação do `v-for`, em que podemos acessar o **índice do item** por meio de `index` (`index` é outro nome arbitrário) |
-| `v-for="(valor, chave) in objeto"` | outra variação do `v-for`, iterando um objeto, em cada iteração acessando uma **chave e seu valor** (atenção que eles vêm **invertido nos parênteses**). Se você quiser só o valor, pode usar `v-for="valor in objeto"`. Também é possível pegar o **índice** do item como **terceiro parâmetro**. |
-| `v-for="n in numero` | nessa variação, o elemento será repetido **`n` vezes**, de acordo com o valor de `numero`. |
-|  |  |
-|  |  |
+| `v-for="(valor, chave) in objeto"` | outra variação do `v-for`, iterando um **objeto**, em cada iteração acessando uma **chave e seu valor** (atenção que eles vêm **invertido nos parênteses**). Se você quiser só o valor, pode usar `v-for="valor in objeto"`. Também é possível pegar o **índice** do item como **terceiro parâmetro**. |
+| `v-for="n in numero"` | nessa variação, o elemento será repetido **`n` vezes**, de acordo com o valor de `numero`. |
 
 ## Sobre o `this` em Vue
 
@@ -235,3 +239,219 @@ As diretivas de condicionais e loops foram explicadas na [Seção de Diretivas](
   </ul>
 </nav>
 ```
+
+## Vue por trás dos panos
+
+- Vue usa o conceito de [proxy object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) do JS para lidar com as variáveis reativas. Por meio do proxy, o Vue é notificado quando essas propriedades são modificadas e recebem um novo valor. E por meio dessa notificação, Vue sabe que é hora de atualizar a UI para refletir esse novo valor. 
+
+- Quando você usa o `instanciaVue.mount('#idDoElementoHTML')`, o elemento em que o Vue é montado é chamado de **template** dessa instância do Vue.
+
+- Vue usa o template para criar um **"Virtual DOM"** dessa seção do HTML (uma cópia do DOM feita em JS, que **roda em memória** - mais rápido). Por meio do proxy, o Vue sabe quando alguma coisa mudou e atualiza esse Virtual DOM. Com isso, baseado nas diferenças entre o Virtual DOM **antigo e o novo** (que são em JS e rodam em memória, além de outras técnicas que aumentam a perfomance), o Vue consegue atualizar o HTML de maneira eficiente. 
+
+- O Vue disponibiliza um **atributo `ref="nomeParaAReferencia"`** que pode ser adicionado aos elementos HTML. Isso possibilita acessar o elemento por meio da instância do Vue. Para acessá-lo, você usa a **propriedade `$refs`** (por exemplo, `this.$refs.nomeParaAReferencia`, te dará **acesso ao objeto DOM do elemento** ao qual essa ref foi associada).
+
+## Ciclo de vida da Instância do Vue
+
+O Vue possui pontos (*hooks*) em seu ciclo de vida que podem ser **acessados** por meio de propriedades do objeto usado no `createApp`. Cada um representa um estágio da instância do Vue em determinado momento e em cada um você pode rodar algum código necessário naquele estágio (para fazer alguma requisição a uma API, ou fazer alguma limpeza antes de encerrar a instância, por exemplo).
+
+| hook | descrição |
+|---|---|
+| `beforeCreate()` | antes de a aplicação ter sido completamente inicializada |
+| `created()` | logo após a aplicação ter sido inicializada, mas antes de estar ligada ao HTML (antes de vermos alguma coisa na tela). Neste ponto, o Vue conhece seus data properties e sua configuração. A partir daí, o Vue pode compilar o template e saber onde serão feitas as interpolações, métodos, etc. |
+| `beforeMount()` | logo antes de o Vue mostrar alguma coisa na tela |
+| `mounted()` | Vue já está ligado ao HTML e alguma coisa (o HTML) é mostrada na tela |
+| `beforeUpdate()` | quando algum dado foi alterado, o beforeUpdate é executado antes de essa alteração ser aplicada |
+| `updated()` | logo após a mudança ter sido processada e aplicada. Alterações na UI ocorrem nesse momento. |
+| `beforeUnmount()` | antes de a instância Vue ser destruída. Ainda conseguimos ver alguma coisa na tela. |
+| `unmounted()` | após a instância Vue ter sido removida. Já não vemos nada na tela associada a essa instância. |
+
+### Convenções
+
+Seu **componente principal** no projeto, aquele que será chamado para iniciar a aplicação, vai se chamar **`src/App.vue`**.
+
+Os **outros componentes** serão colocados na pasta **`/src/components`**.
+
+Nome dos arquivos: PascalCase (mais comum) ou kebab-case.
+
+## Componentes
+
+Um componente pode ser entendido como um pedaço **encapsulado e reusável** de código HTML, que possui **dados e lógica** atrelados a ele. Quando utilizado, um componente é **independente** de outro, ou seja, se você adicionar um componente duas vezes em seu código, cada um deles possui seus próprios dados e sua própria lógica, e **um não irá afetar o outro**. Eles podem, no entanto, se comunicar para compartilharem dados entre si, como será visto mais para frente.
+
+O uso de componente auxilia em dividir uma grande aplicação em pequenos pedaços que interagem entre si.
+
+Existe mais de uma maneira de criar componentes: por meio do método `component()` da instância do Vue, ou por meio de um SFC (Single File Component) - um arquivo com a extensão `.vue`.
+
+### Método `component()`
+
+Por meio da instância do Vue, chamamos o método `component()` e passamos dois argumentos: o **identificador** e o **objeto de configuração**.
+
+- Identificador: uma string que será usada para adicionar o componente ao HTML. Sugestão: use **mais de uma palavra, separadas por `-`** (por exemplo: `meu-componente`), o chamado "kebab-case". Isso impede que você crie um nome que possa entrar em conflito com alguma tag do HTML.
+
+- Objeto de configuração: mesmo objeto que usamos ao criar uma instância do Vue. Nele podemos criar `data`, `methods`, dentre outras propriedades, que pertencerão somente a este componente. Ou seja, um componente pode ser visto como uma instância do Vue, que pertence a outra instância Vue pai.
+
+```js
+const app = Vue.createApp({
+  // código omitido
+});
+
+// criando um componente que pertence a app
+app.component('contato-agenda', {
+  // a propriedade template permite que esse componente renderize este HTML ao ser chamado
+  template: `
+    <li>
+      <h2>{{contato.nome}}</h2>
+      <button @click="toggleDetalhes">
+        {{detalhesVisiveis ? 'Esconder' : 'Mostrar'}} Detalhes
+      </button>
+      <ul v-if="detalhesVisiveis">
+        <li>
+          <strong>Telefone:</strong>{{ contato.telefone }}
+        </li>
+        <li>
+          <strong>Email:</strong> {{ contato.email }}
+        </li>
+      </ul>
+    </li>
+  `,
+  data() {
+    return {
+      detalhesVisiveis: false,
+      // hard-coded somente a fins de exemplo
+      contato: {
+        id: 'f-139',
+        nome: 'Fulano de Tal',
+        telefone: '99 99999-9999',
+        email: 'fulano@email.br'
+      }
+    }
+  },
+  methods: {
+    toggleDetalhes() {
+      this.detalhesVisiveis = !this.detalhesVisiveis;
+    }
+  }
+});
+```
+
+```html
+<ul>
+  <contato-agenda></contato-agenda>
+  <contato-agenda></contato-agenda>
+  <contato-agenda></contato-agenda>
+  <contato-agenda></contato-agenda>
+</ul>
+```
+
+### SFC (Single File Component)
+
+É um recurso do Vue para **escrever componentes**. Por meio de um **único arquivo**, conseguimos **escrever HTML** para a UI, **JS** para a lógica (aquilo que escrevemos dentro do objeto de configuração) **e CSS** para estilização. Internamente, um projeto Vue (construído com o Vue CLI Ou Vite) faz um processo de build para criar os códigos necessários para rodar o app no navegador.
+
+Diferente do método `component()`, aqui temos uma seção separada para o HTML na tag `<template>`, não precisando mais utilizar a propriedade `template` dentro do objeto de configuração.
+
+Arquivos SFC terminam com a **extensão `.vue`**.
+
+Além de centralizar a escrita do componente em um único arquivo, podemos também instalar **extensões** para facilitar o **syntax highlight** e o **autocomplete**. O próprio Vue disponibiliza uma [extensão oficial para VS Code](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
+
+Para utilizar SFC, é necessário ter alguma ferramenta de build, como o Vite, que irá compilar esses arquivos para poder abrir um projeto Vue no navegador.
+
+```vue
+<!-- ContatoAgenda.vue -->
+<template>
+  <li>
+    <h2 class="nomeContato">{{contato.nome}}</h2>
+    <button @click="toggleDetalhes">
+      {{detalhesVisiveis ? 'Esconder' : 'Mostrar'}} Detalhes
+    </button>
+    <ul v-if="detalhesVisiveis">
+      <li>
+        <strong>Telefone:</strong>{{ contato.telefone }}
+      </li>
+      <li>
+        <strong>Email:</strong> {{ contato.email }}
+      </li>
+    </ul>
+  </li>
+</template>
+
+<style>
+.nomeContato {
+  font-size: 24px;
+  font-weight: 800;
+}
+</style>
+
+<script>
+export default {
+  data() {
+    return {
+      detalhesVisiveis: false,
+      // hard-coded somente a fins de exemplo
+      contato: {
+        id: 'f-139',
+        nome: 'Fulano de Tal',
+        telefone: '99 99999-9999',
+        email: 'fulano@email.br'
+      }
+    }
+  },
+  methods: {
+    toggleDetalhes() {
+      this.detalhesVisiveis = !this.detalhesVisiveis;
+    }
+  }
+}
+</script>
+```
+
+Usando um projeto Vue criado pelo Vite, por exemplo, temos um arquivo `main.js`, onde criamos nossa instância Vue e registramos novos componentes por meio do método `component`, dessa vez passando o SFC ao invés de um objeto de configuração. Por conta do Vite, podemos importar o Vue e também os métodos, deixando o código um pouco diferente: 
+
+```js
+// main.js
+import { createApp } from 'vue';
+import App from './App.vue';
+
+// por ser um export default (componente anônimo),
+// podemos dar o nome que quiser a ele. Por convenção,
+// usamos o mesmo nome do arquivo .vue
+import ContatoAgenda from './components/ContatoAgenda.vue';
+
+// Cria a instância Vue e usa o componente App 
+// como componente principal da aplicação
+const app = createApp(App);
+
+// Registra um novo componente à instância.
+// Desse modo, App pode usá-lo.
+app.component('contato-agenda', ContatoAgenda);
+
+// associa a instância ao HTML
+app.mount('#app');
+```
+
+Uma vez importado e registrado o componente a uma instância Vue, podemos utilizá-lo: 
+
+```vue
+<!-- App.vue -->
+<template>
+  <section>
+    <h2>Agenda</h2>
+    <ul>
+      <contato-agenda></contato-agenda>
+      <contato-agenda></contato-agenda>
+    </ul>
+  </section>
+</template>
+
+<!-- restante omitido -->
+```
+
+## Vue CLI e Vite
+
+É uma ferramenta disponibilizada pelo Vue para criar um projeto com uma estrutura de pastas e arquivos pré-configurados, contendo também scripts para rodar localmente e fazer builds para produção. Por meio desse projeto também podemos utilizar os componentes criados com a extensão `.vue` ([SFC - Single File Component](#sfc-single-file-component)).
+
+Até 06/2025, o [CLI está em **"manutenção"**](https://vuejs.org/guide/scaling-up/tooling.html#vue-cli), e o time do Vue recomenda o uso do [**Vite para criar projetos Vue**](https://vuejs.org/guide/scaling-up/tooling.html#vite).
+
+Para criar um projeto Vue e sua versão mais atual, usando o Vite, rode o seguinte comando no terminal:
+
+  npm create vue@latest
+
+Depois basta seguir as instruções na tela para selecionar as opções que você deseja no projeto.
