@@ -405,6 +405,8 @@ export default {
 
 Usando um projeto Vue criado pelo Vite, por exemplo, temos um arquivo `main.js`, onde criamos nossa instância Vue e registramos novos componentes por meio do método `component`, dessa vez passando o SFC ao invés de um objeto de configuração. Por conta do Vite, podemos importar o Vue e também os métodos, deixando o código um pouco diferente: 
 
+**Atenção:** esse é o código para **Vue 3**. Em Vue 2 não temos o createApp.
+
 ```js
 // main.js
 import { createApp } from 'vue';
@@ -455,3 +457,214 @@ Para criar um projeto Vue e sua versão mais atual, usando o Vite, rode o seguin
   npm create vue@latest
 
 Depois basta seguir as instruções na tela para selecionar as opções que você deseja no projeto.
+
+## Props
+
+Uma das formas de passar dados aos componentes é por meio de props.
+
+No componente, **`props` é outra propriedade da instância Vue**, que recebe um **array de strings**, cada string representando o nome de uma prop - um dado que o componente recebe e pode usar. As strings são em **camelCase**.
+
+Ao **usar** o componente, você passa dados usando o nome das props definidas no componente, **como se fossem atributos do HTML**. Aqui, você usa os nomes em **kebab-case**.
+
+As props também podem ser usadas **internamente** na seção `script` do componente, por meio do **`this.nomeDaProp`**. Também podemos usá-las na **interpolação** na seção `template`, simplesmente chamando pelo `nomeDaProp` (**não** preciso usar `props.nomeDaProp`).
+
+```vue
+<!-- ContatoAgenda.vue -->
+<template>
+  <li>
+    <h2>{{ nome }}</h2>
+    <p><strong>Telefone:</strong>{{ numeroTelefone }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+  </li>
+</template>
+
+<script>
+export default {
+  props: [
+    'nome',
+    'numeroTelefone',
+    'email'
+  ],
+  data() {
+    return {
+      detalhesVisiveis: false,
+    }
+  },
+  // código omitido
+}
+</script>
+
+<!--------->
+
+<!-- App.vue -->
+<template>
+  <section>
+    <h2>Agenda</h2>
+    <ul>
+      <contato-agenda
+        nome='Fulano de Tal',
+        numero-telefone='999999999',
+        email='fulano@email.br'
+      ></contato-agenda>
+      <contato-agenda
+        nome='Sicrano de Qual',
+        numero-telefone='111111111',
+        email='sicrano@email.br'
+      ></contato-agenda>
+    </ul>
+  </section>
+</template>
+<!-- restante omitido -->
+```
+
+### Props como objetos
+
+Ao invés de passar um array de strings para `props`, podemos passar um **objeto**. Por meio do objeto, podemos informar o tipo esperado para cada prop, se ela é ou não obrigatória, passar um valor default e até mesmo validar o valor recebido. Essas configurações são mais para **ajudar os desenvolvedores** na hora de utilizar um componente, e muitas vezes irão somente jogar um warning no dev-tools.
+
+```js
+props: {
+  nome: String, // pode ser somente o tipo
+  numeroTelefone: { // pode também ser um objeto com mais validações
+    type: Number,
+    required: true,
+    validator: function(value) { // deve retornar true ou false
+      return validaNumeroDeTelefone(value)
+    }
+  },
+  email: {
+    type: String,
+    default: '' // valor usado se essa prop não for passada
+  }
+}
+```
+
+### Props não devem ser mutadas
+
+Props são usadas por um componente **pai** para passar dados a um componente **filho**. Podemos entender isso como um "fluxo de dados unidirecional".
+
+O componente filho é quem define as props que espera receber, mas **é um erro** alterar valor de uma prop ("mutar" a prop) no componente filho. Entenda a prop como uma variável **readonly**.
+
+Se você precisa trabalhar com o valor de uma prop e internamente modificar esse valor no componente filho, uma alternativa é criar uma **variável interna** no componente filho e usar o valor da prop como valor inicial. Assim, você pode alterar o valor dessa variável como quiser dentro do componente filho.
+
+Uma maneira de inverter o fluxo de dados, isto é, avisar ao componente pai que queremos alterar um valor recebido como prop, é por meio da **emissão de eventos customizados**.
+
+## Usando `$emit`
+
+Da mesma forma que um clique de um botão emite um evento para avisar sobre a ação de clique, os componentes em Vue podem emitir eventos customizados para avisar que uma determinada ação foi executada. Com isso, um **componente filho pode se comunicar com um componente pai** por meio de eventos customizados, possibilitando ao componente pai tomar alguma ação quando o filho emite o evento. Além disso, junto com o evento podemos passar algum dado para o componente pai.
+
+No componente filho, emitimos eventos com o método fornecido pelo Vue: `this.$emit(nome-do-evento, dados)`.
+
+- `nome-do-evento`: é como o evento será identificado ao usar o componente. O componente pai pode "ouvir" o evento com `v-on:nome-do-evento` (ou `@nome-do-evento`). A **convenção é usar kebab-case**.
+
+- `dados`: o segundo argumento (e demais argumentos separados por vírgula) é **opcional** e nele você pode enviar dados para o componente pai. Quando o componente pai ouve o evento, ele pode chamar um método próprio dele e usar esse segundo argumento (e demais) como parâmetro de seu método.
+
+Você também pode emitir eventos no template do componente filho. Neste caso, não precisa do `this`, somente `$emit(nome-do-evento, dados)`.
+
+```vue
+<!-- ContatoAgenda.vue -->
+<template>
+  <li>
+    <h2>{{ nome }} {{ favorito ? '💛' : '' }}</h2>
+    <p><strong>Telefone:</strong>{{ numeroTelefone }}</p>
+    <p><strong>Email:</strong> {{ email }}</p>
+    <button @click="mudaFavorito">{{ favorito ? 'Desfavoritar' : 'Favoritar' }}</button>
+  </li>
+</template>
+
+<script>
+export default {
+  props: [
+    'id',
+    'nome',
+    'numeroTelefone',
+    'email',
+    'favorito'
+  ],
+  methods: {
+    mudaFavorito() {
+      this.$emit('muda-favorito', this.id)
+    }
+  }
+  // código omitido
+}
+</script>
+
+<!--------->
+
+<!-- App.vue -->
+<template>
+  <section>
+    <h2>Agenda</h2>
+    <ul>
+      <contato-agenda
+        v-for='amigo in listaAmigos'
+        :nome='amigo.nome',
+        :numero-telefone='amigo.telefone',
+        :email='amigo.email'
+        :id='amigo.id'
+        @muda-favorito='alteraFavorito'
+      ></contato-agenda>
+    </ul>
+  </section>
+</template>
+<script>
+export default {
+  data() {
+    return {
+      listaAmigos: [
+        {
+          id: 'fulano',
+          nome: 'Fulano de Tal',
+          telefone: '999999999',
+          email: 'fulano@email.br',
+          favorito: false
+        },
+        {
+          id: 'sicrano',
+          nome: 'Sicrano de Qual',
+          telefone: '111111111',
+          email: 'sicrano@email.br',
+          favorito: true
+        },
+      ]
+    }
+  },
+  methods: {
+    alteraFavorito(id) {
+      const amigoEncontrado = this.listaAmigos.find(a => a.id === id);
+      if (amigoEncontrado) {
+        amigoEncontrado.favorito = !amigoEncontrado.favorito;
+      }
+    }
+  }
+}
+</script>
+```
+
+### Propriedade `emits`
+
+Você pode adicionar a propriedade (opcional) `emits` ao componente como forma de documentar que tipo de emits seu componente possui e até mesmo fazer algumas validações. Isso serve mais como ajuda na hora do desenvolvimento, concentrando em um só local os emits que pode ser usados.
+
+Essa propriedade pode ser um array de strings, com cada string representando o nome de um emit criado. Mas ela também pode ser um objeto, como cada emit sendo uma propriedade, e seu valor sendo uma função anônima e os parâmetros esperados, podendo passar dentro do corpo da função algum tipo de validação.
+
+```js
+// ContatoAgenda.vue
+
+// emits: ['muda-favorito'] // pode ser um simples array ou...
+
+// ... pode ser um objeto
+emits: {
+  'muda-favorito': function(id) {
+    // Apenas uma validação interna do emit
+    // O emit em si é chamado via this.$emit
+    if (id) return true;
+    else {
+      console.warn('id é obrigatório!');
+      return false;
+    }
+  }
+}
+```
+
+
+Rever a partir de 105
