@@ -666,5 +666,84 @@ emits: {
 }
 ```
 
+## Prop drilling e provide/inject
 
-Rever a partir de 105
+Prop drilling é o que ocorre quando temos componentes aninhados em vários níveis e precisamos passar uma prop de um componente em um nível para um descendente que está níveis abaixo. Essa prop precisa ser passada para cada componente nos níveis intermediários, que eventualmente nem precisam dessa prop, mas a recebem para poder repassá-la para o próximo componente um nível abaixo, até chegar ao componente de destino.
+
+Para evitar o prop drilling, o Vue disponibiliza as opções (propriedades do objeto de configuração do componente) `provide` e `inject`, que implementam o Padrão de **Injeção de Dependência**.
+
+Usamos o `provide` no componente que irá **fornecer** um dado (e que está em algum nível acima), e o `inject` no componente que irá **consumir** esse dado (e que está em algum nível abaixo). O dado pode ser uma string, array, objeto, etc, até mesmo uma variável reativa ou uma função. Com isso, não importa o quão profundamente aninhado esteja um componente, injetamos nele os dados que ele precisa consumir, sem que estes dados precisem trafegar por todos os componentes intermediários. 
+
+A opção `provide` é um **método** que retorna um **objeto** cujas propriedades são os dados a serem disponibilizados. Já a opção `inject` é um **array**, em que cada elemento é o nome de alguma das propriedades presentes em `provide`.
+
+```vue
+<!-- App.vue -->
+<script>
+data() {
+  return {
+    posts: [
+      {id:1, titulo: 'Primeiro post', conteúdo: 'Lorem ...'},
+      {id:2, titulo: 'Segundo post', conteúdo: 'Ipsum ...'},
+    ],
+  };
+},
+provide() {
+  return {
+    posts: this.posts, // posso fornecer uma variável
+    abrePost: this.selecionaPost // também posso fornecer métodos
+  }
+},
+methods: {
+  selecionaPost(id) {
+    //...
+  }
+}
+</script>
+
+<!-- ListaPosts.vue -->
+<template>
+  <ul>
+    <item-post
+      v-for="post in posts"
+      :key="post.id"
+      :id="post.id"
+      :titulo-post="post.titulo"
+      :conteudo="post.conteudo"
+    ></item-post>
+  </ul>
+</template>
+
+<script>
+export default {
+  inject: ['posts'] // uso somente o que preciso consumir
+};
+</script>
+
+<!-- ItemPost.vue -->
+<template>
+  <li>
+    <h3>{{ titulo-post }}</h3>
+    <p>{{ conteudo }}</p>
+    <button @click="abrePost(id)">Leia mais</button>
+  </li>
+</template>
+
+<script>
+export default {
+  props: ['id', 'tituloPost', 'conteudo'],
+  inject: ['abrePost'] // posso usar o método sem a necessidade de um emit
+};
+</script>
+```
+
+### Quando usar provide/inject ou props e emits
+
+Não há uma regra e você não estará errado se optar usar um ou outro. 
+
+Uma sugestão é optar primeiro pelo uso de props e emits para comunicação entre componentes aninhados. Use o provide/inject quando um dado precisa ser enviado níveis abaixo, sem necessariamente ser consumido nos níveis intermediários. Se o aninhamento não for tão profundo, você pode optar continuar a comunicação via props.
+
+Nada te impede também de usar os dois, aproveitando o provide/inject para os dados que valem a pena serem injetados ao invés de passados via props ou emits.
+
+
+
+Continuar a partir de 111
