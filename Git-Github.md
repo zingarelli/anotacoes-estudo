@@ -155,7 +155,7 @@ O processo de branching é uma maneira de criar **vertentes/ramos de desenvolvim
 
 Uma branch, em termos básicos, é uma lista de commits sucessivos (um histórico de commits, ou uma linha do tempo). Cada novo commit é adicionado ao "topo" da branch, ou seja, a branch ativa tem um ponteiro apontando para o último commit feito. Criar uma nova branch significa criar um novo ponteiro a partir do último commit, sendo que novos commits irão atualizar para onde o ponteiro aponta, dependendo de qual branch estiver ativa.
 
-Por exemplo, suponha que você tem a branch `main`, apontando para o commit `abc1234`. Você então cria e ativa uma nova branch `teste`. Um ponteiro para essa branch é criado e também aponta para o commmit `abc1234`. Suponha que você fez um novo commit, `cde5678`; neste caso, o ponteiro de `teste`, que é a branch ativa, irá apontar para `cde5678`, enquanto o ponteiro da branch `main` continua apontando para `abc1234`. Novos commits continuarão atualizando o ponteiro de `teste`. Por fim, suponha que o último commit feito na branch `teste` foi `ijk2345`, e que agora você retornou para a branch `main` (`main` está ativa) e fez um novo commit, `lmn6789`. Neste caso, branch `main` irá apontar para este commit. Com isso, você agora tem duas ramificações na linha do tempo dos commits, iniciado no commit `abc1234`, mas com a branch `main` apontando para `lmn6789` e a branch `teste` apontando para `ijk2345`.
+Por exemplo, suponha que você tem a branch `main`, apontando para o commit `abc1234`. Você então cria e ativa uma nova branch `teste`. Um ponteiro para essa branch é criado e também aponta para o commit `abc1234`. Suponha que você fez um novo commit, `cde5678`; neste caso, o ponteiro de `teste`, que é a branch ativa, irá apontar para `cde5678`, enquanto o ponteiro da branch `main` continua apontando para `abc1234`. Novos commits continuarão atualizando o ponteiro de `teste`. Por fim, suponha que o último commit feito na branch `teste` foi `ijk2345`, e que agora você retornou para a branch `main` (`main` está ativa) e fez um novo commit, `lmn6789`. Neste caso, branch `main` irá apontar para este commit. Com isso, você agora tem duas ramificações na linha do tempo dos commits, iniciado no commit `abc1234`, mas com a branch `main` apontando para `lmn6789` e a branch `teste` apontando para `ijk2345`.
 
 Outra nomenclatura envolvida no branching é o conceito de **HEAD**. O HEAD é um ponteiro especial que **aponta para a branch ativa**. Ao trocar de branches, o que você está de fato fazendo é movendo o HEAD para apontar para a branch desejada.
 
@@ -173,7 +173,7 @@ O processo de merging implica em juntar duas branches em apenas uma. Isso é com
 
 Existem alguns métodos de merging que o Git pode utilizar. Um deles é o chamado **"fast-forward"**, mais simples, que é quando uma branch `A` está somente "para trás" na linha do tempo de commits em relação a outra branch `B`. Neste caso, o git somente vai avançar (o chamado "fast-forward") o ponteiro de `A` até aonde o ponteiro de `B` está apontando. 
 
-Um caso mais complexto é quando as branches `A` e `B` **divergiram**, isto é, a partir de um ponto em comum, cada uma evoluiu para lados diferentes (houve commits posteriores tanto em `A` quanto em `B` após esse ponto em comum). Ao tentar fazer o merge de `B` para `A`, o Git irá tentar mesclar as mudanças do último commit apontado por cada branch, baseado no commit em comum compartilhado por elas, e aí criar um novo commit que faz a união dessas três "pontas". A isso é dado no nome de **"three-way merge"** (combinação de três caminhos) e o commit resultante é chamado de **merge commit**, diferente dos outros commits por possuir dois "pais": o último commit de `A` e o último commmit de `B`.
+Um caso mais complexto é quando as branches `A` e `B` **divergiram**, isto é, a partir de um ponto em comum, cada uma evoluiu para lados diferentes (houve commits posteriores tanto em `A` quanto em `B` após esse ponto em comum). Ao tentar fazer o merge de `B` para `A`, o Git irá tentar mesclar as mudanças do último commit apontado por cada branch, baseado no commit em comum compartilhado por elas, e aí criar um novo commit que faz a união dessas três "pontas". A isso é dado no nome de **"three-way merge"** (combinação de três caminhos) e o commit resultante é chamado de **merge commit**, diferente dos outros commits por possuir dois "pais": o último commit de `A` e o último commit de `B`.
 
 Durante o three-way merge, o git irá tentar uma estratégia recursiva para fazer a combinação das mudanças efetuadas em cada branch. Caso não encontre nenhum conflito entre as mudanças, é feito o merge commit e a branch atual aponta para ele. No entanto, pode ser que alguns **arquivos tenham sido modificados em ambas as branches** e seus conteúdos sejam diferentes. Neste caso, o Git não tem como saber qual modificação deveria estar valendo, e isso é apontado como um **conflito**, que deve ser resolvido antes da finalização do merge. 
 
@@ -335,7 +335,7 @@ git commit -m "descricao_curta_de_seu_commit"
 
 Isso ajuda a manter um histórico de modificações no projeto e quais arquivos foram alterados/adicionados/removidos. Por meio de outros comandos git, podemos usar esse histórico para "navegar no tempo" do projeto, verificando como ele estava em diferentes etapas, ou até mesmo reverter para um commit anterior.
 
-A flag `-m` e a mensagem são opcionais. Se você usar somente `git commit`, será aberto o editor de texto padrão da sua máquina para que você inclua a mensagem. O commit é finalizado ao salvar a mensagem e fechar o editor de texto.
+A flag `-m` e a mensagem são opcionais. Se você usar somente `git commit`, será aberto o editor de texto padrão da sua máquina para que você inclua a mensagem. A primeira linha é mensagem curta (a mesma que você usaria com a flag `-m`), seguida por uma linha em branco, seguida por uma ou mais linhas com mais detalhes sobre o commit. O commit é finalizado ao salvar a mensagem e fechar o editor de texto.
 
 > As alterações "commitadas" ficam salvas no repositório **local**. Para de fato salvá-las no repositório remoto, utilizamos o comando [`git push`](#git-push).
 
@@ -363,9 +363,11 @@ Exibe o histórico de commits feitos, em ordem decrescente de data, trazendo nom
 
 > `git log --oneline`: histórico resumido; mostra somente parte do hash e mensagem de cada commit. Facilita quando você só quer ler as mensagens de cada commit para uma consulta rápida;
 
-> `git log -p` (ou `--patch`): histórico detalhado: mostra também as alterações (diff) feitas por cada commit em relação ao commit anterior.
+> `git log -p` (ou `--patch`): histórico detalhado: mostra também as alterações (diff) feitas por cada commit em relação ao commit anterior. "Patch" é um nome que também costumam usar para indicar uma modificação/alteração no código, ou uma tarefa em que você trabalhou.
 
 > `git log --graph`: mostra os commits com alguns símbolos auxiliares no começo de cada linha (`|`, `\`, `/`) para criar "bifurcações" na linha do tempo, de modo a facilitar a visualização de branches e merges que aconteceram. O símbolo `|` indica que os commits estão seguindo uma linha direta, ou seja, pertencem a uma mesma branch (geralmente a main). O símbolo `/` indica quando uma branch começou e o `\` indica o momento em que houve um merge dessa branch. Desse modo, você consegue ver o histórico de commits de uma maneira identada, permitindo verificar o histórico por branches.
+
+> `git log nome_da_branch --not main`: exemplo de criação de um log que irá trazer os commits de uma branch `nome_da_branch` que não estejam na branch `main`. Útil, por exemplo, quando você quer verificar os commits que uma branch está introduzindo ao seu código principal.
 
 ### `git show`
 
@@ -389,7 +391,7 @@ E se mais de um arquivo tiver sido modificado? Ele vai mostrar as diferenças ar
 
 A flag `--stage` ou `--cached` mostra as diferenças que estão em staging em comparação ao último commit.
 
-> `git diff hash_commmit_X..hash_commmit_Y`: mostra as diferenças desde o `hash_commmit_X` até o `hash_commmit_Y`. Se **X for um commit mais antigo que Y**, serão mostradas as diferenças em ordem **cronológica**. Caso X seja um commit mais novo que Y, as diferenças serão mostradas em ordem cronológica reversa (meio que mostrando o que será desfeito de X para Y).
+> `git diff hash_commit_X..hash_commit_Y`: mostra as diferenças desde o `hash_commit_X` até o `hash_commit_Y`. Se **X for um commit mais antigo que Y**, serão mostradas as diferenças em ordem **cronológica**. Caso X seja um commit mais novo que Y, as diferenças serão mostradas em ordem cronológica reversa (meio que mostrando o que será desfeito de X para Y).
 
 > o mesmo comando pode ser aplicado para nome de branches.
 
@@ -430,6 +432,8 @@ Envia para o repositório remoto todas mudanças commitadas localmente que ainda
 Atenção: caso você tente fazer um push e o repositório remoto tenha commits que você ainda não tem, seu push será rejeitado. Nesse caso, primeiro você vai ter que fazer o fetch, incorporar os commits que você ainda não tinha (e resolver qualquer conflito) para daí então "pushar" seus commits. Isso mantém o histórico de commits íntegro e único.
 
 A flag `-u` (`git push -u nome_do_repositorio_remoto nome_da_branch`) memoriza o repositório e a branch desse `push` e deixa você usar o comando `git push` sem precisar informar repositório e branch toda vez. **Use com cautela**: caso você comece a trabalhar com outras branches e se esqueça de alterar na hora de fazer o `push`, poderá estar fazendo o push na branch ou repositório errados, então o recomendado é fazer o push completo, com nome do repositório remoto e nome da branch.
+
+A última linha da saída do `git push`, quando o comando é executado com sucesso, traz algumas informações úteis. Por exemplo: `bf3194b..6713947  main -> main`. Ela indica o hash do último commit no repositório remoto, depois o hash do último commit no repositório local (se houver mais de um commit sendo pushado, mostra somente o último), depois a branch do repositório local, e por fim a branch do repositório remoto.
 
 ### `git pull`
 
@@ -656,7 +660,7 @@ A seção de issues também pode ser utilizada para tirar dúvidas e entrar em c
 
 Fork é outra funcionalidade do GitHub, que permite que você **copie** para seu repositório remoto um **projeto de outro usuário do GitHub**. Toda a estrutura e arquivos do projeto serão copiados para seu repositório, junto com uma informação de que seu projeto é um fork desse outro projeto.
 
-Você poderá fazer modificações no projeto, inserir novos arquivos, novas branches, commmits, etc. O `push` dessas modificações **ficarão somente em seu projeto**, não serão enviadas para o projeto original do qual o fork foi feito.
+Você poderá fazer modificações no projeto, inserir novos arquivos, novas branches, commits, etc. O `push` dessas modificações **ficarão somente em seu projeto**, não serão enviadas para o projeto original do qual o fork foi feito.
 
 Atualizações no projeto original **não** serão pegas pelo `git pull`. Caso queira atualizar o seu repositório com o original, é necessário criar um remote para o repositório original, baixar as atualizações com o comando `git fetch` e depois fazer um merge ou rebase da branch principal desse remote com sua branch
 
@@ -759,4 +763,4 @@ O próprio VS Code possui algumas funcionalidades para versionar com o git e lin
 
 ### Continuar em...
 
-pág. 105
+pág. 180 Advanced Pull Requests
