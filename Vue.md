@@ -552,7 +552,7 @@ Uma maneira de inverter o fluxo de dados, isto é, avisar ao componente pai que 
 
 Da mesma forma que um clique de um botão emite um evento para avisar sobre a ação de clique, os componentes em Vue podem emitir eventos customizados para avisar que uma determinada ação foi executada. Com isso, um **componente filho pode se comunicar com um componente pai** por meio de eventos customizados, possibilitando ao componente pai tomar alguma ação quando o filho emite o evento. Além disso, junto com o evento podemos passar algum dado para o componente pai.
 
-No componente filho, emitimos eventos com o método fornecido pelo Vue: `this.$emit(nome-do-evento, dados)`.
+No componente **filho**, emitimos eventos com o método fornecido pelo Vue: `this.$emit(nome-do-evento, dados)`.
 
 - `nome-do-evento`: é como o evento será identificado ao usar o componente. O componente pai pode "ouvir" o evento com `v-on:nome-do-evento` (ou `@nome-do-evento`). A **convenção é usar kebab-case**.
 
@@ -643,7 +643,7 @@ export default {
 
 ### Propriedade `emits`
 
-Você pode adicionar a propriedade (opcional) `emits` ao componente como forma de documentar que tipo de emits seu componente possui e até mesmo fazer algumas validações. Isso serve mais como ajuda na hora do desenvolvimento, concentrando em um só local os emits que pode ser usados.
+Você pode adicionar a propriedade (opcional) `emits` ao componente como forma de documentar que tipo de emits seu componente possui e até mesmo fazer algumas validações. Isso serve mais como ajuda na hora do desenvolvimento, concentrando em um só local os emits que podem ser usados.
 
 Essa propriedade pode ser um array de strings, com cada string representando o nome de um emit criado. Mas ela também pode ser um objeto, como cada emit sendo uma propriedade, e seu valor sendo uma função anônima e os parâmetros esperados, podendo passar dentro do corpo da função algum tipo de validação.
 
@@ -668,7 +668,7 @@ emits: {
 
 ## Prop drilling e provide/inject
 
-Prop drilling é o que ocorre quando temos componentes aninhados em vários níveis e precisamos passar uma prop de um componente em um nível para um descendente que está níveis abaixo. Essa prop precisa ser passada para cada componente nos níveis intermediários, que eventualmente nem precisam dessa prop, mas a recebem para poder repassá-la para o próximo componente um nível abaixo, até chegar ao componente de destino.
+Prop drilling é o que ocorre quando temos componentes aninhados em vários níveis e precisamos passar uma prop de um componente que está em um nível mais alto para outro componente que está níveis abaixo. Essa prop precisa ser passada para cada componente nos níveis intermediários, que eventualmente nem precisam dessa prop, mas a recebem para poder repassá-la para o próximo componente um nível abaixo, até chegar ao componente de destino.
 
 Para evitar o prop drilling, o Vue disponibiliza as opções (propriedades do objeto de configuração do componente) `provide` e `inject`, que implementam o Padrão de **Injeção de Dependência**.
 
@@ -744,6 +744,82 @@ Uma sugestão é optar primeiro pelo uso de props e emits para comunicação ent
 
 Nada te impede também de usar os dois, aproveitando o provide/inject para os dados que valem a pena serem injetados ao invés de passados via props ou emits.
 
+## Componentes globais e locais
+
+Quando você adiciona um componente a sua instância Vue (a instância Vue é a criada com o método `createApp`), ele se torna disponível **globalmente** em sua aplicação, ou seja, qualquer outro componente pode utilizá-lo. 
+ 
+O problema com componentes globais é que todos eles precisam ser carregados pelo Vue quando a aplicação é iniciada, incluindo aqueles que talvez venham a ser utilizados por um componente ou tela específica. Conforme a aplicação cresce, isso pode ser um gargalo de performance.
+
+```js
+// main.js
+
+// instância Vue
+const app = createApp(App);
+
+// componentes globais
+app.component('header', Header);
+app.component('lista-post', ListaPost);
+app.component('post', Post);
+app.component('footer', Footer);
+```
+
+Um componente pode **importar outros componentes** e usá-los internamente. Componentes importados assim são **locais**, pois ficam disponíveis somente pelo componente que o importou. Importante observar que componentes **filhos não têm acesso ao componente importado** pelo pai - cada componente deve importar localmente os componentes que precisar usar.
+
+Para registrar um componente localmente, utilizamos a **propriedade `components`** no objeto de configuração do componente. O `components` recebe um objeto, com cada propriedade sendo o nome customizado para o componente importado, e o valor sendo o componente em si. Aqui o nome pode ser em PascalCase, inclusive quando ele é usado no template do componente.
+
+```vue
+// ListaPost.vue
+<script>
+import Post from './components/Post.vue';
+
+export default {
+  components: {
+      Post // o mesmo que Post: Post
+  },
+  // ...
+}
+</script>
+
+<template>
+<!-- exemplo de uso com PascalCase e autofechamento -->
+<Post />
+
+<!-- assim também funcionaria (necessário ter a tag de fechamento neste caso) -->
+<post></post>
+</template>
+```
+
+Opter por registrar componentes globalmente caso eles sejam utilizados por vários outros componentes. Caso contrário, é mais performático registrá-los localmente, conforme a necessidade.
+
+## Estilos locais
+
+Em arquivos .vue, é possível aplicar estilos locais, adicionando o **atributo `scoped`** em `<style>`. Com isso, o CSS criado será aplicado somente aos elementos, classes, etc. contidos no `<template>` deste componente. Importante notar que os estilos **não serão aplicados aos filhos** do componente.
+
+```vue
+<style scoped>
+/* Vue irá criar um CSS com algo parecido como header[data-v-9a9f6144] */
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #14005e;
+}
+
+/* h1[data-v-9a9f6144] */
+header h1 {
+  color: white;
+  margin: 0;
+}
+</style>
+
+<template>
+<!-- Vue irá renderizar algo como <header data-v-9a9f6144> -->
+<header>
+  <!-- <h1 data-v-9a9f6144> -->
+  <h1>Principal</h1>
+</header>
+</template>
+```
 
 
 Continuar a partir de 111
