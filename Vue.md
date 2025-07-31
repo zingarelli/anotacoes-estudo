@@ -763,18 +763,18 @@ app.component('post', Post);
 app.component('footer', Footer);
 ```
 
-Um componente pode **importar outros componentes** e usá-los internamente. Componentes importados assim são **locais**, pois ficam disponíveis somente pelo componente que o importou. Importante observar que componentes **filhos não têm acesso ao componente importado** pelo pai - cada componente deve importar localmente os componentes que precisar usar.
+Um componente pode **importar outros componentes** e usá-los internamente. Componentes importados assim são **locais**, pois ficam disponíveis somente pelo componente que o importou. Importante observar que componentes **filhos NÃO têm acesso ao componente importado** pelo pai - cada componente deve importar localmente os componentes que precisar usar.
 
-Para registrar um componente localmente, utilizamos a **propriedade `components`** no objeto de configuração do componente. O `components` recebe um objeto, com cada propriedade sendo o nome customizado para o componente importado, e o valor sendo o componente em si. Aqui o nome pode ser em PascalCase, inclusive quando ele é usado no template do componente.
+Para registrar um componente localmente, utilizamos a **propriedade `components`** no objeto de configuração do componente que está fazendo a importação. O `components` recebe um objeto, com cada propriedade sendo o nome customizado para o componente importado, e o valor sendo o componente em si. Aqui o nome pode ser em PascalCase, inclusive quando ele é usado no template do componente que está fazendo a importação.
 
 ```vue
-// ListaPost.vue
+<!-- ListaPost.vue -->
 <script>
-import Post from './components/Post.vue';
+import ListaPost from './components/ListaPost.vue';
 
 export default {
   components: {
-      Post // o mesmo que Post: Post
+      ListaPost // o mesmo que ListaPost: ListaPost
   },
   // ...
 }
@@ -782,18 +782,18 @@ export default {
 
 <template>
 <!-- exemplo de uso com PascalCase e autofechamento -->
-<Post />
+<ListaPost />
 
 <!-- assim também funcionaria (necessário ter a tag de fechamento neste caso) -->
-<post></post>
+<lista-post></lista-post>
 </template>
 ```
 
-Opter por registrar componentes globalmente caso eles sejam utilizados por vários outros componentes. Caso contrário, é mais performático registrá-los localmente, conforme a necessidade.
+Sugestão: opte por registrar componentes globalmente caso eles sejam utilizados por vários outros componentes. Caso contrário, é mais performático registrá-los localmente, conforme a necessidade.
 
 ## Estilos locais
 
-Em arquivos .vue, é possível aplicar estilos locais, adicionando o **atributo `scoped`** em `<style>`. Com isso, o CSS criado será aplicado somente aos elementos, classes, etc. contidos no `<template>` deste componente. Importante notar que os estilos **não serão aplicados aos filhos** do componente.
+Em arquivos .vue, é possível aplicar estilos locais (CSS), adicionando o **atributo `scoped`** em `<style>`. Com isso, o CSS criado será aplicado somente aos elementos, classes, etc. contidos no `<template>` deste componente. Importante notar que os estilos **NÃO serão aplicados aos filhos** do componente.
 
 ```vue
 <style scoped>
@@ -821,5 +821,114 @@ header h1 {
 </template>
 ```
 
+## Uso de `<slots>`
 
-Continuar a partir de 111
+Semelhante a `children` no React, podemos renderizar um componente como filho de outro componente. Para isso, adicionamos ao componente pai a tag `<slot>`. 
+
+Tenha em mente que usamos `props` para passar dados a um componente, e `<slot>` para passar HTML (o `<template>` de outro componente).
+
+O componente pode ter **mais de um slot**, possibilitando uma grande customização do template. Para diferenciar cada slot, usamos o atributo `name`, criando assim "named slots". É possível deixar um dos slots sem `name`, e ele se tornará o slot padrão naquele componente. 
+
+No componente que usa este componente, indicamos os slots por meio de um elemento `<template>` com a diretiva `v-slot`: `<template v-slot:nome-do-slot>`. Note que `nome-do-slot` vem **depois dos dois pontos (`:`)** e **não está entre aspas** - é um argumento da diretiva v-slot. O slot padrão não precisa de `template` e tudo que estiver fora do template com v-slot será renderizado no slot padrão, mas se quiser adicionar um template para deixar mais claro, pode utilizar `<template v-slot:default>`.
+
+- A diretiva tem uma forma abreviada: `#`. Então poderia ser `<template #nome-do-slot>` ou `<template #default>`
+
+```vue
+<!-- Post.vue -->
+<!-- Componente que possui slots -->
+<template>
+  <article>
+    <header>
+      <!-- named slot -->
+      <slot name="header"></slot>
+    </header>
+    <!-- slot padrão -->
+    <slot></slot>
+  </article>
+</template>
+
+<!-- ---- -->
+
+<!-- ListaPost.vue -->
+<!-- Componente que irá preencher os slots de um componente que importou -->
+<template>
+<post>
+  <!-- conteúdo renderizado no slot de Post nomeado como "header" -->
+  <template v-slot:header>
+    <h2>Título</h2>
+  </template>
+  
+  <!-- O conteúdo abaixo é renderizado no slot padrão -->
+  <!-- Se quisesse deixar mais claro, poderia envolvê-lo em -->
+  <!-- <template v-slot:default> -->
+  <p>Lorem ipsum...</p>
+</post>
+</template>
+```
+
+Importante salientar que slots **não tem acesso às props do componente pai**, e os **estilos scoped do componente pai não são aplicados ao slot**.
+
+### Conteúdo padrão
+
+Os slots não são obrigatórios, ou seja, o componente pai não precisa passar conteúdo para o slot de um componente filho. Nesse caso, o elemento em que o slot se encontra será renderizado como vazio. 
+
+É possível, no entanto, deixar um valor padrão para o caso de o slot não receber conteúdo (um fallback). No componente que tem slots, basta adicionar um conteúdo dentro de `<slot></slot>`. Esse conteúdo será mostrado somente se o slot não receber conteúdo do componente pai.
+
+```vue
+<template>
+<header>
+  <slot name="header">
+    <!-- esse heading é renderizado caso o componente 
+     pai não passe nada ao slot header -->
+    <h2>Título padrão</h2>
+  </slot>
+</header>
+</template>
+```
+
+É também possível evitar que um slot seja renderizado caso esteja vazio, verificando seu conteúdo por meio da propriedade `$slots`. Essa propriedade é um objeto, cujos atributos são os nomes dos slots (ou `default` para o slot sem nome). Se um slot `abc` é vazio, o conteúdo dele em `$slots.abc` é `undefined`.
+
+```vue
+<template>
+<!-- se o componente pai não passar conteúdo para o 
+ slot header, nem renderiza o elemento header -->
+<header v-if="$slots.header">
+  <slot name="header"></slot>
+</header>
+</template>
+```
+
+### Props em slots
+
+Um slot pode ter uma ou mais props. Essas props podem ser utilizadas para **passar dados ao componente pai**. Chamamos esses slots de "scoped slots".
+
+Para o componente pai acessar essas props, adicionamos um nome a ser recebido pela diretiva `v-slot`. Por exemplo: `<template v-slot:nome-do-slot="propsDoSlot">`. Essa `propsDoSlot` é um objeto, cujos atributos são as props que o slot recebeu.
+
+De maneira abreviada: `<template #nome-do-slot="propsDoSlot">`. Para o slot padrão: `<template v-slot="propsDoSlot">` ou `<template #default="propsDoSlot">`.
+
+Se o componente possui somente um slot, é possível passar `v-slot="propsDoSlot"` (ou `#default="propsDoSlot"`) diretamente para o nome do componente.
+
+```vue
+<!-- Post.vue -->
+<template>
+  <article v-if="$slots.default">
+    <!-- assuma que os valores para titulo e autor vêm da 
+     propriedade data desse componente -->
+    <slot :titulo="post.titulo" :autor="autor"></slot>
+  </article>
+</template>
+
+<!-- ListaPosts.vue -->
+<template>
+  <post #default="dados">
+    <h2>{{ dados.titulo }}</h2>
+    <h3>{{ dados.autor }}</h3>
+    <p>Lorem ipsum...</p>
+  </post>
+</template>
+```
+
+
+
+
+Continuar a partir de 120.
