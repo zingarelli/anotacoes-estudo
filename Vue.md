@@ -71,7 +71,7 @@ Os métodos podem ser invocados dentro de elementos HTML usando a **interpolaç�
 
 ## Diretivas
 
-São formas de adicionar instruções extras para os elementos HTML, de modo a "injetar" o Vue por meio de **atributos** com o sufixo `v-`.
+São formas de adicionar instruções extras para os elementos HTML, de modo a "injetar" o Vue por meio de **"atributos"** especiais com o sufixo `v-`.
 
 Duas diretivas (`v-bind` e `v-on`) são tão comumente utilizadas que receberam **formas abreviadas**. Você pode optar por usar tanto a forma completa quanto abreviada (mas tente manter a consistência no seu código).
 
@@ -248,7 +248,7 @@ As diretivas de condicionais e loops foram explicadas na [Seção de Diretivas](
 
 - Vue usa o template para criar um **"Virtual DOM"** dessa seção do HTML (uma cópia do DOM feita em JS, que **roda em memória** - mais rápido). Por meio do proxy, o Vue sabe quando alguma coisa mudou e atualiza esse Virtual DOM. Com isso, baseado nas diferenças entre o Virtual DOM **antigo e o novo** (que são em JS e rodam em memória, além de outras técnicas que aumentam a perfomance), o Vue consegue atualizar o HTML de maneira eficiente. 
 
-- O Vue disponibiliza um **atributo `ref="nomeParaAReferencia"`** que pode ser adicionado aos elementos HTML. Isso possibilita acessar o elemento por meio da instância do Vue. Para acessá-lo, você usa a **propriedade `$refs`** (por exemplo, `this.$refs.nomeParaAReferencia`, te dará **acesso ao objeto DOM do elemento** ao qual essa ref foi associada).
+- O Vue disponibiliza um **atributo especial `ref="nomeParaAReferencia"`** que pode ser adicionado aos elementos HTML. Isso possibilita acessar o elemento por meio da instância do Vue. Para acessá-lo, você usa a **propriedade `$refs`** (por exemplo, `this.$refs.nomeParaAReferencia`, te dará **acesso ao objeto DOM do elemento** ao qual essa ref foi associada).
 
 ## Ciclo de vida da Instância do Vue
 
@@ -823,13 +823,13 @@ header h1 {
 
 ## Uso de `<slots>`
 
-Semelhante a `children` no React, podemos renderizar um componente como filho de outro componente. Para isso, adicionamos ao componente pai a tag `<slot>`. 
+Semelhante a `children` no React, podemos passar conteúdo a um componente filho, para que este renderize tal conteúdo dentro de seu template. Para isso, adicionamos ao componente filho um elemento próprio do Vue chamado `<slot>`. 
 
 Tenha em mente que usamos `props` para passar dados a um componente, e `<slot>` para passar HTML (o `<template>` de outro componente).
 
-O componente pode ter **mais de um slot**, possibilitando uma grande customização do template. Para diferenciar cada slot, usamos o atributo `name`, criando assim "named slots". É possível deixar um dos slots sem `name`, e ele se tornará o slot padrão naquele componente. 
+Um componente pode ter **mais de um slot**, possibilitando uma grande customização do template. Para diferenciar cada slot, usamos o atributo `name`, criando assim "named slots". É possível deixar um dos slots sem `name`, e ele se tornará o slot padrão naquele componente. 
 
-No componente que usa este componente, indicamos os slots por meio de um elemento `<template>` com a diretiva `v-slot`: `<template v-slot:nome-do-slot>`. Note que `nome-do-slot` vem **depois dos dois pontos (`:`)** e **não está entre aspas** - é um argumento da diretiva v-slot. O slot padrão não precisa de `template` e tudo que estiver fora do template com v-slot será renderizado no slot padrão, mas se quiser adicionar um template para deixar mais claro, pode utilizar `<template v-slot:default>`.
+No componente pai, indicamos os slots por meio de um elemento `<template>` com a diretiva `v-slot`: `<template v-slot:nome-do-slot>`. Note que `nome-do-slot` vem **depois dos dois pontos (`:`)** e **não está entre aspas** - é um argumento da diretiva v-slot. O slot padrão não precisa de `template` e tudo que estiver fora do template com v-slot será renderizado no slot padrão, mas se quiser adicionar um template para deixar mais claro, pode utilizar `<template v-slot:default>`.
 
 - A diretiva tem uma forma abreviada: `#`. Então poderia ser `<template #nome-do-slot>` ou `<template #default>`
 
@@ -850,7 +850,7 @@ No componente que usa este componente, indicamos os slots por meio de um element
 <!-- ---- -->
 
 <!-- ListaPost.vue -->
-<!-- Componente que irá preencher os slots de um componente que importou -->
+<!-- Componente pai que irá preencher os slots -->
 <template>
 <post>
   <!-- conteúdo renderizado no slot de Post nomeado como "header" -->
@@ -866,13 +866,13 @@ No componente que usa este componente, indicamos os slots por meio de um element
 </template>
 ```
 
-Importante salientar que slots **não tem acesso às props do componente pai**, e os **estilos scoped do componente pai não são aplicados ao slot**.
+Importante salientar que o conteúdo inserido em um slot **não têm acesso às props do componente pai**, e os **estilos scoped do componente pai não são aplicados a ele**. Isso se deve ao fato de esse conteúdo ser "enxergado" e renderizado pelo componente filho.
 
 ### Conteúdo padrão
 
-Os slots não são obrigatórios, ou seja, o componente pai não precisa passar conteúdo para o slot de um componente filho. Nesse caso, o elemento em que o slot se encontra será renderizado como vazio. 
+Os slots não são obrigatórios, ou seja, o componente pai não precisa passar conteúdo para o slot de um componente filho. Nesse caso, o elemento em que o slot se encontra será renderizado como vazio pelo componente filho. 
 
-É possível, no entanto, deixar um valor padrão para o caso de o slot não receber conteúdo (um fallback). No componente que tem slots, basta adicionar um conteúdo dentro de `<slot></slot>`. Esse conteúdo será mostrado somente se o slot não receber conteúdo do componente pai.
+É possível, no entanto, deixar um valor padrão para o caso de o slot não receber conteúdo (um fallback). No componente que tem slots, basta adicionar algum conteúdo dentro de `<slot></slot>` - ele será renderizado somente se o slot não receber conteúdo do componente pai.
 
 ```vue
 <template>
@@ -886,7 +886,7 @@ Os slots não são obrigatórios, ou seja, o componente pai não precisa passar 
 </template>
 ```
 
-É também possível evitar que um slot seja renderizado caso esteja vazio, verificando seu conteúdo por meio da propriedade `$slots`. Essa propriedade é um objeto, cujos atributos são os nomes dos slots (ou `default` para o slot sem nome). Se um slot `abc` é vazio, o conteúdo dele em `$slots.abc` é `undefined`.
+É também possível evitar que um slot seja renderizado caso esteja vazio, verificando seu conteúdo por meio da propriedade `$slots`. Essa propriedade é um objeto, cujos atributos são os nomes dos slots (ou `default` para o slot sem nome). Se um slot `abc` é vazio, o conteúdo dele em `$slots.abc` é `undefined`, então podemos renderizar condicionalmente com `v-if`, por exemplo.
 
 ```vue
 <template>
@@ -900,13 +900,13 @@ Os slots não são obrigatórios, ou seja, o componente pai não precisa passar 
 
 ### Props em slots
 
-Um slot pode ter uma ou mais props. Essas props podem ser utilizadas para **passar dados ao componente pai**. Chamamos esses slots de "scoped slots".
+Um slot pode ter uma ou mais props (atributos passados a ele no **componente filho**). Essas props podem ser utilizadas para **passar dados ao componente pai**. Chamamos esses slots de "scoped slots".
 
-Para o componente pai acessar essas props, adicionamos um nome a ser recebido pela diretiva `v-slot`. Por exemplo: `<template v-slot:nome-do-slot="propsDoSlot">`. Essa `propsDoSlot` é um objeto, cujos atributos são as props que o slot recebeu.
+Para o componente pai acessar essas props, adicionamos um nome a ser recebido pela diretiva `v-slot`. Por exemplo: `<template v-slot:nome-do-slot="propsDoSlot">`. Essa `propsDoSlot` é um objeto, e acessamos as props como atributos desse objeto.
 
 De maneira abreviada: `<template #nome-do-slot="propsDoSlot">`. Para o slot padrão: `<template v-slot="propsDoSlot">` ou `<template #default="propsDoSlot">`.
 
-Se o componente possui somente um slot, é possível passar `v-slot="propsDoSlot"` (ou `#default="propsDoSlot"`) diretamente para o nome do componente.
+Se o componente possui somente um slot, o componente pai pode passar `v-slot="propsDoSlot"` (ou `#default="propsDoSlot"`) diretamente para o componente filho, sem necessidade de envolver em um `<template>`.
 
 ```vue
 <!-- Post.vue -->
@@ -914,7 +914,7 @@ Se o componente possui somente um slot, é possível passar `v-slot="propsDoSlot
   <article v-if="$slots.default">
     <!-- assuma que os valores para titulo e autor vêm da 
      propriedade data desse componente -->
-    <slot :titulo="post.titulo" :autor="autor"></slot>
+    <slot :titulo="post.titulo" :autor="auth.nome"></slot>
   </article>
 </template>
 
@@ -928,7 +928,76 @@ Se o componente possui somente um slot, é possível passar `v-slot="propsDoSlot
 </template>
 ```
 
+## Componente `<component>`
+
+Podemos renderizar componentes de maneira dinâmica usando o componente fornecido pelo Vue chamado `<component>`. Ela aceita uma prop `is`, cujo valor é o nome do componente a ser renderizado (sua tag, tanto kebab-case quanto PascalCase).
+
+Com isso, é possível, por exemplo, ter uma variável reativa cujo valor é uma string, e nela passar o nome do componente que deve ser renderizado. Assim, por meio de algum evento, podemos alterar o valor dessa variável, por sua vez alterando o componente a ser renderizado.
+
+```vue
+<template>
+  <div>
+    <button @click="setComponenteAtivo('novo-post')">+ Novo Post</button>
+    <button @click="setComponenteAtivo('gerencia-posts')">Tela administrativa</button>
+    <component :is="componenteAtivo"></component>
+  </div>
+</template>
+
+<script>
+
+// imports...
+
+export default {
+  components: {
+    NovoPost,
+    GerenciaPosts
+  },
+  data() {
+    return {
+      componenteAtivo: 'gerencia-post' // ou 'GerenciaPost'
+    };
+  },
+  methods: {
+    setComponenteAtivo(cmp) {
+      this.componenteAtivo = cmp
+    }
+  }
+};
+</script>
+```
+
+Por ser dinâmico, quando o componente em `<component>` é modificado, ele é de fato destruído ("unmounted"). Com isso, suas variáveis no objeto de data, por exemplo, são perdidas. Esse pode não ser um comportamento desejado: imagine que o componente era um formulário com vários campos de input, cujos valores estavam associados a variáveis do objeto data; ao ser destruído, esses valores seriam perdidos.
+
+Se você quiser que o Vue não destrua componente, mantendo seu estado em cache, adicione o componente fornecido pelo Vue chamado `<keep-alive>`:
+
+```js
+<keep-alive>
+  <component :is="componenteAtivo"></component>
+</keep-alive>
+```
+
+## Componente `<teleport>`
+
+> Este recurso está disponível somente a partir do Vue 3.
+
+O Vue oferece o componente `<teleport>` que possibilita que você mova porções do seu template para algum outro lugar da estrutura do DOM.
+
+Imagine que seu componente renderiza uma modal. Semanticamente, seria interessante que essa modal fizesse parte do `body` do HTML. Você pode usar o `<teleport>` para avisar ao Vue para que faça isso. 
+
+Para informar para qual local o conteúdo deve ser renderizado, você usa a prop `to`, cujo valor pode ser o nome de um elemento, ou até um id ou classe (ou seja, um seletor CSS).
+
+```vue
+<template>
+  <input type="text" ref="nome">
+  <button @click="addNome">Adicionar</button>
+  <!-- o conteúdo abaixo será renderizado no final do body -->
+  <teleport to="body">
+    <minha-modal v-if="inputVazio">
+      <p>Por favor, digite seu nome</p>
+    </minha-modal>
+  </teleport>
+</template>
+```
 
 
-
-Continuar a partir de 120.
+Continuar a partir de 124.
