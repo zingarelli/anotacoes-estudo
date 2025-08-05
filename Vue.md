@@ -348,6 +348,9 @@ app.component('contato-agenda', {
 
 Diferente do método `component()`, aqui temos uma seção separada para o HTML na tag `<template>`, não precisando mais utilizar a propriedade `template` dentro do objeto de configuração.
 
+> Em Vue 2, um template só pode ter 1 elemento principal que engloba os outros elementos (você não pode ter elementos irmãos). Já em Vue 3 é possível ter elementos irmãos, filhos diretos de um template. Isso é chamado de "fragment".
+
+
 Arquivos SFC terminam com a **extensão `.vue`**.
 
 Além de centralizar a escrita do componente em um único arquivo, podemos também instalar **extensões** para facilitar o **syntax highlight** e o **autocomplete**. O próprio Vue disponibiliza uma [extensão oficial para VS Code](https://marketplace.visualstudio.com/items?itemName=Vue.volar).
@@ -547,6 +550,12 @@ O componente filho é quem define as props que espera receber, mas **é um erro*
 Se você precisa trabalhar com o valor de uma prop e internamente modificar esse valor no componente filho, uma alternativa é criar uma **variável interna** no componente filho e usar o valor da prop como valor inicial. Assim, você pode alterar o valor dessa variável como quiser dentro do componente filho.
 
 Uma maneira de inverter o fluxo de dados, isto é, avisar ao componente pai que queremos alterar um valor recebido como prop, é por meio da **emissão de eventos customizados**.
+
+### Attribute Fallthrough
+
+Quando você adiciona atributos ou event listeners para um componente customizado (um componente que você criou), estes atributos e eventos são **atribuídos ao elemento principal** do componente (o filho direto de `<template>`). Isso é denominado *"attribute fallthrough"*.
+
+Note que em Vue 3 podemos ter mais de um elemento principal abaixo de template (elementos irmãos). Nesse caso, o attribute fallthrough não é aplicado, pois Vue não tem como saber para qual elemente encaminhar os atributos e eventos. Você pode, no entanto, manualmente indicar para qual elemento os atributos devem ir, adicionando `v-bind="$attrs"` a este elemento.
 
 ## Usando `$emit`
 
@@ -945,7 +954,7 @@ Com isso, é possível, por exemplo, ter uma variável reativa cujo valor é uma
 
 <script>
 
-// imports...
+// imports omitidos
 
 export default {
   components: {
@@ -968,7 +977,7 @@ export default {
 
 Por ser dinâmico, quando o componente em `<component>` é modificado, ele é de fato destruído ("unmounted"). Com isso, suas variáveis no objeto de data, por exemplo, são perdidas. Esse pode não ser um comportamento desejado: imagine que o componente era um formulário com vários campos de input, cujos valores estavam associados a variáveis do objeto data; ao ser destruído, esses valores seriam perdidos.
 
-Se você quiser que o Vue não destrua componente, mantendo seu estado em cache, adicione o componente fornecido pelo Vue chamado `<keep-alive>`:
+Se você não quiser que o Vue destrua o componente, mantendo seu estado em cache, adicione o componente fornecido pelo Vue chamado `<keep-alive>`:
 
 ```js
 <keep-alive>
@@ -982,7 +991,7 @@ Se você quiser que o Vue não destrua componente, mantendo seu estado em cache,
 
 O Vue oferece o componente `<teleport>` que possibilita que você mova porções do seu template para algum outro lugar da estrutura do DOM.
 
-Imagine que seu componente renderiza uma modal. Semanticamente, seria interessante que essa modal fizesse parte do `body` do HTML. Você pode usar o `<teleport>` para avisar ao Vue para que faça isso. 
+Imagine que seu componente renderiza uma modal. Semanticamente, seria interessante que essa modal fizesse parte do `body` do HTML. Você pode usar o `<teleport>` para pedir ao Vue que faça isso. 
 
 Para informar para qual local o conteúdo deve ser renderizado, você usa a prop `to`, cujo valor pode ser o nome de um elemento, ou até um id ou classe (ou seja, um seletor CSS).
 
@@ -1000,4 +1009,4 @@ Para informar para qual local o conteúdo deve ser renderizado, você usa a prop
 ```
 
 
-Continuar a partir de 124.
+Continuar a partir de 144.
