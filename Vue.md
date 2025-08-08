@@ -1008,5 +1008,97 @@ Para informar para qual local o conteúdo deve ser renderizado, você usa a prop
 </template>
 ```
 
+## Detalhes sobre formulários
 
-Continuar a partir de 144.
+- para obter o valor de um input, podemos utilizar o `v-model` ou o `ref`. No entanto, é necessário um cuidado extra com o `ref`: ele sempre retorna uma **string** com o valor. Já `v-model` tenta converter o valor de acordo com o **tipo do input**: se for `number`, devolve um número.
+
+  - com input do tipo `date`, no entanto, ambos devolvem uma string com a data (yyyy-mm-dd)
+
+  - `v-model` também tem um modificador para forçar a conversão do valor para número: `v-model.number`. Além disso, também há um modificador para eliminar espaços em branco do começo e fim do input: `v-model.trim`
+
+- Podemos usar o `v-model` em campos de `select`. Com isso, fazemos o two-way binding do **`value` selecionado** no dropdown. Se desejar, ao criar uma variável em `data` para armazenar esse valor, podemos inicializá-la com o value de um dos `option` para que seja o valor padrão do select.
+
+- Em grupos de checkboxes ou radio buttons, adicionamos o mesmo `v-model` para cada um dos inputs que compõem o grupo. O comportamento deles varia:
+
+  - no caso de somente **um** checkbox, o valor de `v-model` será um **booleano** indicando se o campo está checked ou não;
+  - no caso de um **grupo de checkboxes** (checkbox com mesmo atributo `name`), `v-model` deve ser inicializado como um **array**. Além disso, cada checkbox precisa ter um **atributo `value`** com um **valor diferente** em cada um. Esse value será adicionado ao array caso o checkbox em questão seja marcado como checked.
+  - para um grupo de radio buttons, como somente um no grupo é selecionado, `v-model` pode ser inicializado como **string**. É necessário, no entanto, atribuir um valor ao **atributo `value`**, para que o v-model utilize este valor para indicar qual radio button foi selecionado.
+
+## Usando `v-model` em componentes customizados
+
+Quando usado em elementos HTML de input, o `v-model` uma combinação de `v-bind:value` e `v-on:input`. Mas ele também pode ser utilizado em componentes customizados, que você mesmo cria.
+
+Quando usado em um componente customizado, `v-model` vai disponibilizar uma **prop `modelValue`** e emitir um **evento `update:modelValue`** ao componente. Por meio da prop temos o valor atribuído a `v-model` e pelo evento podemos atualizar esse valor.
+
+```vue
+<!-- Avaliacao.vue. -->
+<!-- Quando clicamos em um botão, modelValue é atualizado 
+com o novo valor. Esse valor também é usado para ativar
+um CSS no botão clicado. -->
+<template>
+  <ul>
+    <li :class="{ active: modelValue === 'amei' }">
+      <button type="button" @click="activate('amei')">Amei</button>
+    </li>
+    <li :class="{ active: modelValue === 'legal' }">
+      <button type="button" @click="activate('legal')">Legalzinho</button>
+    </li>
+    <li :class="{ active: modelValue === 'odiei' }">
+      <button type="button" @click="activate('odiei')">Odiei</button>
+    </li>
+  </ul>
+</template>
+
+<script>
+export default {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  methods: {
+    activate(option) {
+      this.$emit('update:modelValue', option)
+    }
+  }
+}
+</script>
+
+<!-- ----- -->
+
+<!-- App.vue -->
+<!-- Agora podemos passar v-model a Avaliacao -->
+<template>
+  <form @submit.prevent="handleSubmit">
+    <div class="form-control">
+      <Avaliacao v-model="nota" />
+    </div>    
+    <div>
+      <button>Salvar</button>
+    </div>
+  </form>
+</template>
+
+<script>
+import Avaliacao from './Avaliacao.vue';
+
+export default {
+  components: {
+    Avaliacao
+  },
+  data() {
+    return {      
+      nota: null
+    }
+  },
+  methods: {
+    handleSubmit() {
+      console.log('Nota: ' + this.nota)
+      this.nota = null;
+    }
+  }
+}
+</script>
+```
+
+
+
+
+Continuar a partir de 153.
