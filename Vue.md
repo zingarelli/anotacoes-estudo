@@ -1098,7 +1098,101 @@ export default {
 </script>
 ```
 
+## Lidando com requisições HTTP
+
+- como sempre, podemos usar `fetch` (nativo do JS), `axios` (precisa instalar), etc.
+
+- podemos utilizar o hook `mounted` para buscar dados em uma API e exibi-los em tela assim que o componente já está totalmente inicializado e adicionado ao DOM.
+
+- na propriedade `data`, podemos criar uma variável `isLoading` e manipulá-la para mostrar uma mensagem na tela enquanto os dados ainda estão sendo carregados
+
+- também podemos criar uma computed property para o caso de a requisição ter sido feita, mas não recebermos nenhum dado da API (um array vazio, por exemplo). Exemplo:
+
+  ```js
+  computed: {
+    isEmpty() {
+      return !this.isLoading && (!this.results || this.results.length === 0)
+    }
+  }
+  ```
+
+- caso haja algum erro na requisição, seja problema no servidor, problema no envio da requisição, ou um status code diferente de 200, etc., podemos criar uma variável `error` na propriedade `data` e manipulá-la para exibir uma mensagem ou modal com uma mensagem de erro para a pessoa.
+
+Exemplo usando as três variáveis com v-ifs encadeados. Note que é melhor colocar a mensagem de erro logo após a mensagem de loading, para garantir que ele seja mostrado depois da tentativa de carregar e antes de receber algum dado da API.
+
+```vue
+<template>
+  <section>
+    <base-card>
+      <h2>Pesquisa</h2>
+      <div>
+        <base-button @click="carregaPesquisa">Ver resultados salvos</base-button>
+      </div>
+      <p v-if="isLoading">Carregando...</p>
+      <p v-else-if="!isLoading && error">{{ error }}</p>
+      <p v-else-if="isEmpty">Nenhum resultado encontrado! Comece salvando novas avaliações.</p>
+      <ul v-else>
+        <survey-result
+          v-for="result in results"
+          :key="result.id"
+          :name="result.name"
+          :rating="result.rating"
+        ></survey-result>
+      </ul>
+    </base-card>
+  </section>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      results: [],
+      isLoading: false,
+      error: null
+    }
+  },
+  computed: {
+    isEmpty() {
+      return !this.isLoading && (!this.results || this.results.length === 0)
+    }
+  },
+  methods: {
+    carregaPesquisa() {
+      this.isLoading = true;
+      this.error = null;
+      fetch('URL_da_sua_API_aqui')
+        .then(response => {
+          if (response.ok) return response.json();
+        })
+        .then(data => {
+          const dataResults = [];
+          for (const key in data) {
+            dataResults.push({
+              id: key,
+              name: data[key].userName,
+              rating: data[key].rating
+            });
+          }
+          this.results = dataResults;
+        })
+        .catch(error => {
+          console.log(error);
+          this.error = 'Ocorreu um erro ao recuperar os dados! Por favor, entre em contato com o suporte.';
+        })
+        .finally(() => this.isLoading = false);
+    }
+  }, 
+  mounted() {
+    this.loadExperiences();
+  }
+};
+</script>
+```
 
 
 
-Continuar a partir de 153.
+
+
+Continuar a partir de Seção 170.
+Ver se o projeto no firebase foi deletado.
