@@ -1098,7 +1098,116 @@ export default {
 </script>
 ```
 
+### Query Parameters
+
+Podemos também trabalhar com query parameters.
+
+Para **passar query parameters** quando se trabalha com um objeto a ser usado em um `<router-link>`, usamos a propriedade `query`, que recebe um objeto com os parâmetros da query.
+
+```js
+computed: {
+  linkMembros() {
+    return { 
+      name: 'membros-do-time',
+      params: { idTime: this.id }, 
+      query: { sort: this.escolhaOrdenacao } 
+    }
+  }
+}
+```
+
+Para **ler query parameters**, usamos `this.$route.query`, que retorna um objeto com os parâmetros da query. Fique atento que é `$route`, e não `$router`.
+
+Diferente de params, query parameters **não** são convertidos em props quando a rota é configurada com `props: true`. O acesso é somente por `$route.query`.
+
+### Componentes `<router-view>` nomeados
+
+Podemos ter mais de um `<router-view>` em um mesmo template. Semelhante a slots, damos um nome a cada `<router-view>` para indicar o que cada um irá renderizar. Isso é feito com prop `name`. Dessa forma, em uma **única rota** podemos ter **mais de um componente** sendo renderizado em **partes diferentes** da UI, possibilitanto flexibilizar ainda mais a estrutura do layout de uma rota.
+
+```vue
+<!-- Times.vue -->
+<template>
+  <main>
+    <!-- podemos ter uma router-view sem nome, que 
+     será chamada por padrão de "default" -->
+    <router-view></router-view>
+  </main>
+  <footer>
+    <router-view name="rodape"></router-view>
+  </footer>
+</template>
+```
+
+No objeto de rota da rota, ao invés da propriedade `component`, utilizamos `components` (plural), que recebe um objeto, em que cada propriedade é o nome de um `<router-view>`, e o valor é o componente a ser renderizado.
+
+```js
+routes: [
+  {
+    path: '/times',
+    components: {
+      default: ListaDeTimes,
+      rodape: RodapeTimes
+    }
+  },
+  {
+    path: '/membros',
+    components: {
+      default: ListaDeMembros,
+      rodape: RodapeMembros
+    }
+  },
+]
+```
+
+### Comportamento do scroll
+
+Ao navegar entre páginas do histórico, podemos ter controle sobre o scroll da página, podendo mostrar à pessoa exatamente a porção da página em que ela estava ao clicar no botão voltar, por exemplo. 
+
+Para controlarmos o comportamento do scroll, adicionamos o método `scrollBehavior()` ao objeto de configuração passado ao `createRouter`. Esse método será chamado toda vez que a página mudar, e vai receber três argumentos passados pelo Router: `to`, `from`, `savedPosition` (essas são sugestões de nomes, e você pode nomeá-los como desejar). 
+
+- `to`: objeto de rota com dados da rota atual (rota acessada ao avançar no histórico)
+- `from`: objeto de rota com dados da rota anterior
+- `savedPosition`: objeto com as coordenadas `left` e `top`, que são preenchidas ao voltar uma rota atrás no histórico. Elas guardam a posição da tela em que a pessoa estava na página anterior. Ao avançar no histório, o valor de `savedPosition` é null.
+
+Nesse método, podemos retornar um objeto com `left` e `top`, informando em qual posição ("altura") a página deve ser exibida. No exemplo abaixo, ao avançar na navegação, será sempre exibido o topo da página, mas ao voltar, a página será exibida na posição em que a pessoa estava quando avançou.
+
+```js
+scrollBehavior(to, from, savedPosition) {
+  if (savedPosition) {
+    // comportamento ao voltar no histórico
+    return savedPosition;
+  }
+  // comportamento ao avançar
+  return { top: 0, left: 0 };
+}
+```
+
+### Proteções de navegação
+
+Por meio do vue router, podemos adicionar algumas proteções à navegação, também chamados de *navigation guards* ou *navigation hooks*, possibilitando que façamos alguma ação antes e/ou depois de uma mudança ou atualização de rota. Por exemplo, podemos verificar se a pessoa está logada antes de acessar uma página, bem como mostrar alguma janela de confirmação antes de sair de uma página em que dados em um formulário não foram salvos.
+
+Temos diversos métodos (ou hooks) que podem ser usados.
+
+#### `beforeEach)()`
+
+Método da instância do Router (criado com o createRouter), é uma proteção global, que roda uma função, passada como parâmetro, **toda vez** que houver uma ação de navegaão (quando navegamos de uma página para outra). Ele também será chamado quando abrimos a aplicação ou recarregamos a página.
+
+O Router irá passar três argumentos à função a ser executada:
+
+- `to`: objeto de rota com dados da rota para onde queremos ir
+- `from`: objeto de rota com dados da rota de onde estamos saindo
+- `next`: função usada para confirmar ou cancelar a ação de navegação. 
+
+Se quisermos continuar a navegação, usamos `next()` (ou `next(true)`). Se quisermos cancelar, usamos `next(false)`.
+
+A função `next()` também aceita como parâmetro uma string ou um objeto de navegação, em que podemos indicar uma rota alternativa que será usada. Por exemplo, podemos verificar se a pessoa está logada na aplicação e, caso não esteja, usamos next para redirecioná-la à tela de login: 
+
+```js
+router.beforeEach(function(to, from, next) {
+  if (pessoaEstaLogada()) next();
+  else next('/login');
+});
+```
 
 
-
-Continuar a partir de 153.
+Continuar a partir de 187.
