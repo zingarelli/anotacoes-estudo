@@ -1026,7 +1026,7 @@ Para informar para qual local o conteúdo deve ser renderizado, você usa a prop
 
 ## Usando `v-model` em componentes customizados
 
-Quando usado em elementos HTML de input, o `v-model` uma combinação de `v-bind:value` e `v-on:input`. Mas ele também pode ser utilizado em componentes customizados, que você mesmo cria.
+Quando usado em elementos HTML de input, o `v-model` é uma combinação de `v-bind:value` e `v-on:input`. Mas ele também pode ser utilizado em componentes customizados, que você mesmo cria.
 
 Quando usado em um componente customizado, `v-model` vai disponibilizar uma **prop `modelValue`** e emitir um **evento `update:modelValue`** ao componente. Por meio da prop temos o valor atribuído a `v-model` e pelo evento podemos atualizar esse valor.
 
@@ -1190,6 +1190,254 @@ export default {
 </script>
 ```
 
+## Roteamento com vue-router
+
+O vue-router é um pacote que já vem instalado quando você cria um app Vue com Vite, por exemplo. Caso esteja trabalhando em um projeto antigo e seja necessário instalar, rode o comando `npm install vue-router@4` para instalar o pacote na versão 4.
+
+Para começar a usar o vue-router, precisamos criar uma instância de Router (com `createRouter`) e depois adicioná-la à instância Vue (com `use`).
+
+> Essa é a abordagem em **Vue 3**. Em Vue 2, é utilizado uma abordagem com `new VueRouter` e `new Vue`. [Consulte a documentação](https://v3.router.vuejs.org/guide/#javascript) para mais detalhes.
+
+### `createRouter`
+
+Como o nome diz, é a função usada para criar um Router. Ela aceita como parâmetro um objeto de configuração, com diferente opções. Dentre elas:
+
+- `history`: como o Router irá lidar com o histórico de navegação. O mais comum é usar a função `createWebHistory()` para usar o mecanismo de histórico do próprio navegador;
+
+- `routes`: um array de objetos de rota. Cada objeto contém um `path`, que informa a rota em si (o que vem após o domínio na URL), e um `component`, que informa o componente a ser renderizado nessa rota, além de outras configurações.
+
+### `use`
+
+Esse método vem da instância Vue e possibilita adicionar o Router a essa instância. Exemplo:
+
+```js
+// main.js
+import { createApp } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
+
+import App from './App.vue';
+import Times from './components/times/Times.vue';
+import Jogadores from './components/jogadores/Jogadores.vue';
+
+// criação do Router
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    // observe que rotas principais começam com /
+    { path: '/times', component: Times },
+    { path: '/jogadores', component: Jogadores }
+  ],
+});
+
+const app = createApp(App)
+
+// adicionando o Router à instância Vue
+app.use(router);
+
+app.mount('#app');
+```
+
+### `router-view`
+
+O componente `router-view` é adicionado em um template para renderizar o conteúdo da rota acessada. Esse componente vem disponível quando você usa o Router em usa instância Vue, podendo ser utilizado por qualquer componente da aplicação que seja descendente dessa instância.
+
+```vue
+<!-- App.vue -->
+<template>
+  <main>
+    <!-- irá renderizar o componente da 
+     rota que estiver na URL da página.
+     Por exemplo sua-url.com.br/times 
+     renderiza o componente Times -->
+    <router-view></router-view>
+  </main>
+</template>
+```
+
+### `router-link`
+
+Outro componente disponibilizado pelo Router. Possibilita a navegação pelas rotas sem recarregar a página, mantendo o conceito de uma Single Page Application (SPA). Internamente, cria um elemento HTML `a`.
+
+Você passa uma rota a ser navegada por meio da prop `to`. Não se esqueça de adicionar a `/` para identificar uma rota principal (*root route*).
+
+```vue
+<!-- Menu.vue -->
+<template>
+  <header>
+    <nav>
+      <ul>
+        <li>
+          <router-link to="/times">Ver times</router-link>
+        </li>
+        <li>
+          <router-link to="/jogadores">Ver jogadores</router-link>
+        </li>
+      </ul>
+    </nav>
+  </header>
+</template>
+```
+
+O RouterLink adiciona **2 classes** ao link que representa a **rota ativa**: `router-link-active` e `router-link-exact-active`. Por meio deles, você pode criar um CSS e estilizar o link ativo. A diferença entre eles é que o primeiro será aplicado a rotas e [subrotas](#rotas-aninhadas).
+
+A prop `to` também aceita um objeto, em que você pode setar outras configurações para a rota, como o uso do `name` ou invés do `path` da rota, uso de `params` para passar um objeto de parâmetros no caso de [rotas dinâmicas](#rotas-dinâmicas).
+
+### Acessando o Router
+
+No script de seus componentes, você pode acessar a instância do Router por meio do `this.$router`. Dentro dele, podemos utilizar diferentes métodos do Router:
+
+- `push`: navega para uma nova rota e a adiciona ao histórico de navegação. A rota é passada via parâmetro como uma string.
+
+- `back` e `forward`: emulam os botões de voltar e avançar do navegador
+
+### Rotas dinâmicas
+
+Você pode ter rotas e subrotas com **segmentos dinâmicos**, ou seja, parte da rota possui um valor que não é fixo. Para isso, você cria uma rota com parâmetro, usando `:nomeDoParametro`. Por exemplo: `{ path: '/times/:idTime', component: MembrosDoTime}` - neste caso, `:idTime` é um parâmetro representando um segmento dinâmico na rota `/times`.
+
+O parâmetro (ou parâmetros) de uma rota pode ser acessado usando `this.$route.params`. Ele retorna um objeto com todos os parâmetros dinâmicos passados à rota.
+
+No caso de mais de um segmento dinâmico, por exemplo, `/times/:idTime/:ano/:mes`, `this.$route.params` retornaria todos eles. Algo como: 
+
+```js
+// sua-url.com.br/times/vasco/2021/04
+{
+  ano: '2021',
+  idTime: 'vasco'
+  mes: '04'
+}
+```
+
+#### Obtendo os parâmetros como props
+
+Ao invés de recuperar os parâmetros de um segmento dinâmico usando o `this.$route.params`, podemos passá-los como props ao componente. Assim, ao acessar o componente pela rota dinâmica, os parâmetros são associados às props declaradas no componente. 
+
+A vantagem disso é que assim também podemos utilizar o componente de maneira avulsa, sem necessariamente acessá-lo por meio de uma rota, e aí nesse caso passamos os conteúdos necessários via props. Com isso, o componente pode ser reutilizado para mais de um caso.
+
+Para tratar os parâmetros dinâmicos como props, adicionamos a propriedade `props: true` à rota desejada. Não se esqueça de declarar as props ao componente, para mapear os parâmetros da rota (cada prop precisa ter o mesmo nome do parâmetro dinâmico que se deseja obter).
+
+```js
+// main.js, na propriedade routes de um createRouter
+{ path: '/times/:idTime', component: MembrosDoTime, props: true }
+
+// -------
+
+// TeamMembers.vue
+export default {
+  props: ['idTime'], // <= mesmo nome do parâmetro dinâmico
+  methods: {
+    carregaMembrosDoTime(idTime) {
+      // usa a prop para fazer uma requisição 
+      // e recuperar os membros desse time
+    }
+  },
+  created() {
+    this.carregaMembrosDoTime(this.idTime);
+  },
+  watch: {
+    idTime(newId) {
+      this.carregaMembrosDoTime(newId);
+    }
+  }
+};
+
+// -------
+
+// Em algum outro componente.vue, podemos agora
+// usar o componente membros-do-time sem precisar
+// navegar até a rota /times/:idTime
+<membros-do-time id-time="t2"></membros-do-time>
+```
+
+### Outras propriedades de um objeto de rota
+
+Além de `path`, `component` e `props`, outras propriedades interessantes de um objeto de rota são:
+
+- `redirect: /outra-rota`: faz o redirecionamento para `/outra-rota`, alterando a URL na página. Você adiciona o `redirect` na rota em que você deseja aplicar o redirecionamento.
+
+  ```js
+  // ao acessar sua-url.com.br, será redirecionado 
+  // para sua-url.com.br/times
+  { path: '/', redirect: '/times' },
+  ```
+
+- `alias`: carrega o conteúdo de uma rota nas rotas listadas em `alias`, funcionando como rotas sinônimas. A URL da página é mantida na rota que foi acessada.  Pode ser somente uma string para representar uma rota, ou um array de strings para um conjunto de rotas.
+
+  ```js
+  // ao acessar sua-url.com.br ou sua-url.com.br/home, 
+  // será renderizado o conteúdo do caminho /times
+  { path: '/times', component: Times, alias: ['/', '/home'] },
+  ```
+
+- `name`: um nome para essa rota, que pode ser usado para referenciar a rota ao invés de usar seu path. Pode ser útil no caso de o path da rota ser mudado futuramente - se em outros componentes essa rota for referenciada pelo `name`, nenhuma mudança precisa ser aplicada nesses outros componentes.
+
+### Página não encontrada
+
+Podemos criar uma rota "catch all", isto é, um componente que será renderizado quando a pessoa acessa uma rota não mapeada em routes (a famosa página não encontrada ou not found). Para isso, criamos uma rota cujo parâmetro vem acompanhado de uma expressão regular, indicando para fazer o match com qualquer coisa que vier naquela rota, incluindo subrotas:
+
+```js
+// qualquer coisa que vier na rota e que não teve 
+// match com as rotas anteriores será pega aqui e 
+// adicionada a um parâmetro notFound (pode ser o 
+// nome que você quiser)
+{ path: '/:notFound(.*)', component: NotFound}
+```
+
+> Essa forma de match com expressão regular foi adicionada no **vue-router 4**. Em versões anteriores, você pode usar só `path: *` para dar match com qualquer coisa que vier na rota e subrotas.
+
+Essa rota deve ser a **última** do seu array de objetos de rota, para garantir que foram feitas todas as tentativas de match das rotas anteriores.
+
+### Rotas aninhadas
+
+Rotas aninhadas são subrotas de uma rota que fica um nível acima delas (sua rota mãe). Essas rotas mãe podem tanto ser uma rota principal, como também outras subrotas, ou seja, podemos ter rotas aninhadas em profundidade
+
+> As rotas principais (root routes) são as que estão no mesmo "nível zero" no array de routes, e por isso em um objeto de rota tem a propriedade `path` iniciada com `/`.
+
+Para definir rotas aninhadas, utilizamos a propriedade `children` na rota mãe, que é outro array com objetos de rotas. Por serem filhas dessa rota, elas **compartilham do path inicial** da rota mãe, então em seu path definimos somente o **segmento necessário** para se chegar a essa subrota (sem a `/` no início), e a rota final é a composição do path da rota mãe com o path da subrota:
+
+```js
+routes: [
+  // /jogadores e /times são rotas irmãs
+  // pois estão no mesmo nível
+  { path: '/jogadores', component: Jogadores }
+  { 
+    path: '/times', 
+    component: Times,
+    // subrotas de /times
+    children: [
+      // o path completo será /times/:idtime
+      { path: ':idTime', component: MembrosDoTime, props: true }
+    ] },
+]
+```
+
+As subrotas renderizam o **mesmo conteúdo** de sua rota mãe. Para renderizar o conteúdo específico da subrota, precisamos alterar o `template` da rota mãe, adicionando a ela um `<router-view>`, que servirá como se fosse um slot para o conteúdo da subrota. Observe que esse comportamento só acontece no caso de rotas aninhadas. Se no exemplo acima a rota `/times` e a rota `/times/:idTime` fossem rotas-irmãs, ou seja, estivessem no mesmo nível no array de routes, seus conteúdos seriam renderizados de maneira independente, mesmo que compartilhassem de um segmento de rota em comum. 
+
+Quando você quer criar uma relação de hierarquia entre rotas, incluindo renderização de conteúdo, você usa rotas aninhadas (pense em uma rota principal que define um layout em comum, e subrotas que definem conteúdos específicos dentro desse layout).
+
+> Uma rota mãe **não** compartilha dados reativos nem métodos com subrotas, somente layout. É possível, no entanto, passar props às subrotas. Além disso, ao acessar uma subrota, o componente da rota mãe permanece montado, incluindo seus estados.
+
+```vue
+<!-- Times.vue -->
+<template>
+  <!-- o conteúdo da subrota será renderizado aqui -->
+  <router-view></router-view>
+
+  <!-- este conteúdo será renderizado na rota principal,
+   bem como em todas as suas subrotas -->
+  <ul>
+    <teams-item
+      v-for="time in times"
+      :key="time.id"
+      :id="time.id"
+      :nome="time.nome"
+      :qtde-membros="time.membros.length"
+    ></teams-item>
+  </ul>
+</template>
+```
+
+Vale notar que, no caso de subrotas, um `<router-link>` ligado a uma rota mãe continuará recebendo a classe `router-link-active`, pois ela é adicionada ao link tanto em rotas quanto subrotas. Com isso, você ainda consegue estilizar esse link mesmo se estiver em uma subrota. Se quiser aplicar um estilo ao link somente quando estiver na rota principal, use a classe `router-link-exact-active`.
+
 ### Query Parameters
 
 Podemos também trabalhar com query parameters.
@@ -1208,7 +1456,7 @@ computed: {
 }
 ```
 
-Para **ler query parameters**, usamos `this.$route.query`, que retorna um objeto com os parâmetros da query. Fique atento que é `$route`, e não `$router`.
+Para **ler query parameters**, usamos `this.$route.query`, que retorna um **objeto** com os parâmetros da query. Fique atento que é `$route`, e não `$router`.
 
 Diferente de params, query parameters **não** são convertidos em props quando a rota é configurada com `props: true`. O acesso é somente por `$route.query`.
 
@@ -1217,8 +1465,7 @@ Diferente de params, query parameters **não** são convertidos em props quando 
 Podemos ter mais de um `<router-view>` em um mesmo template. Semelhante a slots, damos um nome a cada `<router-view>` para indicar o que cada um irá renderizar. Isso é feito com prop `name`. Dessa forma, em uma **única rota** podemos ter **mais de um componente** sendo renderizado em **partes diferentes** da UI, possibilitanto flexibilizar ainda mais a estrutura do layout de uma rota.
 
 ```vue
-<!-- Times.vue -->
-<template>
+</template>
   <main>
     <!-- podemos ter uma router-view sem nome, que 
      será chamada por padrão de "default" -->
@@ -1280,9 +1527,9 @@ Por meio do vue router, podemos adicionar algumas proteções à navegação, ta
 
 Temos diversos métodos (ou hooks) que podem ser usados.
 
-#### `beforeEach)()`
+#### `beforeEach()`
 
-Método da instância do Router (criado com o createRouter), é uma proteção global, que roda uma função, passada como parâmetro, **toda vez** que houver uma ação de navegaão (quando navegamos de uma página para outra). Ele também será chamado quando abrimos a aplicação ou recarregamos a página.
+Método da instância do Router (criado com o createRouter), é uma proteção global, que roda uma função, passada como parâmetro, **toda vez** que houver uma ação de navegção (quando navegamos de uma página para outra). Ele também será chamado quando abrimos a aplicação ou recarregamos a página.
 
 O Router irá passar três argumentos à função a ser executada:
 
