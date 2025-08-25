@@ -1370,6 +1370,8 @@ Além de `path`, `component` e `props`, outras propriedades interessantes de um 
 
 - `name`: um nome para essa rota, que pode ser usado para referenciar a rota ao invés de usar seu path. Pode ser útil no caso de o path da rota ser mudado futuramente - se em outros componentes essa rota for referenciada pelo `name`, nenhuma mudança precisa ser aplicada nesses outros componentes.
 
+- `meta`: nessa propriedade você pode passar qualquer outra informação que acha necessário associar à rota. Por exemplo, poderia enviar um objeto informando os tipos de pessoas que têm permissão para acessar aquela página, e depois acessar a propriedade meta em uma [proteção de navegação](#proteções-de-navegação).
+
 ### Página não encontrada
 
 Podemos criar uma rota "catch all", isto é, um componente que será renderizado quando a pessoa acessa uma rota não mapeada em routes (a famosa página não encontrada ou not found). Para isso, criamos uma rota cujo parâmetro vem acompanhado de uma expressão regular, indicando para fazer o match com qualquer coisa que vier naquela rota, incluindo subrotas:
@@ -1548,6 +1550,66 @@ router.beforeEach(function(to, from, next) {
 });
 ```
 
+#### `afterEach()`
 
-Continuar a partir de 187.
+Outro método da instância do Router, executa uma função ao **sair** da rota. Útil, por exemplo, para mandar algum dado analítico de navegação.
+
+A função a ser executada recebe somente os argumentos `to` e `from`, já que `next` não faz sentido, pois já saímos da rota e a ação de navegação já foi feita.
+
+```js
+router.afterEach( (to, from) => {
+  console.log(to, from);
+  alert(`Você deixou a rota ${from.path}`);
+})
+```
+
+#### `beforeEnter()`
+
+Esse método pode ser definido dentro de um **objeto de rota**. Também recebe os três parâmetros `to`, `from` e `next`, e é chamado antes de acessar a rota desse objeto (o componente da rota ainda nem estará montado).
+
+```js
+beforeEnter(to, from, next) {
+  console.log(to, from)
+  alert('Sou mostrado antes de a rota renderizar!')
+  next()
+}
+```
+
+A vantagem nesse caso é quando você quer adicionar uma proteção a nível de rota, e não a nível global, como é o cado do `beforeEach`.
+
+#### Proteções a nível de componente
+
+No ciclo de vida de um componente, temos hooks relacionados à proteção de navegação, que podem ser adicionados ao declarar o componente. Todos recebem os argumentos `to`, `from` e `next`:
+
+- `beforeRouteEnter()`: similar a `beforeEnter`, mas agora em nível de componente. Se `beforeEnter` e `beforeRouteEnter` são usados, `beforeEnter` é chamado antes, por estar declarado a nível de rota;
+
+- `beforeRouteUpdate()`: é chamado durante o **rerender** do componente, causado por uma **atualização na rota** (por exemplo, uma mudança na query string, ou parâmetro. Pode ser usado como uma alternativa a um watcher de um parâmetro, por exemplo (pela propriedade `to`, você consegue acessar o parâmetro e fazer alguma coisa);
+
+- `beforeRouteLeave()`: chamado antes de sair da rota, ou seja, antes de o componente ser desmontado (e aí fica a diferença para o hook `unmounted`). Pode ser usado, por exemplo, para confirmar se a pessoa quer sair da página: imagine que a página possui um formulário e os dados ainda não foram salvos; você pode usar esse hook para confirmar a ação da pessoa e ter a chance de cancelar a navegação caso a pessoa desista.
+
+<script>
+export default {
+  components: {
+    Membro,
+  },
+  beforeRouteEnter(to, from, next) {
+    console.log(to, from);
+    alert('Também sou mostrado antes de o componente ser montado!');
+    next();
+  },
+  beforeRouteUpdate(to, from, next) {
+    console.log(to, from);
+    alert('Sou mostrado quando a rota é atualizada dinamicamente')
+    next();
+  },
+  beforeRouteLeave(to, from, next) {
+    if (this.dadosForamSalvos) return next();
+    next(confirm('Os dados não foram salvos. Tem certeza de que deseja continuar?'));
+  }
+};
+</script>
+
+
+
+Continuar a partir de 194.
 Ver se o projeto no firebase foi deletado.
