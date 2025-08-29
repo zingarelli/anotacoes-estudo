@@ -189,7 +189,7 @@ please contact us at support@github.com
 >>>>>>> iss53:index.html
 ```
 
-Tudo que estiver entre `<<<<<<<` e `=======` são as mudanças contidas na branch atual (no caso do exemplo, o ponteiro `HEAD`). Tudo que estiver abaixo de `=======` e acimda de `>>>>>>>` são as mudanças contidas na branch a ser incorporada (no caso, `iss53`). Cabe a **você ser responsável por resolver os conflitos**, decidindo por qual mudança deve ser aceita, ou até mesmo mesclando partes de cada uma. Você também precisa tirar essas linhas adicionadas pelo git.
+Tudo que estiver entre `<<<<<<<` e `=======` são as mudanças contidas na branch atual (no caso do exemplo, o ponteiro `HEAD`). Tudo que estiver abaixo de `=======` e acima de `>>>>>>>` são as mudanças contidas na branch a ser incorporada (no caso, `iss53`). Cabe a **você ser responsável por resolver os conflitos**, decidindo por qual mudança deve ser aceita, ou até mesmo mesclando partes de cada uma. Você também precisa tirar essas linhas adicionadas pelo git.
 
 Resolvidos os conflitos no arquivo (ou arquivos), eles devem ser salvos, adicionados ao staging e commitados. Este commit irá ser o merge commit.
 
@@ -550,7 +550,15 @@ Faz um merge (combinação) da branch em que você se encontra atualmente com o 
 
 No caso de haver conflitos entre arquivos modificados em ambas as branches, vocês precisará fazer manualmente a resolução do conflito antes de finalizar o merge.
 
-Saiba mais sobre o processo de merging e resolução de conflitos na [Seção sobre Merging](#merging)
+Se você só quiser **testar** como ficaria o merge, sem de fato executar um processo de merging, pode usar: 
+
+```bash
+git merge --no-commit --no-ff outra_branch
+```
+
+O comando acima irá tentar fazer o merge automático e colocar as mudanças em staging. No entanto, **não fará o commit** automático. Se houver conflitos, você ainda pode resolvê-los. Se você estiver satisfeito com o processo, pode prosseguir com um `git commit`. Se não gostou do resultado, pode reverter todo o processo com um `git merge --abort`.
+
+Saiba mais sobre o processo de merging e resolução de conflitos na [Seção sobre Merging](#merging).
 
 ### `git rebase`
 
