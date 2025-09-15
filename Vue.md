@@ -1609,7 +1609,121 @@ export default {
 };
 </script>
 
+## Animações
 
+Animações usando somente CSS não conseguem lidar com elementos da página quando eles são removidos do DOM, algo que pode acontecer quando usamos o Vue em uma SPA. Como o elemento é removido, a animação associada a ele não funciona, já que o elemento deixou de existir.
 
-Continuar a partir de 194.
+Vue auxilia nessa parte por meio do componente `<transition>`. Dentro desse componente você inclui o elemento que deve ser animado com a ajuda do Vue.
+
+O componente `<transition>` deve possuir **um único** elemento filho (há uma exceção a essa regra), caso contrário, o Vue irá gerar um erro de compilação. Quando o elemento filho é um componente customizado, este deve possuir somente um elemento raiz (um único elemento dentro de `template`) para que `<transition>` funcione. Quando há mais de um elemento raiz no componente customizado, uma solução é levar a `<transition>` para dentro dele e aplicá-la ao elemento que se quer animar.
+
+- a exceção para se ter mais de um elemento filho dentro de `<transition>` é caso você garanta que somente um dos elementos vai estar visível por vez (usando um `v-if`/`v-else`, por exemplo).
+
+Para controlar a animação, `<transition>` adiciona algumas classes CSS utilitárias, que podemos manipular para personalizar a animação. 
+
+As três classes a seguir são adicionadas quando o elemento passa de unmounted para mounted: 
+
+- `*-enter-from`: estilos para o início da animação;
+- `*-enter-active`: estilos para quando a animação está em andamento. É adicionada junto com `*-enter-from` e permanece até o fim de `*-enter-to`. É nela que podemos adicionar a propriedade CSS `transition` (não confundir com o componente, que tem o mesmo nome);
+- `*-enter-to`: estilos para o fim da animação.
+
+De maneira similar, quando o elemento passa de mounted para unmounted, Vue trabalha com as classes: `*-leave-from`, `*-leave-active` e `*-leave-to`. 
+
+O Vue fica responsável por controlar a animação e sua duração baseado na aplicação e remoção dessas classes durante o ciclo de vida do componente a ser animado. O Vue também fica responsável por garantir que a animação aconteça e só **depois desmonte o componente**.
+
+Exemplo: 
+
+```vue
+<template>
+  <div class="container">
+    <transition>
+      <p v-if="mostraParagrafo">Posso ou não ser visível...</p>
+    </transition>
+    <button @click="toggleParagrafo">Mostrar/Esconder parágrafo</button>
+  </div>
+</template>  
+
+<script>
+export default {
+  data() {
+    return { 
+      mostraParagrafo: false
+    };
+  },
+  methods: {
+    toggleParagrafo() {
+      this.mostraParagrafo = !this.mostraParagrafo;
+    }
+  },
+};
+</script>
+
+<style>
+.v-enter-from {
+  opacity: 0;
+  transform: translateY(-30px);
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: all .7s ease-out;
+}
+
+.v-enter-to,
+.v-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.v-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+</style>
+```
+
+Por **padrão**, o nome das classes começa com o prefixo `v-` (`v-enter-from`, `v-enter-to`, etc). Mas você pode **associar um nome** a um componente `<transition>`. Nesse caso, ao invés do prefixo `v-`, **usamos o nome como prefixo**. Por exemplo, para `<transition name="paragrafo">`, teríamos `paragrafo-enter-from`, `paragrafo-enter-to`, etc. Associar um nome à transição também possibilita que você tenha mais de uma transição aplicada a diferentes elementos do componente, dando a elas nomes diferentes para poder aplicar diferentes animações.
+
+Caso você queira controlar as animações via JS ao invés de CSS, o Vue também disponibiliza eventos que são disparados durante as animações: `before-enter`, `enter`, `after-enter`, `before-leave`, `leave` e `after-leave`. Cada evento envia como argumento o elemento a ser animado.
+
+- os eventos são úteis caso você esteja utilizando uma biblioteca para fazer animações, por exemplo.
+
+Vue também provê animações para listas, por meio de `<transition-group>`. Saiba mais na [documentação](https://vuejs.org/guide/built-ins/transition-group.html).
+
+Por fim, também podemos animar a transição entre rotas (lembrando que o componente de cada rota deve ter somente um componente principal para a `<transition>` funcionar). Segue um exemplo: 
+
+```vue
+<template>
+  <router-view v-slot="slotProps">
+    <transition name="route" mode="out-in">
+      <component :is="slotProps.Component"></component>
+    </transition>
+  </router-view>
+</template>
+
+<style>
+.route-enter-active {
+  animation: slide-beat 0.4s ease-out reverse;
+}
+.route-leave-active {
+  animation: slide-beat 0.4s ease-in;
+}
+
+@keyframes slide-beat {
+  0% {
+    transform: translateX(0) scale(1);
+  }
+
+  70% {
+    transform: translateX(-120px) scale(1.1);
+  }
+
+  100% {
+    transform: translateX(-150px) scale(1);
+  }
+}
+</style>
+```
+
+Continuar a partir de 213 - Vuex
 Ver se o projeto no firebase foi deletado.
